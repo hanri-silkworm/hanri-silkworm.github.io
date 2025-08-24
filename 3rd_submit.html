@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>참가 제출지 – 누에 고치 성별 맞추기 대회</title>
+  <style>
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --pri:#4b5563; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
+      --shadow:0 10px 30px rgba(17,24,39,.08);
+      --green:#059669; --blue:#1e3a8a; --blue-bd:#bfdbfe; --blue-bg:#eff6ff;
+      --rose:#9d174d; --rose-bd:#fbcfe8; --rose-bg:#fdf2f8;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+    .brand strong{font-weight:800}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 14px;border-radius:999px;border:1px solid var(--muted);
+      background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600;
+      text-align:center;
+    }
+    .btn.primary{background:var(--pri);color:#fff;border:0}
+    .btn.success{background:var(--green);color:#fff;border:0}
+    .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+    /* 슬림한 큰 버튼 */
+    .btn.lg{font-size:16px; padding:10px 18px; min-height:42px; min-width:140px}
+    @media (min-width:768px){ .btn.lg{font-size:17px; padding:12px 22px; min-width:180px} }
+
+    .hero{margin:20px auto 14px;border-radius:24px;background:
+      radial-gradient(1200px 600px at 10% -10%, #f3f4f6, transparent 60%),
+      radial-gradient(1200px 600px at 110% 10%, #eef2f7, transparent 60%),
+      var(--paper);box-shadow:var(--shadow)}
+    .hero-grid{display:grid;grid-template-columns:1fr;gap:12px;padding:24px}
+    .hero h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:-.3px;line-height:1.15;text-align:center}
+    .hero .sub{margin:6px 0 0;color:var(--sub);font-weight:600;text-align:center}
+
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .card .inner{padding:18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:720px){.grid{grid-template-columns:1fr}}
+
+    label{font-weight:700;display:block;margin-bottom:6px}
+    .subnote{color:var(--sub);font-size:12px;margin-top:4px}
+    input[type="text"], input[type="tel"]{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted); outline:none; background:#fff;
+    }
+    input[type="text"]:focus, input[type="tel"]:focus{box-shadow:0 0 0 3px var(--ring)}
+
+    fieldset{border:1px solid var(--muted);border-radius:14px;padding:14px}
+    legend{font-weight:800;color:var(--blue);padding:0 6px}
+    .qgrid{display:grid;grid-template-columns:140px 1fr 1fr;gap:14px;align-items:center}
+    @media (max-width:900px){.qgrid{grid-template-columns:1fr}}
+    .photo{width:140px;height:140px;border-radius:12px;background:#f3f4f6;border:1px solid var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .photo img{max-width:100%;max-height:100%;display:block}
+    .name{font-weight:800}
+
+    /* 라디오 라벨 기본 */
+    .radios{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .radio{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--muted);border-radius:999px;cursor:pointer;transition: all .12s ease;background:#fff}
+    .radio input{accent-color:#2563eb}
+    .radio:hover{box-shadow:0 6px 18px rgba(15,23,42,.06)}
+
+    /* 선택 시 강조 색상 — 버튼(라벨)만 변경 */
+    .radio.selected-f{background:var(--rose-bg);border-color:var(--rose-bd);color:var(--rose)}
+    .radio.selected-m{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)}
+
+    .actions{display:flex;gap:12px;justify-content:center;padding:16px}
+    .ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:6px 10px;border-radius:999px;font-weight:700;display:inline-block}
+    .err{background:#fee2e2;border:1px solid #fecaca;color:#b91c1c;padding:6px 10px;border-radius:999px;font-weight:700;display:inline-block}
+    .agree{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+    .hp{position:absolute;left:-9999px;top:-9999px}
+
+    /* 제목 중앙정렬 클래스 */
+    .form-section-title{ text-align:center; }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="brand" href="index.html"><strong>🐛누에 고치 성별 맞추기 대회</strong></a>
+      <div>
+        <a class="btn primary" href="index.html#archive">아카이브</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <h1>참가 제출지</h1>
+        <div class="sub">닉네임·이름·휴대폰을 작성하고, 20문항의 고정된 누에 이름·사진을 보고 성별(암/수)만 선택하십시오.</div>
+      </div>
+    </section>
+
+    <!-- 참가자 정보 -->
+    <section class="card" aria-labelledby="hdr-info">
+      <div class="inner">
+        <h2 id="hdr-info" style="margin:0 0 12px">참가자 정보</h2>
+        <div class="grid">
+          <div>
+            <label for="nickname">참가자 닉네임 <span class="req" style="color:#ef4444">*</span></label>
+            <input id="nickname" name="nickname" type="text" required placeholder="예: 누돌이"/>
+          </div>
+          <div>
+            <label for="realname">참가자 이름 <span class="req" style="color:#ef4444">*</span></label>
+            <input id="realname" name="realname" type="text" required placeholder="예: 한리"/>
+          </div>
+          <div>
+            <label for="phone">참가자 휴대폰 번호 <span class="req" style="color:#ef4444">*</span></label>
+            <input id="phone" name="phone" type="tel" required inputmode="tel"
+                   pattern="^0?1[0-9]-?\d{3,4}-?\d{4}$"
+                   placeholder="예: 010-1234-5678"/>
+            <div class="subnote">연락 목적 외 사용하지 않습니다.</div>
+          </div>
+          <div>
+            <label for="edition">회차</label>
+            <input id="edition" name="edition" type="text" value="제 3회" readonly/>
+          </div>
+        </div>
+        <label class="agree"><input type="checkbox" id="agree" required/> 개인정보 수집·이용에 동의합니다.</label>
+      </div>
+    </section>
+
+    <!-- 20개 문항 (이름·사진 고정) -->
+    <form id="form" class="card" enctype="multipart/form-data" style="margin-top:18px">
+      <div class="inner">
+        <h2 class="form-section-title" style="margin:0 0 8px">문항 (총 20문항)</h2>
+
+        <div id="questions" style="display:grid;gap:12px;margin-top:8px"></div>
+
+        <div class="actions">
+          <button type="submit" class="btn success lg" id="btn-submit">제출</button>
+          <button type="button" class="btn lg" id="btn-reset">초기화</button>
+        </div>
+        <div id="status" style="text-align:center"></div>
+
+        <input class="hp" type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      </div>
+    </form>
+  </main>
+
+  <script>
+    /* ====== 설정 ====== */
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyi1H50Uzc0ATvEJbsEFgqOWO-ns7Z5s-ZAXWNTMb6DWY8U62-TYqkhEOg3vl2P5I7Q3Q/exec';
+
+    /* 고정 문항(20개): 이름 · 이미지 URL */
+    const ITEMS = [
+      { name:'누돌이',   image:'assets/silkworms/01.jpg' },
+      { name:'누른자',   image:'assets/silkworms/02.jpg' },
+      { name:'누명스',   image:'assets/silkworms/03.jpg' },
+      { name:'누각이',   image:'assets/silkworms/04.jpg' },
+      { name:'누달곰',   image:'assets/silkworms/05.jpg' },
+      { name:'누하나',   image:'assets/silkworms/06.jpg' },
+      { name:'누둘',     image:'assets/silkworms/07.jpg' },
+      { name:'누셋',     image:'assets/silkworms/08.jpg' },
+      { name:'누넷',     image:'assets/silkworms/09.jpg' },
+      { name:'누다섯',   image:'assets/silkworms/10.jpg' },
+      { name:'누여섯',   image:'assets/silkworms/11.jpg' },
+      { name:'누일곱',   image:'assets/silkworms/12.jpg' },
+      { name:'누여덟',   image:'assets/silkworms/13.jpg' },
+      { name:'누아홉',   image:'assets/silkworms/14.jpg' },
+      { name:'누열',     image:'assets/silkworms/15.jpg' },
+      { name:'누열하나', image:'assets/silkworms/16.jpg' },
+      { name:'누열둘',   image:'assets/silkworms/17.jpg' },
+      { name:'누열셋',   image:'assets/silkworms/18.jpg' },
+      { name:'누열넷',   image:'assets/silkworms/19.jpg' },
+      { name:'누스물',   image:'assets/silkworms/20.jpg' }
+    ];
+
+    const $ = (s)=>document.querySelector(s);
+    const Q_TOTAL = ITEMS.length;
+
+    // 문항 렌더
+    const qWrap = $('#questions');
+    ITEMS.forEach((it, idx)=>{
+      const i = idx + 1;
+      const fs = document.createElement('fieldset');
+      fs.dataset.index = i;
+      fs.innerHTML = `
+        <legend>문항 ${i}</legend>
+        <div class="qgrid">
+          <div class="photo"><img src="${it.image}" alt="${it.name} 사진" onerror="this.alt='이미지를 불러올 수 없습니다.'"></div>
+          <div>
+            <div class="name">${it.name}</div>
+            <div class="subnote">이미지를 참고하여 성별을 선택하십시오.</div>
+          </div>
+          <div>
+            <label>성별 선택 <span class="req" style="color:#ef4444">*</span></label>
+            <div class="radios" role="radiogroup" aria-label="${it.name} 성별 선택">
+              <label class="radio" data-type="F">
+                <input type="radio" name="q${i}_gender" value="F" required/>
+                <span>암컷</span>
+              </label>
+              <label class="radio" data-type="M">
+                <input type="radio" name="q${i}_gender" value="M" required/>
+                <span>수컷</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+      qWrap.appendChild(fs);
+    });
+
+    // 버튼(라벨) 색상만 토글
+    function paintGroup(group){
+      const labels = group.querySelectorAll('.radio');
+      labels.forEach(lb => lb.classList.remove('selected-f','selected-m'));
+      const checked = group.querySelector('input[type="radio"]:checked');
+      if(!checked) return;
+      const type = checked.value; // 'F' | 'M'
+      const activeLabel = checked.closest('.radio');
+      if(type === 'F'){ activeLabel.classList.add('selected-f'); }
+      if(type === 'M'){ activeLabel.classList.add('selected-m'); }
+    }
+
+    // 라디오 변경 시 버튼 스타일 갱신
+    qWrap.addEventListener('change', (e)=>{
+      const t = e.target;
+      if(t.matches('input[type="radio"][name$="_gender"]')){
+        const group = t.closest('.radios');
+        paintGroup(group);
+      }
+    });
+
+    // 초기화
+    $('#btn-reset').addEventListener('click', ()=>{
+      document.getElementById('form').reset();
+      document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected-f','selected-m'));
+      $('#status').textContent = '';
+    });
+
+    // 제출 전 검증
+    function validateHeader(){
+      if(!$('#nickname').value.trim()) return false;
+      if(!$('#realname').value.trim()) return false;
+      const phone = $('#phone');
+      if(!phone.value.trim() || !new RegExp(phone.pattern).test(phone.value.trim())) return false;
+      if(!$('#agree').checked) return false;
+      if($('#website').value.trim() !== '') return false; // 허니팟
+      return true;
+    }
+
+    function buildFormData(){
+      const fd = new FormData();
+      fd.set('edition', $('#edition').value.trim());
+      fd.set('nickname', $('#nickname').value.trim());
+      fd.set('name', $('#realname').value.trim());
+      fd.set('phone', $('#phone').value.trim());
+      fd.set('submittedAt', new Date().toISOString());
+      ITEMS.forEach((it, idx)=>{
+        const i = idx+1;
+        fd.set(`q${i}_name`, it.name);
+        fd.set(`q${i}_imageUrl`, new URL(it.image, location.href).href);
+        const g = (document.querySelector(`input[name="q${i}_gender"]:checked`)||{}).value || '';
+        fd.set(`q${i}_gender`, g);
+      });
+      return fd;
+    }
+
+    document.getElementById('form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      $('#status').textContent = '';
+      if(!validateHeader()){
+        $('#status').innerHTML = '<span class="err">필수 항목을 확인하십시오.</span>';
+        return;
+      }
+      for(let i=1;i<=Q_TOTAL;i++){
+        if(!document.querySelector(`input[name="q${i}_gender"]:checked`)){
+          $('#status').innerHTML = `<span class="err">문항 ${i}의 성별을 선택하십시오.</span>`;
+          return;
+        }
+      }
+      if(!ENDPOINT){
+        $('#status').innerHTML = '<span class="err">서버 엔드포인트가 설정되지 않았습니다.</span>';
+        return;
+      }
+
+      const btn = $('#btn-submit');
+      btn.disabled = true; btn.textContent = '전송 중…';
+      try{
+        const res = await fetch(ENDPOINT, { method:'POST', body: buildFormData() });
+        if(res.ok){
+          $('#status').innerHTML = '<span class="ok">제출 완료되었습니다. 감사합니다!</span>';
+          document.getElementById('form').reset();
+          document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected-f','selected-m'));
+        }else{
+          const text = await res.text().catch(()=> '');
+          $('#status').innerHTML = '<span class="err">서버 응답 오류가 발생했습니다.</span>';
+          console.error('Server error body:', text);
+        }
+      }catch(err){
+        console.error(err);
+        $('#status').innerHTML = '<span class="err">네트워크 오류가 발생했습니다.</span>';
+      }finally{
+        btn.disabled = false; btn.textContent = '제출';
+      }
+    });
+  </script>
+</body>
+</html>
