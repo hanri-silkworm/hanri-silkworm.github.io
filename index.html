@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hanri — Home</title>
+  <meta name="description" content="Hanri 개인 홈페이지 — CV와 누에 이벤트 페이지로 이동" />
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --text: #0e141b;
+      --muted: #6b7280;      /* gray-500 */
+      --line: #d1d5db;       /* gray-300 */
+      --line-strong: #9ca3af;/* gray-400 */
+      --radius: 16px;
+      --shadow: 0 6px 18px rgba(0,0,0,.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0f14;
+        --card-bg: #0f1720;
+        --text: #e5e7eb;
+        --muted: #9aa3b2;
+        --line: #1f2937;
+        --line-strong: #374151;
+        --shadow: 0 8px 20px rgba(0,0,0,.35);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    /* Center the whole page block */
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100svh;                /* full screen height incl. mobile UI */
+      display: flex;                      /* allow vertical centering */
+    }
+
+    .wrap {
+      /* Center header, main, footer as a vertical stack */
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;                /* horizontal centering */
+      justify-content: center;            /* vertical centering */
+      gap: 20px;                          /* breathing space between sections */
+      width: 100%;
+    }
+
+    /* Header */
+    header { 
+      max-width: 960px; 
+      width: 100%;
+      margin: 0 auto;                     /* keep centered within max-width */
+      padding: 0 20px; 
+    }
+    .brand { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 8px; 
+      text-align: center; 
+    }
+    .brand h1 { margin: 0; font-size: 1.25rem; letter-spacing: .2px; font-weight: 700; }
+    .brand p { margin: 2px 0 0; font-size: .95rem; color: var(--muted); }
+
+    /* Main */
+    main { 
+      max-width: 960px; 
+      width: 100%;
+      margin: 0 auto; 
+      padding: 0 20px 0; 
+    }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 720px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+
+    a.card { 
+      position: relative; display: block; text-decoration: none; color: inherit; 
+      background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); 
+      box-shadow: var(--shadow); 
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease; 
+    }
+    a.card:hover { transform: translateY(-2px); border-color: var(--line-strong); box-shadow: 0 10px 22px rgba(0,0,0,.08); }
+    a.card:focus-visible { outline: 3px solid var(--line-strong); outline-offset: 4px; }
+
+    .card__content { padding: 22px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+    .card__emoji { font-size: 28px; line-height: 1; }
+    .card__title { margin: 0; font-size: 1.08rem; font-weight: 700; }
+    .card__desc { margin: 6px 0 0; color: var(--muted); line-height: 1.45; font-size: .96rem; }footer { 
+      max-width: 960px; 
+      width: 100%;
+      margin: 0 auto; 
+      padding: 0 20px 0; 
+      color: var(--muted); font-size: .9rem; text-align: center; 
+    }
+
+    @media (prefers-reduced-motion: reduce) { a.card { transition: none; } a.card:hover { transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand" aria-label="사이트 헤더">
+        <div>
+          <h1>Ri Han</h1>
+          <!-- 영작 적용: 연구, 프로젝트, 누에 아카이브 → Research · Projects · Silkworm Archive -->
+          <p>Research · Projects · Silkworm Archive</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="grid" role="list">
+        <!-- CV 카드 (이모지) -->
+        <a class="card" role="listitem" href="./hanri_cv.html" aria-label="CV 페이지로 이동">
+                    <div class="card__content">
+            <div class="card__emoji" aria-hidden="true">📄</div>
+            <div>
+              <h2 class="card__title">Curriculum Vitae</h2>
+              <p class="card__desc">Access the curriculum vitae, research areas, publication list, and contact information.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 누에 이벤트 카드 (이모지) -->
+        <a class="card" role="listitem" href="./nunu.html" aria-label="누에 이벤트 페이지로 이동">
+                    <div class="card__content">
+            <div class="card__emoji" aria-hidden="true">🐛</div>
+            <div>
+              <h2 class="card__title">NuNu (Silkworm page)</h2>
+              <p class="card__desc">Information about silkworms and the silkworm events hub page. (Korean only)</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <footer>
+      <div>© <span id="y"></span> Hanri · <span style="opacity:.9">정적 사이트 — GitHub Pages 호스팅</span></div>
+    </footer>
+  </div>
+
+  <script>
+    // 연도 자동 표기
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
