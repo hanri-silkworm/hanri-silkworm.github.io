@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>제 2회 리더보드 – 누에 고치 성별 맞추기 대회</title>
+  <style>
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --muted:#e5e7eb; --radius:14px; --shadow:0 10px 30px rgba(17,24,39,.08);
+      --blue:#1e3a8a; --blue-bg:#eff6ff; --blue-bd:#bfdbfe;
+      --red:#b91c1c; --red-bg:#fef2f2; --red-bd:#fecaca;
+      --box-w: 980px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+    .wrap{max-width:1120px;margin:0 auto;padding:20px 24px}
+
+    /* NAV */
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+    .brand strong{font-weight:800;letter-spacing:.2px}
+    .nav-actions{display:flex;gap:8px;align-items:center;justify-content:center}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
+    .btn.primary{background:#4b5563;color:#ffffff;border:0}
+    .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+
+    /* 상단 박스 */
+    .hero{margin:14px auto 10px;border:1px solid var(--muted);border-radius:var(--radius);background:var(--paper);box-shadow:var(--shadow);max-width:var(--box-w)}
+    .hero-inner{padding:16px 18px}
+    .hero h1{margin:0;font-size:clamp(20px,3vw,28px);letter-spacing:-.2px;line-height:1.18}
+    .lead{color:var(--sub);margin:8px 0 6px}
+    .guides{color:#4b5563;margin:6px 0 0;padding-left:18px;list-style:disc}
+    .guides li{margin:4px 0}
+
+    /* 리더보드 카드 */
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;max-width:var(--box-w);margin-left:auto;margin-right:auto}
+    .card .inner{padding:16px 18px}
+    h2{margin:0 0 6px;font-size:20px}
+
+    /* TABLE */
+    .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff}
+    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+    thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
+    tbody td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;overflow:hidden}
+    tbody tr:hover{background:#fafafa}
+
+    .rank-col{width:100px}
+    .nick-col{width:190px}
+    .score-col{width:70px}
+    .rank{font-weight:800;white-space:nowrap}
+    .nick{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .score{font-weight:800;white-space:nowrap}
+
+    /* 20칸 균등 그리드 */
+    .answers{
+      display:grid;
+      grid-template-columns: repeat(20, minmax(18px, 1fr));
+      gap:3px; align-items:center; width:100%;
+    }
+    .chip{
+      display:inline-flex;align-items:center;justify-content:center;
+      height:18px;border-radius:5px;border:1px solid #e5e7eb;background:#fff;
+      font-weight:800;letter-spacing:.2px;padding:0;width:100%;
+    }
+    .chip .t{font-size:11.5px; line-height:1}
+    .chip.correct{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
+    .chip.wrong{color:var(--red);background:var(--red-bg);border-color:var(--red-bd)}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="brand" href="index.html" aria-label="누에 대회 홈">
+        <strong>🐛누에 고치 성별 맞추기 대회</strong>
+      </a>
+      <nav class="nav-actions">
+        <a class="btn" href="index.html">HOME</a>
+        <a class="btn primary" href="#">제 3회 준비중</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main class="wrap">
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>🐛제 2회 리더보드</h1>
+        <p class="lead">
+          제출지는 네모칸에 <b>암/수</b>로 표기하며,
+          <b style="color:#1e3a8a">파랑(정답)</b> · <b style="color:#b91c1c">빨강(오답)</b>으로 구분한다.
+          칩 위에 마우스를 올리면 <b>누에 이름</b> 툴팁이 나타난다.
+        </p>
+        <ul class="guides">
+          <li>1·2·3위만 🥇/🥈/🥉 이모지, 그 외는 <b>n등</b> 으로 표시.</li>
+          <li>동점자는 동일 순위이며, 다음 순위는 연속으로 이어진다.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- TABLE -->
+  <div class="wrap">
+    <section class="card">
+      <div class="inner">
+        <h2>리더보드</h2>
+        <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">로딩 중…</div></div>
+      </div>
+    </section>
+  </div>
+
+<script>
+/* ====== 메타 ====== */
+const HEADERS = ["01. 누누", "02. 누추한 분이 귀한곳에", "03. 누짱", "04. 누쿤", "05. 누진세", "06. 누말썽이", "07. 누렁이", "08. 누명을 쓴 누에", "09. 누먹보", "10. 누여명", "11. 누재윤", "12. 누앙이", "13. 누텔라", "14. 누구인가", "15. 누가 기침소리를 내었는가", "16. 누룩곰팡이", "17. 누짱구", "18. 누칼협", "19. 누명스명스한 상황", "20. 누른자"];
+const ANSWER_KEY_COMP = "ASSASASSSSSAAAAAASSS"; // A=암컷, S=수컷
+const KEY = ANSWER_KEY_COMP.split('').map(c => c==='A' ? '암컷' : '수컷');
+
+/* ====== 데이터 ====== */
+const ROWS_COMP = [
+{"nick": "다크엔젤", "score": 8, "ans": "SSAAAAASASSSASSASAAA"},
+{"nick": "지혜뿡뿡", "score": 12, "ans": "SASAAASASASASAAASSSA"},
+{"nick": "부녀자", "score": 9, "ans": "SAASAASSAAASAAAASASS"},
+{"nick": "위치킹", "score": 8, "ans": "SAASSSAAASSAASAASASA"},
+{"nick": "파태편", "score": 12, "ans": "ASSSSASSAASAASSASASA"},
+{"nick": "율탱", "score": 11, "ans": "AAASAAAASASAAAAASASS"},
+{"nick": "웨스트", "score": 8, "ans": "SAASASSSASSSASASSAAS"},
+{"nick": "단팥빵", "score": 14, "ans": "ASSASASSAASSSSASASSA"},
+{"nick": "배", "score": 12, "ans": "AASASASSSSAASSASSAAA"},
+{"nick": "용드래곤", "score": 10, "ans": "SASSAAASASAASAAAAAAS"},
+{"nick": "단드래곤", "score": 10, "ans": "SASSAAASSSAASAAASASA"},
+{"nick": "헤일리", "score": 11, "ans": "SSSAAASSSSSSSSSSSAAS"},
+{"nick": "오넨지", "score": 8, "ans": "SAASSSSASAAAASSSAASA"},
+{"nick": "누울래용", "score": 11, "ans": "SAASSASASASASAASASAA"},
+{"nick": "231", "score": 11, "ans": "ASSSSAASSAAASASSAAAA"},
+{"nick": "누클리어웨폰", "score": 11, "ans": "SSAAAAASSSSSASSASSAS"},
+{"nick": "기명하", "score": 9, "ans": "AAAAAAAAAAAAAAAAAAAA"},
+{"nick": "동천불주먹", "score": 9, "ans": "SSAASSAASSAASASASASA"},
+{"nick": "끼욧", "score": 9, "ans": "ASASASASASSAAASSSAAA"},
+{"nick": "럭키조", "score": 10, "ans": "SASSAASASSAAASSSAAAS"},
+{"nick": "삼학년", "score": 6, "ans": "SSASASSASAASSASSSASA"},
+{"nick": "유냉", "score": 11, "ans": "SASSSSSSSSSSSSSSSSSS"},
+{"nick": "카이제로스", "score": 8, "ans": "AAASSSSASSSASSSASAAA"},
+{"nick": "sun", "score": 8, "ans": "SASSSSSSAAAASASSAAAA"},
+{"nick": "심피티", "score": 9, "ans": "AASSSSSAAAAAAASAAAAA"},
+{"nick": "예리무", "score": 8, "ans": "SAAASSSAAASAASSSAAAA"},
+{"nick": "막둥이 마미", "score": 12, "ans": "SAASSSSSSSSSASAASSSS"},
+{"nick": "토끼검객", "score": 12, "ans": "SSSSSSSSSSSSSSSSSSSS"},
+{"nick": "사이다맛귤", "score": 10, "ans": "AASAASAASAASASAASSSS"},
+{"nick": "양념게장", "score": 10, "ans": "SSASAASSSASAASSSAAAA"},
+{"nick": "빈이", "score": 13, "ans": "SASAAASASASAAAAAAASA"},
+{"nick": "무적엘지창기야사랑한드아아악", "score": 10, "ans": "SAASSASASASSASSAASAS"},
+{"nick": "서호", "score": 6, "ans": "SAASSSSAASSSSSSASSAA"},
+{"nick": "콩", "score": 12, "ans": "SSSASSSSSSSSSSSSSASS"},
+{"nick": "집게사장", "score": 12, "ans": "SSASSASSSASSSASASSSS"},
+{"nick": "야 서강준", "score": 9, "ans": "SSAASSAASSAASSAASSAA"},
+{"nick": "유한우", "score": 10, "ans": "ASSASSAAAASASSASSAAS"},
+{"nick": "누에사랑", "score": 10, "ans": "SSASAASASSASAASASSSA"},
+{"nick": "가나초코", "score": 11, "ans": "AAASSAASSASASASSAASA"},
+{"nick": "도롱빵", "score": 7, "ans": "SAASAAAAAAASASAASSSS"},
+{"nick": "지산부인", "score": 12, "ans": "SASASSSSSSSASASSAAAA"},
+{"nick": "단댕이", "score": 12, "ans": "AASSSASASASASAAAAAAA"},
+{"nick": "김가희동생", "score": 12, "ans": "SSASAASASSAAASASASAS"},
+{"nick": "박준형", "score": 13, "ans": "ASASAASAASSSAAASAASS"},
+{"nick": "브라이언", "score": 12, "ans": "AASSSSSASSSAAASSSSAA"},
+{"nick": "누에누에앨갰샙니대", "score": 11, "ans": "ASSAASSAAASSASAAASAA"},
+{"nick": "류이지", "score": 10, "ans": "SAASAASSSSSSSAASSASA"},
+{"nick": "다갱이", "score": 9, "ans": "SSSSAAASAASAASSASSAA"},
+{"nick": "엄윤경", "score": 9, "ans": "SSAASSAASSAASSAASSAA"},
+{"nick": "호루류", "score": 9, "ans": "SSSSAASSSAAAASSSSAAA"},
+{"nick": "이윤지", "score": 10, "ans": "SAAAASSSSASAASASAAAA"},
+{"nick": "김서윤", "score": 14, "ans": "SASASSAASSSAAAASASSA"},
+{"nick": "바닐라라떼", "score": 8, "ans": "SAASAASSSSAASSSSSAAS"},
+{"nick": ".....", "score": 10, "ans": "SAASSAASSAASAAASAAAS"}
+];
+
+/* ====== 랭크/유틸 ====== */
+function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
+function denseRank(rows){
+  const arr = rows.slice().sort((a,b)=> b.score - a.score);
+  const uniq=[]; arr.forEach(r=>{ if(!uniq.includes(r.score)) uniq.push(r.score); });
+  const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
+  arr.forEach(r=> r._rank = m.get(r.score));
+  return arr;
+}
+/* ⬇ 수정: 'A'/'S'와 '암컷'/'수컷' 모두 지원 */
+function asShort(v){
+  if(v==='A' || v==='암컷') return '암';
+  if(v==='S' || v==='수컷') return '수';
+  return '-';
+}
+
+/* ====== 렌더 ====== */
+function render(){
+  const data = denseRank(ROWS_COMP.map(r=>({nick:r.nick, score:r.score, ans:r.ans})));
+
+  const tbl = document.createElement('table');
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th class="rank-col">순위</th>
+      <th class="nick-col">닉네임</th>
+      <th class="score-col">점수</th>
+      <th>제출지</th>
+    </tr>`;
+  tbl.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+
+  data.forEach(row=>{
+    const tr = document.createElement('tr');
+
+    const tdRank = document.createElement('td'); tdRank.className='rank';  tdRank.textContent = medalRank(row._rank);
+    const tdNick = document.createElement('td'); tdNick.className='nick';  tdNick.textContent = row.nick || '-';
+    const tdScore= document.createElement('td'); tdScore.className='score'; tdScore.textContent = `${row.score}점`;
+
+    const tdAns = document.createElement('td');
+    const wrap  = document.createElement('div'); wrap.className='answers';
+
+    for(let i=0;i<20;i++){
+      const a = row.ans[i]; // 'A' or 'S'
+      const isCorrect = a ? ((a==='A'&&KEY[i]==='암컷')||(a==='S'&&KEY[i]==='수컷')) : false;
+
+      const chip = document.createElement('span');
+      chip.className = 'chip ' + (a ? (isCorrect ? 'correct' : 'wrong') : '');
+      chip.title = `${HEADERS[i]}: ${a==='A'?'암컷':a==='S'?'수컷':'-'} / 정답: ${KEY[i]}`;
+      const t = document.createElement('span'); t.className='t'; t.textContent = asShort(a); // ⬅ 핵심 수정
+      chip.appendChild(t); 
+      wrap.appendChild(chip);
+    }
+    tdAns.appendChild(wrap);
+
+    tr.appendChild(tdRank); tr.appendChild(tdNick); tr.appendChild(tdScore); tr.appendChild(tdAns);
+    tbody.appendChild(tr);
+  });
+
+  tbl.appendChild(tbody);
+  const host = document.getElementById('tableWrap');
+  host.innerHTML=''; host.appendChild(tbl);
+}
+render();
+</script>
+</body>
+</html>
