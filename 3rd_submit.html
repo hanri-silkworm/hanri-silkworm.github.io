@@ -120,7 +120,8 @@
           <div>
             <label for="phone">참가자 휴대폰 번호 <span class="req" style="color:var(--danger)">*</span></label>
             <input id="phone" name="phone" type="tel" required inputmode="tel"
-                   pattern="^0?1[0-9]-?\\d{3,4}-?\\d{4}$"
+                   maxlength="13"
+                   pattern="^01[0-9]-?\d{3,4}-?\d{4}$"
                    placeholder="예: 010-1234-5678"/>
             <div class="subnote">연락 목적 외 사용하지 않습니다.</div>
           </div>
@@ -151,8 +152,8 @@
   </main>
 
   <script>
-    /* ====== 설정: 새 웹앱 URL로 교체됨 ====== */
-    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbz-SstNCA5ofw0ZOqe4SgqJmCN7cPkG1ThINT6PtvJkCfNAdtwXaIFEhpmntbmU4XfD-A/exec';
+    /* ====== 설정: 새 웹앱 URL ====== */
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxVl9s_cs47BxdB4QhE2HJgLZQKQ3lgAScF50FsYCHy-KEE21Uo92v7cEIXl3a-9fFugw/exec';
 
     /* 고정 문항(20개): 이름 · 이미지 URL */
     const ITEMS = [
@@ -181,7 +182,31 @@
     const $ = (s)=>document.querySelector(s);
     const Q_TOTAL = ITEMS.length;
 
-    // 문항 렌더
+    // ====== 휴대폰 입력 자동 하이픈 ======
+    function normalizePhone(raw){ return (raw||'').replace(/[^\d]/g,''); }
+    function formatKoreanPhone(d){
+      if (d.startsWith('010')){
+        if (d.length <= 3) return d;
+        if (d.length <= 7) return d.slice(0,3) + '-' + d.slice(3);
+        return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7,11);
+      } else {
+        if (d.length <= 3) return d;
+        if (d.length <= 6) return d.slice(0,3) + '-' + d.slice(3);
+        if (d.length <= 10) return d.slice(0,3) + '-' + d.slice(3,6) + '-' + d.slice(6,10);
+        return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7,11);
+      }
+    }
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', ()=>{
+      const digits = normalizePhone(phoneInput.value);
+      phoneInput.value = formatKoreanPhone(digits);
+    });
+    phoneInput.addEventListener('blur', ()=>{
+      const digits = normalizePhone(phoneInput.value);
+      phoneInput.value = formatKoreanPhone(digits);
+    });
+
+    // ====== 문항 렌더 ======
     const qWrap = $('#questions');
     ITEMS.forEach((it, idx)=>{
       const i = idx + 1;
@@ -214,13 +239,13 @@
       qWrap.appendChild(fs);
     });
 
-    // 버튼(라벨) 색상만 토글 + 에러표시 해제
+    // 선택 버튼 색상만 토글 + 에러표시 해제
     function paintGroup(group){
       const labels = group.querySelectorAll('.radio');
       labels.forEach(lb => lb.classList.remove('selected-f','selected-m'));
       const checked = group.querySelector('input[type="radio"]:checked');
       if(!checked) return;
-      const type = checked.value; // 'F' | 'M'
+      const type = checked.value;
       const activeLabel = checked.closest('.radio');
       if(type === 'F'){ activeLabel.classList.add('selected-f'); }
       if(type === 'M'){ activeLabel.classList.add('selected-m'); }
@@ -229,7 +254,6 @@
       const help = fs.querySelector('[data-help]');
       if(help){ help.style.display = 'none'; }
     }
-
     qWrap.addEventListener('change', (e)=>{
       const t = e.target;
       if(t.matches('input[type="radio"][name$="_gender"]')){
@@ -248,11 +272,6 @@
       $('#agreeWrap').classList.remove('checkbox-invalid');
       $('#status').textContent = '';
     });
-
-    // 입력 정규화
-    function normalizePhone(raw){
-      return (raw||'').replace(/[^\d]/g,'');
-    }
 
     // 필수 검증 + 상세 표시
     function validateAll(){
@@ -302,21 +321,17 @@
       return { ok: issues.length===0 && missingQuestions.length===0, issues, missingQuestions };
     }
 
-    function showStatusError(msg){
-      $('#status').innerHTML = `<span class="err">${msg}</span>`;
-    }
-    function showStatusOk(msg){
-      $('#status').innerHTML = `<span class="ok">${msg}</span>`;
-    }
+    function showStatusError(msg){ $('#status').innerHTML = `<span class="err">${msg}</span>`; }
+    function showStatusOk(msg){ $('#status').innerHTML = `<span class="ok">${msg}</span>`; }
 
-    // 서버 중복 확인
+    // 서버 중복 확인 — 실패 시에도 제출 중단(강제)
     async function checkPhoneDuplicate(phoneDigits){
       const url = `${ENDPOINT}?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}`;
       const res = await fetch(url, { method:'GET', cache:'no-store' });
       if(!res.ok) throw new Error('dup-check http error');
       const data = await res.json();
-      if(typeof data.exists === 'boolean') return data.exists;
-      return false;
+      if(data && data.ok === false) throw new Error('dup-check server error');
+      return !!(data && data.exists);
     }
 
     // 제출 데이터 묶기
@@ -359,6 +374,8 @@
       const phoneDigits = normalizePhone($('#phone').value.trim());
       const btn = $('#btn-submit');
       btn.disabled = true; btn.textContent = '중복 확인 중…';
+
+      // 클라이언트 중복 확인(실패 시에도 제출 중단)
       try{
         const exists = await checkPhoneDuplicate(phoneDigits);
         if(exists){
@@ -367,13 +384,16 @@
           return;
         }
       }catch(err){
-        console.warn('중복 확인 실패 — 제출 진행:', err);
+        showStatusError('중복 확인에 실패했습니다. 잠시 후 다시 시도하십시오.');
+        btn.disabled = false; btn.textContent = '제출';
+        return;
       }
 
       btn.disabled = true; btn.textContent = '전송 중…';
       try{
         const res = await fetch(ENDPOINT, { method:'POST', body: buildFormData() });
-        if(res.ok){
+        const data = await res.json().catch(()=>({ok:res.ok}));
+        if(res.ok && data && data.ok){
           showStatusOk('제출 완료되었습니다. 감사합니다!');
           document.getElementById('form').reset();
           document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected-f','selected-m'));
@@ -381,10 +401,11 @@
           document.querySelectorAll('[data-help]').forEach(el=>el.style.display='none');
           ['nickname','realname','phone'].forEach(id=>$('#'+id).classList.remove('invalid'));
           $('#agreeWrap').classList.remove('checkbox-invalid');
+        }else if (data && data.error === 'duplicate_phone'){
+          showStatusError('이미 동일한 휴대폰 번호로 제출된 기록이 있습니다. 중복 제출은 불가합니다.');
         }else{
-          const text = await res.text().catch(()=> '');
           showStatusError('서버 응답 오류가 발생했습니다.');
-          console.error('Server error body:', text);
+          console.error('Server response:', data);
         }
       }catch(err){
         console.error(err);
