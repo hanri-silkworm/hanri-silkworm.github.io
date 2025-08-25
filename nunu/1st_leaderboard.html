@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>제 1회 리더보드 – 누에 고치 성별 맞추기 대회</title>
+  <style>
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --pri:#4b5563; --pri-2:#374151; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
+      --radius:14px; --shadow:0 10px 30px rgba(17,24,39,.08);
+      --blue:#1e3a8a; --blue-bg:#eff6ff; --blue-bd:#bfdbfe;
+      --red:#b91c1c; --red-bg:#fef2f2; --red-bd:#fecaca;
+      --box-w: 980px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+    .wrap{max-width:1120px;margin:0 auto;padding:20px 24px}
+
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+    .brand strong{font-weight:800;letter-spacing:.2px}
+    .nav-actions{display:flex;gap:8px;align-items:center;justify-content:center}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
+    .btn.primary{background:#4b5563;color:#ffffff;border:0}
+    .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+
+    .hero{margin:14px auto 10px; border:1px solid var(--muted); border-radius:var(--radius); background:var(--paper); box-shadow:var(--shadow); max-width:var(--box-w);}
+    .hero-inner{padding:16px 18px}
+    .hero h1{margin:0; font-size:clamp(20px,3vw,28px); letter-spacing:-.2px; line-height:1.18}
+    .lead{color:var(--sub); margin:8px 0 6px}
+    .guides{color:#4b5563; margin:6px 0 0; padding:0 0 0 18px}
+    .guides li{margin:4px 0}
+
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden; max-width:var(--box-w); margin-left:auto; margin-right:auto;}
+    .card .inner{padding:16px 18px}
+    h2{margin:0 0 6px;font-size:20px}
+    .table-wrap{overflow:auto;border:1px solid var(--muted);border-radius:12px;background:#fff}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);text-align:left;padding:10px 12px;font-size:14px;color:#334155}
+    tbody td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+    tbody tr:hover{background:#fafafa}
+    .rank{width:120px;font-weight:800}
+    .score{font-weight:800}
+
+    .answers{display:grid; gap:6px}
+    .chip{display:inline-flex;align-items:center;justify-content:center; height:26px;border-radius:8px;border:1px solid #e5e7eb;background:#fff; font-weight:800;letter-spacing:.2px;padding:0 8px;min-width:34px}
+    .chip.correct{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
+    .chip.wrong{color:var(--red);background:var(--red-bg);border-color:var(--red-bd)}
+    .chip .t{font-size:13px}
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="brand" href="./nunu/index.html" aria-label="누에 대회 홈">
+        <strong>🐛누에 고치 성별 맞추기 대회</strong>
+      </a>
+      <nav class="nav-actions">
+        <a class="btn" href="index.html">HOME</a>
+        <a class="btn primary" href="#">제 3회 준비중</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>🐛제 1회 리더보드</h1>
+        <p class="lead">
+          제출지는 네모칸에 <b>암/수</b>로 표기하며,
+          <b style="color:#1e3a8a">파랑(정답)</b> · <b style="color:#b91c1c">빨강(오답)</b>으로 구분한다.
+          칩 위에 마우스를 올리면 <b>누에 이름</b> 툴팁이 나타난다.
+        </p>
+        <ul class="guides">
+          <li>1·2·3위만 🥇/🥈/🥉 이모지, 그 외는 <b>n등</b> 텍스트</li>
+          <li>동점자는 동일 순위이며, 다음 순위는 연속으로 이어진다.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="inner">
+        <h2>리더보드</h2>
+        <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">로딩 중…</div></div>
+      </div>
+    </section>
+  </div>
+
+<script>
+const HEADERS = ["01 누돌이", "02 누룽지", "03 누토피아", "04 누재명", "05 누우면돼지", "06 누디스코", "07 누네띠네", "08 누가바", "09 누스타라다무스", "10 누엉뚱", "11 누팡이", "12 누순이", "13 누구세요", "14 누너예", "15 누멍"];
+const ANSWER_KEY = ["수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "암컷", "암컷", "암컷", "암컷", "수컷", "암컷", "암컷", "암컷", "수컷"];
+const ROWS = [{"name": "김O희", "score": 12, "answers": ["암컷", "수컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "암컷", "수컷", "수컷"], "rank": 1}, {"name": "김O윤", "score": 10, "answers": ["수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "암컷", "암컷", "수컷", "수컷"], "rank": 2}, {"name": "윤O률", "score": 9, "answers": ["암컷", "암컷", "수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "암컷", "암컷", "암컷", "수컷", "암컷", "수컷", "수컷"], "rank": 3}, {"name": "임O은", "score": 9, "answers": ["암컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "수컷"], "rank": 3}, {"name": "이O경", "score": 8, "answers": ["암컷", "수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "암컷", "수컷", "암컷", "암컷", "수컷", "수컷", "수컷", "암컷"], "rank": 4}, {"name": "정O", "score": 8, "answers": ["수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷"], "rank": 4}, {"name": "이O은", "score": 8, "answers": ["수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "수컷", "수컷", "수컷", "암컷", "암컷", "암컷"], "rank": 4}, {"name": "배O정", "score": 8, "answers": ["암컷", "암컷", "수컷", "수컷", "암컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "수컷", "수컷"], "rank": 4}, {"name": "윤O비", "score": 8, "answers": ["암컷", "수컷", "암컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "수컷", "암컷"], "rank": 4}, {"name": "조O현", "score": 8, "answers": ["암컷", "수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "수컷"], "rank": 4}, {"name": "김O산", "score": 7, "answers": ["암컷", "수컷", "암컷", "암컷", "암컷", "암컷", "수컷", "수컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "암컷"], "rank": 5}, {"name": "이O빈", "score": 7, "answers": ["암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷"], "rank": 5}, {"name": "임O지", "score": 7, "answers": ["수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷"], "rank": 5}, {"name": "심O호", "score": 7, "answers": ["암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷"], "rank": 5}, {"name": "한O", "score": 6, "answers": ["수컷", "암컷", "수컷", "암컷", "암컷", "암컷", "암컷", "수컷", "암컷", "암컷", "암컷", "암컷", "암컷", "암컷", "수컷"], "rank": 6}, {"name": "한O혜", "score": 6, "answers": ["암컷", "암컷", "수컷", "수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "수컷", "수컷", "수컷", "암컷", "수컷", "암컷"], "rank": 6}, {"name": "김O하", "score": 6, "answers": ["수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "수컷", "수컷", "수컷"], "rank": 6}, {"name": "권O홍 박사님", "score": 6, "answers": ["수컷", "수컷", "수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "수컷", "암컷", "암컷"], "rank": 6}, {"name": "홍O핑핑", "score": 6, "answers": ["암컷", "암컷", "수컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "암컷", "수컷", "수컷"], "rank": 6}, {"name": "백O우", "score": 6, "answers": ["수컷", "수컷", "암컷", "수컷", "암컷", "암컷", "암컷", "수컷", "수컷", "수컷", "암컷", "암컷", "수컷", "암컷", "수컷"], "rank": 6}, {"name": "김O현", "score": 6, "answers": ["수컷", "암컷", "수컷", "수컷", "수컷", "암컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "수컷", "암컷", "수컷"], "rank": 6}, {"name": "김O찬", "score": 5, "answers": ["수컷", "암컷", "암컷", "수컷", "수컷", "수컷", "암컷", "암컷", "수컷", "수컷", "수컷", "암컷", "수컷", "암컷", "암컷"], "rank": 7}, {"name": "분O이", "score": 5, "answers": ["수컷", "암컷", "수컷", "암컷", "수컷", "수컷", "암컷", "수컷", "수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "암컷"], "rank": 7}, {"name": "박O형", "score": 4, "answers": ["수컷", "암컷", "수컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "암컷", "암컷", "수컷", "암컷", "수컷", "수컷"], "rank": 8}, {"name": "심O훈", "score": 4, "answers": ["수컷", "암컷", "암컷", "수컷", "수컷", "수컷", "암컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷", "암컷", "수컷"], "rank": 8}, {"name": "심O기", "score": 4, "answers": ["수컷", "암컷", "암컷", "수컷", "수컷", "암컷", "암컷", "암컷", "암컷", "수컷", "수컷", "수컷", "수컷", "암컷", "수컷"], "rank": 8}];
+const MINWIDTH = 600;
+
+function asShort(a){
+  const s = (a||'').trim();
+  if(s === '암컷') return '암';
+  if(s === '수컷') return '수';
+  return s || '-';
+}
+function rankLabel(n){
+  if(n===1) return '🥇 1등';
+  if(n===2) return '🥈 2등';
+  if(n===3) return '🥉 3등';
+  return n + '등';
+}
+function render(){
+  const data = ROWS.slice();
+
+  // Correct grid columns + min width so chips line up horizontally
+  const dyn = document.createElement('style');
+  const minW = Math.max(MINWIDTH, HEADERS.length * 40);
+  dyn.innerHTML = `.answers{grid-template-columns:repeat(${HEADERS.length},1fr);min-width:${minW}px}`;
+  document.head.appendChild(dyn);
+
+  const tbl = document.createElement('table');
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th class="rank">순위</th><th>이름</th><th>점수</th><th>제출지</th></tr>';
+  tbl.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  data.forEach(r=>{
+    const tr = document.createElement('tr');
+
+    const tdRank = document.createElement('td'); tdRank.className='rank'; tdRank.textContent = rankLabel(r.rank);
+    const tdName = document.createElement('td'); tdName.textContent = r.name || '-';
+    const tdScore = document.createElement('td'); tdScore.className='score'; tdScore.textContent = String(r.score);
+
+    const tdAns = document.createElement('td');
+    const wrap = document.createElement('div'); wrap.className='answers';
+    for(let i=0;i<HEADERS.length;i++){
+      const a = (r.answers && r.answers[i]) ? r.answers[i].trim() : '';
+      const correct = (ANSWER_KEY && ANSWER_KEY[i]) ? ANSWER_KEY[i].trim() : '';
+      const chip = document.createElement('span');
+      chip.className = 'chip' + (a && correct ? (a===correct ? ' correct' : ' wrong') : '');
+      const label = document.createElement('span'); label.className='t'; label.textContent = asShort(a);
+      chip.title = (HEADERS[i] || ('Q'+(i+1))) + ': ' + (a || '미응답') + (correct ? (' / 정답: ' + correct) : '');
+      chip.appendChild(label);
+      wrap.appendChild(chip);
+    }
+    tdAns.appendChild(wrap);
+
+    tr.appendChild(tdRank); tr.appendChild(tdName); tr.appendChild(tdScore); tr.appendChild(tdAns);
+    tbody.appendChild(tr);
+  });
+
+  tbl.appendChild(tbody);
+  const host = document.getElementById('tableWrap');
+  host.innerHTML = '';
+  host.appendChild(tbl);
+}
+render();
+</script>
+</body>
+</html>
