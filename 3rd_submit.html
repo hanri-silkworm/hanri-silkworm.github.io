@@ -111,31 +111,29 @@
         <div class="grid">
           <div>
             <label for="nickname">참가자 닉네임 <span class="req" style="color:var(--danger)">*</span></label>
-            <input id="nickname" name="nickname" type="text" required placeholder="예: 누르미"/>
+            <input id="nickname" name="nickname" type="text" placeholder="예: 누르미"/>
           </div>
           <div>
             <label for="realname">참가자 이름 <span class="req" style="color:var(--danger)">*</span></label>
-            <input id="realname" name="realname" type="text" required placeholder="예: 홍길동"/>
+            <input id="realname" name="realname" type="text" placeholder="예: 홍길동"/>
           </div>
           <div>
             <label for="phone">참가자 휴대폰 번호 <span class="req" style="color:var(--danger)">*</span></label>
-            <input id="phone" name="phone" type="tel" required inputmode="tel"
-                   maxlength="13"
-                   pattern="^01[0-9]-?\d{3,4}-?\d{4}$"
-                   placeholder="예: 010-1234-5678"/>
-            <div class="subnote">연락 목적 외 사용하지 않습니다.</div>
+            <input id="phone" name="phone" type="tel" inputmode="tel"
+                   maxlength="13" placeholder="예: 010-1234-5678"/>
+            <div class="subnote">입력 시 자동으로 000-0000-0000 형식으로 변환됩니다.</div>
           </div>
           <div>
             <label for="edition">회차</label>
             <input id="edition" name="edition" type="text" value="제 2회" readonly/>
           </div>
         </div>
-        <label class="agree" id="agreeWrap"><input type="checkbox" id="agree" required/> 개인정보 수집·이용에 동의합니다.</label>
+        <label class="agree" id="agreeWrap"><input type="checkbox" id="agree"/> 개인정보 수집·이용에 동의합니다.</label>
       </div>
     </section>
 
     <!-- 20개 문항 (이름·사진 고정) -->
-    <form id="form" class="card" enctype="multipart/form-data" style="margin-top:18px">
+    <form id="form" class="card" enctype="multipart/form-data" style="margin-top:18px" novalidate>
       <div class="inner">
         <h2 class="form-section-title" style="margin:0 0 8px">문항 (총 20문항)</h2>
         <div id="questions" style="display:grid;gap:12px;margin-top:8px"></div>
@@ -152,7 +150,7 @@
   </main>
 
   <script>
-    /* ====== 설정: 새 웹앱 URL ====== */
+    /* ====== 설정: 웹앱 URL ====== */
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxVl9s_cs47BxdB4QhE2HJgLZQKQ3lgAScF50FsYCHy-KEE21Uo92v7cEIXl3a-9fFugw/exec';
 
     /* 고정 문항(20개): 이름 · 이미지 URL */
@@ -182,31 +180,28 @@
     const $ = (s)=>document.querySelector(s);
     const Q_TOTAL = ITEMS.length;
 
-    // ====== 휴대폰 입력 자동 하이픈 ======
-    function normalizePhone(raw){ return (raw||'').replace(/[^\d]/g,''); }
-    function formatKoreanPhone(d){
-      if (d.startsWith('010')){
-        if (d.length <= 3) return d;
-        if (d.length <= 7) return d.slice(0,3) + '-' + d.slice(3);
-        return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7,11);
-      } else {
-        if (d.length <= 3) return d;
-        if (d.length <= 6) return d.slice(0,3) + '-' + d.slice(3);
-        if (d.length <= 10) return d.slice(0,3) + '-' + d.slice(3,6) + '-' + d.slice(6,10);
-        return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7,11);
-      }
+    /* ====== 휴대폰 입력: 항상 3-4-4 자동 하이픈 ====== */
+    function onlyDigits(s){ return (s||'').replace(/[^\d]/g,''); }
+    function format344(d){
+      d = onlyDigits(d).slice(0,11); // 최대 11자리
+      if (d.length <= 3) return d;
+      if (d.length <= 7) return d.slice(0,3) + '-' + d.slice(3);
+      return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7);
     }
     const phoneInput = document.getElementById('phone');
     phoneInput.addEventListener('input', ()=>{
-      const digits = normalizePhone(phoneInput.value);
-      phoneInput.value = formatKoreanPhone(digits);
+      const cur = phoneInput.value;
+      const formatted = format344(cur);
+      const pos = phoneInput.selectionStart;
+      phoneInput.value = formatted;
+      // 커서가 끝으로 튀지 않도록 간단 처리(대부분의 케이스에서 자연스럽게 동작)
+      phoneInput.setSelectionRange(formatted.length, formatted.length);
     });
     phoneInput.addEventListener('blur', ()=>{
-      const digits = normalizePhone(phoneInput.value);
-      phoneInput.value = formatKoreanPhone(digits);
+      phoneInput.value = format344(phoneInput.value);
     });
 
-    // ====== 문항 렌더 ======
+    /* ====== 문항 렌더 ====== */
     const qWrap = $('#questions');
     ITEMS.forEach((it, idx)=>{
       const i = idx + 1;
@@ -224,11 +219,11 @@
             <label>성별 선택 <span class="req" style="color:#ef4444">*</span></label>
             <div class="radios" role="radiogroup" aria-label="${it.name} 성별 선택">
               <label class="radio" data-type="F">
-                <input type="radio" name="q${i}_gender" value="F" required/>
+                <input type="radio" name="q${i}_gender" value="F"/>
                 <span>암컷</span>
               </label>
               <label class="radio" data-type="M">
-                <input type="radio" name="q${i}_gender" value="M" required/>
+                <input type="radio" name="q${i}_gender" value="M"/>
                 <span>수컷</span>
               </label>
             </div>
@@ -273,8 +268,8 @@
       $('#status').textContent = '';
     });
 
-    // 필수 검증 + 상세 표시
-    function validateAll(){
+    // 필수 검증 + 상세 표시 + 경고창
+    function validateAllWithAlert(){
       const issues = [];
       const nickname = $('#nickname');
       const realname = $('#realname');
@@ -292,11 +287,16 @@
         issues.push('이름');
         realname.classList.add('invalid');
       }
-      const pn = phone.value.trim();
-      const phonePattern = new RegExp(phone.pattern);
-      if(!pn || !phonePattern.test(pn)){
-        issues.push('휴대폰 번호(형식)');
+      const phoneDigits = onlyDigits(phone.value);
+      if(!phoneDigits){
+        issues.push('휴대폰 번호');
         phone.classList.add('invalid');
+      }else if(phoneDigits.length !== 11){
+        issues.push('휴대폰 번호(11자리)');
+        phone.classList.add('invalid');
+      }else{
+        // 올바른 11자리면 보기용으로 포맷 고정
+        phone.value = format344(phone.value);
       }
       if(!agree.checked){
         issues.push('개인정보 동의');
@@ -318,7 +318,23 @@
         }
       }
 
-      return { ok: issues.length===0 && missingQuestions.length===0, issues, missingQuestions };
+      if(issues.length || missingQuestions.length){
+        let msg = '';
+        if(issues.length) msg += `미입력 항목: ${issues.join(', ')}\n`;
+        if(missingQuestions.length) msg += `미선택 문항: ${missingQuestions.join(', ')}`;
+        alert(msg.trim());
+        // 첫 미선택 문항 위치로 스크롤
+        const firstMiss = missingQuestions[0];
+        if(firstMiss){
+          document.querySelector(`fieldset[data-index="${firstMiss}"]`).scrollIntoView({behavior:'smooth', block:'center'});
+        }else if(issues.length){
+          (nickname.classList.contains('invalid') ? nickname :
+           realname.classList.contains('invalid') ? realname :
+           phone).focus();
+        }
+        return { ok:false, issues, missingQuestions };
+      }
+      return { ok:true, issues:[], missingQuestions:[] };
     }
 
     function showStatusError(msg){ $('#status').innerHTML = `<span class="err">${msg}</span>`; }
@@ -341,7 +357,7 @@
       fd.set('nickname', $('#nickname').value.trim());
       fd.set('name', $('#realname').value.trim());
       fd.set('phone', $('#phone').value.trim());
-      fd.set('phone_norm', normalizePhone($('#phone').value.trim()));
+      fd.set('phone_norm', onlyDigits($('#phone').value.trim()));
       fd.set('submittedAt', new Date().toISOString());
       ITEMS.forEach((it, idx)=>{
         const i = idx+1;
@@ -358,33 +374,24 @@
       e.preventDefault();
       $('#status').textContent = '';
 
-      const { ok, issues, missingQuestions } = validateAll();
-      if(!ok){
-        const parts = [];
-        if(issues.length) parts.push('필수 항목: ' + issues.join(', '));
-        if(missingQuestions.length) parts.push('미선택 문항: ' + missingQuestions.join(', '));
-        showStatusError(parts.join(' · '));
-        const firstMiss = missingQuestions[0];
-        if(firstMiss){
-          document.querySelector(`fieldset[data-index="${firstMiss}"]`).scrollIntoView({behavior:'smooth', block:'center'});
-        }
-        return;
-      }
+      const { ok } = validateAllWithAlert();
+      if(!ok) return;
 
-      const phoneDigits = normalizePhone($('#phone').value.trim());
+      const phoneDigits = onlyDigits($('#phone').value.trim());
       const btn = $('#btn-submit');
       btn.disabled = true; btn.textContent = '중복 확인 중…';
 
-      // 클라이언트 중복 확인(실패 시에도 제출 중단)
       try{
         const exists = await checkPhoneDuplicate(phoneDigits);
         if(exists){
-          showStatusError('이미 동일한 휴대폰 번호로 제출된 기록이 있습니다. 중복 제출은 불가합니다.');
+          alert('이미 동일한 휴대폰 번호로 제출된 기록이 있습니다. 중복 제출은 불가합니다.');
+          showStatusError('중복 번호로 제출 차단');
           btn.disabled = false; btn.textContent = '제출';
           return;
         }
       }catch(err){
-        showStatusError('중복 확인에 실패했습니다. 잠시 후 다시 시도하십시오.');
+        alert('중복 확인에 실패했습니다. 잠시 후 다시 시도하십시오.');
+        showStatusError('중복 확인 실패');
         btn.disabled = false; btn.textContent = '제출';
         return;
       }
@@ -395,6 +402,7 @@
         const data = await res.json().catch(()=>({ok:res.ok}));
         if(res.ok && data && data.ok){
           showStatusOk('제출 완료되었습니다. 감사합니다!');
+          alert('제출이 완료되었습니다. 감사합니다!');
           document.getElementById('form').reset();
           document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected-f','selected-m'));
           document.querySelectorAll('fieldset').forEach(fs=>fs.classList.remove('invalid'));
@@ -402,14 +410,17 @@
           ['nickname','realname','phone'].forEach(id=>$('#'+id).classList.remove('invalid'));
           $('#agreeWrap').classList.remove('checkbox-invalid');
         }else if (data && data.error === 'duplicate_phone'){
-          showStatusError('이미 동일한 휴대폰 번호로 제출된 기록이 있습니다. 중복 제출은 불가합니다.');
+          alert('이미 동일한 휴대폰 번호로 제출된 기록이 있습니다. 중복 제출은 불가합니다.');
+          showStatusError('중복 번호로 제출 차단');
         }else{
           showStatusError('서버 응답 오류가 발생했습니다.');
+          alert('서버 응답 오류가 발생했습니다.');
           console.error('Server response:', data);
         }
       }catch(err){
         console.error(err);
         showStatusError('네트워크 오류가 발생했습니다.');
+        alert('네트워크 오류가 발생했습니다.');
       }finally{
         btn.disabled = false; btn.textContent = '제출';
       }
