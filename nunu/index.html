@@ -6,41 +6,35 @@
   <title>누에 고치 성별 맞추기 대회 – 공식 아카이브 & 참가</title>
   <style>
     :root{
-      --bg: #ffffff; /* 실크 느낌의 배경 */
-      --paper: #ffffff; /* 카드 배경 */
-      --ink: #111827; /* 본문 텍스트 */
-      --sub: #6b7280; /* 보조 텍스트 */
-      --pri: #4b5563; /* 포인트(그린) */
-      --pri-2: #374151; /* 포인트 진한 그린 */
-      --acc: #9ca3af;  /* 악센트 */
-      --muted: #e5e7eb;/* 경계선 */
-      --ring: rgba(107,114,128,.25);
-      --radius: 16px;
-      --radius-sm: 12px;
-      --shadow: 0 10px 30px rgba(17,24,39,.08);
+      --bg: #ffffff; --paper: #ffffff; --ink: #111827; --sub: #6b7280;
+      --pri: #4b5563; --pri-2: #374151; --acc: #9ca3af; --muted: #e5e7eb; --ring: rgba(107,114,128,.25);
+      --radius: 16px; --radius-sm: 12px; --shadow: 0 10px 30px rgba(17,24,39,.08);
+
+      /* ✅ 아카이브 3장 폭과 상단 박스 폭을 통일 */
+      --archive-card-w: 400px;
+      --archive-gap: 18px;
+      --archive-row-w: calc(3 * var(--archive-card-w) + 2 * var(--archive-gap));
+      --accent-green: #10b981;   /* emerald-500 */
+      --accent-green-ink: #065f46; /* emerald-800 */
     }
     *{box-sizing: border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
 
-    /* 공통 폭 유틸 (네비와 히어로에만 사용) */
-    .wrap{max-width:1120px;margin:0 auto;padding:24px}
+    .wrap{max-width:var(--archive-row-w);margin:0 auto;padding:24px}
 
     /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px}
     .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
-    .brand svg{width:28px;height:28px}
     .brand strong{font-weight:800;letter-spacing:.2px}
     .nav-actions{display:flex;gap:8px;align-items:center;justify-content:center}
     .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
-    /* 그라데이션 제거: 단색 버튼 */
     .btn.primary{background:#4b5563;color:#ffffff;border:0}
     .btn.accent{background:#d1d5db;color:#111827;border:0}
     .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
-    .btn.disabled,
-    .btn[aria-disabled="true"]{opacity:.7;cursor:not-allowed;pointer-events:none}
+    .btn.disabled,.btn[aria-disabled="true"]{opacity:.7;cursor:not-allowed;pointer-events:none}
 
-    /* HERO (상단 카드) */
+    /* HERO */
     .hero{position:relative;margin:24px auto 12px;border-radius:24px;background:
       radial-gradient(1200px 600px at 10% -10%, #f3f4f6, transparent 60%),
       radial-gradient(1200px 600px at 110% 10%, #eef2f7, transparent 60%),
@@ -49,70 +43,75 @@
     .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;padding:40px}
     @media (max-width:900px){.hero-grid{grid-template-columns:1fr;}}
     .hero h1{margin:0 0 8px;font-size:clamp(24px,4vw,40px);letter-spacing:-.3px;line-height:1.2}
-    /* 제목 두 번째 줄(작게) */
-    .hero h1 .sub{
-      display:block;
-      font-size:clamp(18px,2.6vw,28px);
-      font-weight:700;
-      color:var(--pri-2);
-      letter-spacing:-.2px;
-      margin-top:8px; /* ⬅ 간격 확대 */
-    }
-    .hero p.lead{
-      color:var(--sub);
-      margin:0 0 16px;
-      line-height:1.7; /* ⬅ 줄 간격 확대 */
-    }
-
-    /* 히어로 왼쪽 컬럼: 형제 요소 간 공통 간격 */
-    .hero-grid section > * + *{ margin-top:10px; } /* ⬅ 배지들/제목/리드/버튼 사이 간격 */
-
-    /* 배지(pill) */
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      font-weight:700;font-size:12px;border:1px solid transparent;
-    }
+    .hero h1 .sub{display:block;font-size:clamp(18px,2.6vw,28px);font-weight:700;color:var(--pri-2);letter-spacing:-.2px;margin-top:8px}
+    .hero p.lead{color:var(--sub);margin:0 0 16px;line-height:1.7}
+    .hero-grid section > * + *{ margin-top:10px }
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid transparent}
     .pill.live{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
     .pill.upcoming{background:#eff6ff;color:#1e3a8a;border-color:#bfdbfe}
-
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
-    /* HERO 오른쪽 패널(이벤트 안내) 세로 중앙 정렬 */
-    .hero-grid > .panel{
-      display:flex;flex-direction:column;justify-content:center;
-    }
+/* === 이벤트 안내 패널: 회색 톤 버전 === */
+.hero-grid > .panel{display:flex;flex-direction:column;justify-content:center}
 
-    /* === 중앙 래퍼: 아카이브부터 전부 한 곳에 === */
-    #content.page{
-      display:grid;justify-items:center;gap:40px;padding:0 24px 24px;
-    }
-    #content.page > *{width:min(1120px, 100%)}
+.panel.notice{
+  /* 은은한 회색 그라디언트 배경 */
+  background: linear-gradient(180deg, #f3f4f6 0%, #ffffff 100%);
+  border: 1px solid var(--muted);
+  border-left: 4px solid #cbd5e1;           /* 좌측 포인트 보더(회색) */
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.panel-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:8px
+}
+.panel-head .ico{
+  width:18px;height:18px;
+  color:#6b7280;                             /* 아이콘도 회색 */
+  opacity:.95
+}
+.panel-title{margin:0;font-size:16px;font-weight:800;letter-spacing:.2px;color:var(--pri-2)}
+.panel-desc{margin:2px 0 8px;font-size:13px;color:var(--sub)}
+
+.panel-divider{
+  height:1px;width:100%;margin:8px 0;
+  background:linear-gradient(to right, transparent 0%, #e5e7eb 12%, #e5e7eb 88%, transparent 100%);
+  border-radius:999px;
+}
+
+.panel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.panel-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
+.panel-list .check{
+  width:18px;height:18px;margin-top:1px;
+  color:#6b7280;                             /* 체크 아이콘 회색 */
+}
+
+.panel-foot{display:flex;gap:8px;align-items:center;margin-top:10px;color:#4b5563;font-size:13px}
+.panel-foot svg{width:16px;height:16px;color:#6b7280}
+
+    /* === 중앙 래퍼 === */
+    #content.page{display:grid;justify-items:center;gap:40px;padding:0 24px 24px;}
+    #content.page > *{width:min(var(--archive-row-w), 100%)}
 
     /* SECTIONS */
     .section{margin:40px 0;text-align:center}
     .section h2{font-size:24px;margin:0 0 6px}
     .section p.sub{color:var(--sub);margin:0 0 18px}
 
-    /* TWO COLUMN */
-    .two-col{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
-    @media (max-width:900px){.two-col{grid-template-columns:1fr}}
-    .panel{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center}
-    .panel h3{margin:0 0 8px}
-    .embed{aspect-ratio:16/9;background:#0f172a;border-radius:var(--radius-sm);display:grid;place-items:center;color:#e2e8f0;font-size:14px;border:1px dashed rgba(148,163,184,.6)}
-
-    /* 아카이브 카드 그리드: 언제나 중앙 */
-    .card-grid{
-      display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:18px;margin-top:28px;
-    }
-    .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;text-align:center;flex:0 1 340px;max-width:360px}
+    /* 카드 그리드 */
+    .card-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:var(--archive-gap);margin-top:28px}
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;text-align:center;flex:0 1 var(--archive-card-w);max-width:var(--archive-card-w)}
     .card .cover{height:140px;background:linear-gradient(135deg,rgba(75,85,99,.12),rgba(156,163,175,.14));display:flex;align-items:center;justify-content:center}
     .card .cover svg{width:84px;height:84px;opacity:.9}
     .card .body{padding:18px}
+    .card .body p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .meta{display:flex;gap:10px;color:var(--sub);font-size:13px;justify-content:center;flex-wrap:wrap}
     .kicker{color:var(--pri-2);font-weight:800;font-size:12px;letter-spacing:.6px;text-transform:uppercase}
 
-    /* === 회색(준비중) 카드 변형 === */
+    /* 회색(준비중) 카드 */
     .card.muted{background:#f9fafb;border-color:#e5e7eb;}
     .card.muted .cover{background:linear-gradient(135deg,rgba(156,163,175,.25),rgba(209,213,219,.25))}
     .card.muted .kicker,.card.muted h3,.card.muted p{color:#6b7280}
@@ -120,7 +119,7 @@
     .card.muted .btn.primary{background:#9ca3af;color:#111827}
     .card.muted .btn.primary.disabled,.card.muted .btn.primary[aria-disabled="true"]{opacity:.85}
 
-    /* ==== FAQ: 둥근 버튼 스타일 ==== */
+    /* FAQ */
     .faq details{margin:10px 0;border:0}
     .faq summary{
       list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -139,7 +138,6 @@
     }
     .faq summary:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ring)}
 
-    /* FOOTER */
     footer{margin:48px 0 12px;color:var(--sub);text-align:center;font-size:14px}
     .tag{display:inline-flex;gap:8px;align-items:center}
     .tag svg{width:16px;height:16px}
@@ -164,9 +162,7 @@
   <main id="home" class="wrap hero">
     <div class="hero-grid">
       <section>
-        <!-- 진행 중: 녹색 배지 -->
         <div class="pill live">제 2회 완료 · 2025/08/11 ~ 2025/08/25</div>
-        <!-- 준비 중: 파란색 배지 -->
         <div class="pill upcoming">제 3회 준비 중 · 예상 9월 초중순 시작 예정</div>
 
         <h1>🐛누에의 비밀을 맞혀보세요
@@ -183,17 +179,45 @@
           <a class="btn" href="#faq">FAQ</a>
         </div>
       </section>
-      <aside class="panel">
-        <h3>이벤트 안내</h3>
-        <ul style="margin:10px 0 0 18px; padding:0; list-style-position: inside; text-align:left">
-          <li>참가 방법: 설문 링크로 접수</li>
-          <li>점수 규칙: 정답 수를 기준으로 순위를 산정한다. 동점자의 경우 중복 등수를 부여합니다.</li>
-          <li>데이터 공개: 대회 종료 후 익명 통계</li>
+
+      <!-- ✅ 리디자인된 이벤트 안내 패널 -->
+      <aside class="panel notice" aria-labelledby="notice-title">
+        <div class="panel-head">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M3 11l18-7v16l-6-2-4 3v-5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h3 id="notice-title" class="panel-title">이벤트 안내</h3>
+        </div>
+
+        <div class="panel-desc">핵심만 확인하고 바로 참여하실 수 있도록 요약했습니다.</div>
+        <div class="panel-divider" aria-hidden="true"></div>
+
+        <ul class="panel-list">
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><strong>참가 방법</strong>: 설문 링크로 접수</div>
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><strong>점수 규칙</strong>: 정답 수를 기준으로 순위를 산정한다. 동점자의 경우 중복 등수를 부여합니다.</div>
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><strong>데이터 공개</strong>: 대회 종료 후 <u>익명 통계</u></div>
+          </li>
         </ul>
-        <div style="height:12px"></div>
-        <div class="tag">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12l4 4 12-12" stroke-linecap="round"/></svg>
-          안전한 공개 범위로 운영합니다.
+
+        <div class="panel-foot" aria-label="운영 원칙">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M4 12l4 4 12-12" stroke-linecap="round"/>
+          </svg>
+          <span>안전한 공개 범위로 운영합니다.</span>
         </div>
       </aside>
     </div>
@@ -208,7 +232,6 @@
       <p class="sub">제 1회와 제 2회의 기록을 보관과 참여 페이지</p>
 
       <div class="card-grid">
-        <!-- 1회 -->
         <article class="card">
           <div class="cover" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
@@ -223,7 +246,7 @@
             </div>
           </div>
         </article>
-        <!-- 2회 -->
+
         <article class="card">
           <div class="cover" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
@@ -238,7 +261,7 @@
             </div>
           </div>
         </article>
-        <!-- 3회 안내 (회색 톤) -->
+
         <article class="card muted">
           <div class="cover" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
@@ -284,11 +307,9 @@
       <div>© 2025 누에 고치 성별 맞추기 대회 · 문의: <a href="#" style="color:var(--pri-2);text-decoration:none">hanri@hanri.net</a></div>
     </footer>
   </div>
-  <!-- === 중앙 래퍼 끝 === -->
 
-  <!-- 알림 스크립트: '제 3회 준비중' 버튼 클릭 시 안내 -->
+  <!-- 안내 스크립트 -->
   <script>
-    // 네비게이션의 버튼
     const btnApplyNav = document.getElementById('btn-apply');
     if (btnApplyNav) {
       btnApplyNav.addEventListener('click', function (e) {
@@ -296,8 +317,6 @@
         alert('준비중입니다!');
       });
     }
-
-    // 히어로 영역의 버튼
     const btnApplyHero = document.getElementById('btn-apply-hero');
     if (btnApplyHero) {
       btnApplyHero.addEventListener('click', function (e) {
