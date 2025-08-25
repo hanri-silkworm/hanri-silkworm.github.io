@@ -20,19 +20,23 @@
     *{box-sizing: border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
 
+    /* 기본 wrap(본문 영역은 3카드 폭 유지) */
     .wrap{max-width:var(--archive-row-w);margin:0 auto;padding:24px}
 
-    /* NAV */
+    /* NAV (리더보드 페이지와 크기/디자인 통일) */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px} /* ⬅ 2회 리더보드와 동일 */
     .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
     .brand strong{font-weight:800;letter-spacing:.2px}
     .nav-actions{display:flex;gap:8px;align-items:center;justify-content:center}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600} /* ⬅ 2회 리더보드와 동일 */
     .btn.primary{background:#4b5563;color:#ffffff;border:0}
     .btn.accent{background:#d1d5db;color:#111827;border:0}
     .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
     .btn.disabled,.btn[aria-disabled="true"]{opacity:.7;cursor:not-allowed;pointer-events:none}
+
+    /* ⬇ 네비게이션만 1120px 폭을 사용(리더보드와 동일), 본문은 3카드 폭 유지 */
+    header.nav .wrap{max-width:1120px;padding:20px 24px}
 
     /* HERO */
     .hero{position:relative;margin:24px auto 12px;border-radius:24px;background:
@@ -51,46 +55,27 @@
     .pill.upcoming{background:#eff6ff;color:#1e3a8a;border-color:#bfdbfe}
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
-/* === 이벤트 안내 패널: 회색 톤 버전 === */
-.hero-grid > .panel{display:flex;flex-direction:column;justify-content:center}
-
-.panel.notice{
-  /* 은은한 회색 그라디언트 배경 */
-  background: linear-gradient(180deg, #f3f4f6 0%, #ffffff 100%);
-  border: 1px solid var(--muted);
-  border-left: 4px solid #cbd5e1;           /* 좌측 포인트 보더(회색) */
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 16px 18px;
-  text-align: left;
-}
-
-.panel-head{
-  display:flex;align-items:center;gap:10px;margin-bottom:8px
-}
-.panel-head .ico{
-  width:18px;height:18px;
-  color:#6b7280;                             /* 아이콘도 회색 */
-  opacity:.95
-}
-.panel-title{margin:0;font-size:16px;font-weight:800;letter-spacing:.2px;color:var(--pri-2)}
-.panel-desc{margin:2px 0 8px;font-size:13px;color:var(--sub)}
-
-.panel-divider{
-  height:1px;width:100%;margin:8px 0;
-  background:linear-gradient(to right, transparent 0%, #e5e7eb 12%, #e5e7eb 88%, transparent 100%);
-  border-radius:999px;
-}
-
-.panel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.panel-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
-.panel-list .check{
-  width:18px;height:18px;margin-top:1px;
-  color:#6b7280;                             /* 체크 아이콘 회색 */
-}
-
-.panel-foot{display:flex;gap:8px;align-items:center;margin-top:10px;color:#4b5563;font-size:13px}
-.panel-foot svg{width:16px;height:16px;color:#6b7280}
+    /* === 이벤트 안내 패널: 회색 톤 버전 === */
+    .hero-grid > .panel{display:flex;flex-direction:column;justify-content:center}
+    .panel.notice{
+      background: linear-gradient(180deg, #f3f4f6 0%, #ffffff 100%);
+      border: 1px solid var(--muted);
+      border-left: 4px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      text-align: left;
+    }
+    .panel-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .panel-head .ico{width:18px;height:18px;color:#6b7280;opacity:.95}
+    .panel-title{margin:0;font-size:16px;font-weight:800;letter-spacing:.2px;color:var(--pri-2)}
+    .panel-desc{margin:2px 0 8px;font-size:13px;color:var(--sub)}
+    .panel-divider{height:1px;width:100%;margin:8px 0;background:linear-gradient(to right, transparent 0%, #e5e7eb 12%, #e5e7eb 88%, transparent 100%);border-radius:999px}
+    .panel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .panel-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
+    .panel-list .check{width:18px;height:18px;margin-top:1px;color:#6b7280}
+    .panel-foot{display:flex;gap:8px;align-items:center;margin-top:10px;color:#4b5563;font-size:13px}
+    .panel-foot svg{width:16px;height:16px;color:#6b7280}
 
     /* === 중앙 래퍼 === */
     #content.page{display:grid;justify-items:center;gap:40px;padding:0 24px 24px;}
@@ -147,12 +132,12 @@
   <!-- NAV -->
   <header class="nav">
     <div class="nav-inner wrap">
-      <a class="brand" href="#home" aria-label="누에 대회 홈">
+      <a class="brand" href="index.html" aria-label="누에 대회 홈">
         <strong>🐛누에 고치 성별 맞추기 대회</strong>
       </a>
       <nav class="nav-actions">
         <a class="btn" href="#archive">아카이브</a>
-        <a class="btn" href="#leaderboard">제 2회 리더보드</a>
+        <a class="btn" href="2nd_leaderboard.html">제 2회 리더보드</a>
         <a class="btn primary" href="#apply" id="btn-apply">제 3회 준비중</a>
       </nav>
     </div>
@@ -180,7 +165,7 @@
         </div>
       </section>
 
-      <!-- ✅ 리디자인된 이벤트 안내 패널 -->
+      <!-- 회색톤 이벤트 안내 패널 -->
       <aside class="panel notice" aria-labelledby="notice-title">
         <div class="panel-head">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
