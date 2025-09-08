@@ -9,14 +9,13 @@
       --bg:#ffffff; --paper:#ffffff; --ink:#0f172a; --sub:#6b7280;
       --pri:#4b5563; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
       --shadow:0 10px 30px rgba(17,24,39,.08);
-      --green:#059669; --blue:#1e3a8a;
-      --danger:#ef4444;
+      --green:#059669; --blue:#1e3a8a; --danger:#ef4444;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
     .wrap{max-width:980px;margin:0 auto;padding:24px}
 
-    /* NAV (브랜드 텍스트 제거, 우측 버튼만) */
+    /* NAV (상단 로고 제거, 버튼만) */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 16px}
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
@@ -38,7 +37,7 @@
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:18px}
 
-    /* PRODUCT (이미지 + 요약설명) */
+    /* PRODUCT */
     .product{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}
     @media (max-width:920px){.product{grid-template-columns:1fr}}
     .prod-figure{border:1px solid var(--muted);border-radius:12px;overflow:hidden;background:#f3f4f6;display:block}
@@ -48,7 +47,7 @@
     .bullets{margin:8px 0 0;padding-left:18px}
     .bullets li{margin:4px 0}
 
-    /* FORM 공통 */
+    /* FORM */
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media (max-width:720px){.grid{grid-template-columns:1fr}}
     label{font-weight:700;display:block;margin-bottom:6px}
@@ -67,8 +66,6 @@
     .radio input{accent-color:#2563eb}
     .radio:hover{box-shadow:0 6px 18px rgba(15,23,42,.06)}
     .radio.selected{border-color:#93c5fd;background:#eff6ff;color:#1e3a8a}
-    .radio.selected-black{background:#111827;color:#fff;border-color:#111827}
-    .radio.selected-white{background:#fff;border-color:#cbd5e1;color:#111827; box-shadow: inset 0 0 0 2px #e5e7eb;}
 
     /* SIZE STEPPER */
     .sizes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
@@ -76,39 +73,23 @@
     .size-box{border:1px solid var(--muted);border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:8px}
     .size-box h4{margin:0;font-size:14px}
     .stepper{display:flex;align-items:center;justify-content:center;gap:8px}
-    .stepper button{
-      width:34px;height:34px;border-radius:10px;border:1px solid var(--muted);background:#fff;cursor:pointer;font-size:18px;line-height:1
-    }
+    .stepper button{width:34px;height:34px;border-radius:10px;border:1px solid var(--muted);background:#fff;cursor:pointer;font-size:18px;line-height:1}
     .stepper button:active{transform:translateY(1px)}
-    .stepper input{
-      width:64px;text-align:center;padding:8px 6px;border-radius:10px;border:1px solid var(--muted);background:#fff;
-    }
+    .stepper input{width:64px;text-align:center;padding:8px 6px;border-radius:10px;border:1px solid var(--muted);background:#fff}
     .stepper input[readonly]{background:#fff}
     .total{margin-top:10px;font-weight:800;color:var(--blue)}
 
-    /* 상태 안내 — 텍스트만 */
-    #status{min-height:24px;text-align:center;margin-top:6px}
-    .notice{background:none!important;border:0!important;border-radius:0!important;padding:0!important;display:inline!important;font-weight:700}
-    .notice-ok{color:#065f46}
-    .notice-err{color:#b91c1c}
-
-    .actions{display:flex;gap:12px;justify-content:center;padding:16px}
-    .addr-row{display:grid;grid-template-columns:140px 1fr auto;gap:10px}
-    @media (max-width:720px){.addr-row{grid-template-columns:1fr;}}
-
-    /* ===== 상품 정보 표 ===== */
-    .table-wrap{margin-top:10px;border:1px solid var(--muted);border-radius:12px;background:#fff;overflow:auto}
-    table.spec{width:100%;border-collapse:separate;border-spacing:0;min-width:560px}
-    .spec thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
-    .spec tbody td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-    .spec tbody tr:hover{background:#fafafa}
-    .spec .num{ text-align:center; }
+    /* SUMMARY */
+    .paybox{margin-top:12px;border:1px dashed #cbd5e1;border-radius:12px;padding:12px}
+    .paybox .row{display:flex;justify-content:space-between;gap:10px;margin:4px 0}
+    .paybox .row.total{font-weight:900;border-top:1px solid #e5e7eb;padding-top:8px}
+    .paybox .acc{margin-top:6px;color:#111827}
+    .paybox .note{color:#6b7280;font-size:13px;margin-top:6px}
   </style>
-  <!-- 다음(카카오) 우편번호 검색 위젯 -->
+  <!-- 카카오 우편번호 -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-  <!-- NAV: 버튼만 노출 (브랜드 텍스트 제거) -->
   <header class="nav">
     <div class="nav-inner wrap">
       <a class="btn" href="index.html">Home</a>
@@ -121,111 +102,28 @@
     <section class="hero">
       <div class="hero-inner">
         <h1>누에 티셔츠 주문</h1>
-        <div class="sub">주문자 정보와 옵션(색상·뒷면 디자인·사이즈별 수량)을 선택하면 스프레드시트로 저장됩니다.</div>
+        <div class="sub">뒷면 옵션에 따라 단가가 달라집니다. 한 주문서에는 <b>하나의 뒷면 옵션만</b> 선택해 주세요.</div>
       </div>
     </section>
 
-    <!-- 제품 소개 (이미지 + 간단 설명) -->
+    <!-- 제품 소개 -->
     <section class="card" aria-labelledby="hdr-prod">
       <div class="inner product">
-        <figure class="prod-figure" aria-label="제품 이미지">
+        <figure class="prod-figure">
           <img src="https://www.hanri.net/nunu/nunu_tshirt_image.png" alt="누에 티셔츠 제품 이미지" onerror="this.style.opacity=.25; this.alt='이미지 준비중'">
         </figure>
         <div class="prod-desc">
           <h3 id="hdr-prod">누누 실크웜 티셔츠</h3>
-          <p>부드러운 코튼 원단에 누에 심볼을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 세 가지 뒷면 디자인 옵션을 제공합니다.</p>
+          <p>부드러운 코튼 원단에 누에 심볼을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 <b>뒷면 옵션 없음·텍스트형</b> 중 선택 가능합니다.</p>
           <ul class="bullets">
-            <li>색상: 흰색 / 검은색</li>
-            <li>뒷면 옵션: 로고형 / 텍스트형 / 심볼+문구</li>
+            <li><b>가격</b> — 뒷면 옵션 <u>없음 16,000원</u> · <u>텍스트형 22,000원</u> (장당)</li>
+            <li><b>배송비</b> — 4,000원(주문당)</li>
+            <li><b>입금 계좌</b> — 농협 <u>302-1235-6391-61</u> (예금주: 한리)</li>
             <li>사이즈: S · M · L · XL · 2XL</li>
+            <li>소재: 면100% (애쉬 95/5, 모쿠그레이 80/20)</li>
+            <li>핏: 정사이즈(남녀공용) · 신축성 좋음 · 도톰한 17수</li>
           </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- 상품 정보 + 사이즈 표 -->
-    <section class="card" style="margin-top:16px" aria-labelledby="hdr-info">
-      <div class="inner">
-        <h2 id="hdr-info" style="margin:0 0 8px">상품 정보</h2>
-
-        <div style="display:grid;grid-template-columns:1fr;gap:10px">
-          <div>
-            <p style="margin:0 0 8px"><strong>도톰한 17수 라운드 티셔츠</strong> 입니다. 오래입어도 쉽게 모양이 변하지 않는 상품입니다.</p>
-            <ul class="bullets">
-              <li>소재 : 면 100% <span style="color:var(--sub)">(애쉬: 면 95%, 폴리에스터 5% / 모쿠그레이: 면 80%, 폴리에스터 20%)</span></li>
-              <li>제조사 : Printstar</li>
-              <li>제조국 : Made in China</li>
-              <li>사이즈 : S, M, L, XL, 2XL</li>
-              <li>핏 : 정사이즈 (남녀공용)</li>
-              <li>신축성 : 신축성 좋음</li>
-              <li>감촉 : 부드러운 감촉</li>
-              <li>두께 : 도톰한 소재</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 style="margin:10px 0 6px">세탁방법</h3>
-            <ul class="bullets">
-              <li>드라이클리닝 또는 단독 손세탁 가능합니다.</li>
-              <li>찬물에 뒤집어 세탁해 주십시오.</li>
-              <li>표백제를 사용하거나 물에 장시간(30분 이상) 담가두지 마세요.</li>
-              <li>마찰에 의한 보푸라기, 올 뜯김이 발생할 수 있습니다.</li>
-              <li>건조기 사용 불가합니다. 세탁 후 그늘에서 건조 바랍니다.</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 style="margin:10px 0 6px">사이즈 정보</h3>
-            <div class="table-wrap">
-              <table class="spec" aria-label="티셔츠 사이즈 표">
-                <thead>
-                  <tr>
-                    <th>Size (cm)</th>
-                    <th class="num">S</th>
-                    <th class="num">M</th>
-                    <th class="num">L</th>
-                    <th class="num">XL</th>
-                    <th class="num">2XL</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>총기장</td>
-                    <td class="num">66</td>
-                    <td class="num">70</td>
-                    <td class="num">74</td>
-                    <td class="num">77</td>
-                    <td class="num">81</td>
-                  </tr>
-                  <tr>
-                    <td>어깨너비</td>
-                    <td class="num">45.5</td>
-                    <td class="num">48</td>
-                    <td class="num">50</td>
-                    <td class="num">53</td>
-                    <td class="num">55</td>
-                  </tr>
-                  <tr>
-                    <td>가슴너비</td>
-                    <td class="num">47</td>
-                    <td class="num">51</td>
-                    <td class="num">54</td>
-                    <td class="num">56</td>
-                    <td class="num">59</td>
-                  </tr>
-                  <tr>
-                    <td>소매길이</td>
-                    <td class="num">19</td>
-                    <td class="num">19.5</td>
-                    <td class="num">21</td>
-                    <td class="num">23</td>
-                    <td class="num">25</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="subnote">※ 측정 위치에 따라 ±1~2cm 오차가 있을 수 있습니다.</div>
-          </div>
+          <p class="sub" style="margin-top:8px"><b>안내</b> — 뒷면 옵션이 다른 경우 <u>각 옵션별로 주문서를 따로 제출</u>해 주세요. (예: 없음 2장 / 텍스트형 1장 ⇒ 2건으로 접수)</p>
         </div>
       </div>
     </section>
@@ -234,23 +132,20 @@
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-orderer">
       <div class="inner">
         <h2 id="hdr-orderer" style="margin:0 0 12px">주문자 정보</h2>
-
         <div class="grid">
           <div>
             <label for="custName">주문자 명 <span class="req">*</span></label>
             <input id="custName" type="text" placeholder="예: 홍길동"/>
           </div>
-
           <div>
             <label for="phone">전화번호 <span class="req">*</span></label>
             <input id="phone" type="tel" inputmode="tel" maxlength="13" placeholder="예: 010-1234-5678"/>
             <div class="subnote">입력 시 자동으로 000-0000-0000 형식으로 변환됩니다.</div>
           </div>
-
           <!-- 주소 -->
           <div style="grid-column:1/-1">
             <label>집 주소 <span class="req">*</span></label>
-            <div class="addr-row" style="margin-bottom:8px">
+            <div class="addr-row" style="display:grid;grid-template-columns:140px 1fr auto;gap:10px;margin-bottom:8px">
               <input id="postcode" type="text" placeholder="우편번호" readonly/>
               <input id="addr1" type="text" placeholder="도로명 주소" readonly/>
               <button type="button" class="btn" id="btnFindAddr">주소 찾기</button>
@@ -266,94 +161,81 @@
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-opt">
       <div class="inner">
         <h2 id="hdr-opt" style="margin:0 0 12px">옵션 선택</h2>
-
         <div class="grid">
           <!-- 색상 -->
           <div>
             <label>티셔츠 색상 <span class="req">*</span></label>
             <div class="radios" id="colorGroup" role="radiogroup" aria-label="티셔츠 색상">
-              <label class="radio" data-color="white">
-                <input type="radio" name="color" value="white" hidden/>
-                <span>흰색</span>
-              </label>
-              <label class="radio" data-color="black">
-                <input type="radio" name="color" value="black" hidden/>
-                <span>검은색</span>
-              </label>
+              <label class="radio"><input type="radio" name="color" value="흰색" hidden/><span>흰색</span></label>
+              <label class="radio"><input type="radio" name="color" value="검은색" hidden/><span>검은색</span></label>
             </div>
           </div>
-
-          <!-- 뒷면 디자인 -->
+          <!-- 뒷면 옵션 (2종) -->
           <div>
-            <label>뒷면 디자인 <span class="req">*</span></label>
-            <div class="radios" id="designGroup" role="radiogroup" aria-label="뒷면 디자인">
-              <label class="radio">
-                <input type="radio" name="design" value="로고형" hidden/>
-                <span>로고형</span>
-              </label>
-              <label class="radio">
-                <input type="radio" name="design" value="텍스트형" hidden/>
-                <span>텍스트형</span>
-              </label>
-              <label class="radio">
-                <input type="radio" name="design" value="심볼+문구" hidden/>
-                <span>심볼+문구</span>
-              </label>
+            <label>뒷면 옵션 <span class="req">*</span></label>
+            <div class="radios" id="designGroup" role="radiogroup" aria-label="뒷면 옵션">
+              <label class="radio"><input type="radio" name="design" value="없음" hidden/><span>없음 (₩16,000)</span></label>
+              <label class="radio"><input type="radio" name="design" value="텍스트형" hidden/><span>텍스트형 (₩22,000)</span></label>
             </div>
+            <div class="subnote">※ 한 주문서에는 하나의 뒷면 옵션만 선택 가능합니다. 옵션이 다르면 주문을 나눠 주세요.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 사이즈 수량 -->
+    <!-- 사이즈 수량 + 자동 합계 -->
     <form id="orderForm" class="card" style="margin-top:16px" novalidate>
       <div class="inner">
         <h2 style="margin:0 0 12px">사이즈별 수량</h2>
 
         <div class="sizes" id="sizesWrap">
-          <div class="size-box" data-size="S">
-            <h4>S</h4>
+          <!-- S ~ 2XL -->
+          <div class="size-box" data-size="S"><h4>S</h4>
             <div class="stepper">
-              <button type="button" class="qty-btn" data-delta="-1" aria-label="S 수량 감소">−</button>
-              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="S 수량 표시">
-              <button type="button" class="qty-btn" data-delta="1" aria-label="S 수량 증가">+</button>
+              <button type="button" class="qty-btn" data-delta="-1">−</button>
+              <input type="number" value="0" min="0" max="99" readonly>
+              <button type="button" class="qty-btn" data-delta="1">+</button>
             </div>
           </div>
-          <div class="size-box" data-size="M">
-            <h4>M</h4>
+          <div class="size-box" data-size="M"><h4>M</h4>
             <div class="stepper">
-              <button type="button" class="qty-btn" data-delta="-1" aria-label="M 수량 감소">−</button>
-              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="M 수량 표시">
-              <button type="button" class="qty-btn" data-delta="1" aria-label="M 수량 증가">+</button>
+              <button type="button" class="qty-btn" data-delta="-1">−</button>
+              <input type="number" value="0" min="0" max="99" readonly>
+              <button type="button" class="qty-btn" data-delta="1">+</button>
             </div>
           </div>
-          <div class="size-box" data-size="L">
-            <h4>L</h4>
+          <div class="size-box" data-size="L"><h4>L</h4>
             <div class="stepper">
-              <button type="button" class="qty-btn" data-delta="-1" aria-label="L 수량 감소">−</button>
-              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="L 수량 표시">
-              <button type="button" class="qty-btn" data-delta="1" aria-label="L 수량 증가">+</button>
+              <button type="button" class="qty-btn" data-delta="-1">−</button>
+              <input type="number" value="0" min="0" max="99" readonly>
+              <button type="button" class="qty-btn" data-delta="1">+</button>
             </div>
           </div>
-          <div class="size-box" data-size="XL">
-            <h4>XL</h4>
+          <div class="size-box" data-size="XL"><h4>XL</h4>
             <div class="stepper">
-              <button type="button" class="qty-btn" data-delta="-1" aria-label="XL 수량 감소">−</button>
-              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="XL 수량 표시">
-              <button type="button" class="qty-btn" data-delta="1" aria-label="XL 수량 증가">+</button>
+              <button type="button" class="qty-btn" data-delta="-1">−</button>
+              <input type="number" value="0" min="0" max="99" readonly>
+              <button type="button" class="qty-btn" data-delta="1">+</button>
             </div>
           </div>
-          <div class="size-box" data-size="2XL">
-            <h4>2XL</h4>
+          <div class="size-box" data-size="2XL"><h4>2XL</h4>
             <div class="stepper">
-              <button type="button" class="qty-btn" data-delta="-1" aria-label="2XL 수량 감소">−</button>
-              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="2XL 수량 표시">
-              <button type="button" class="qty-btn" data-delta="1" aria-label="2XL 수량 증가">+</button>
+              <button type="button" class="qty-btn" data-delta="-1">−</button>
+              <input type="number" value="0" min="0" max="99" readonly>
+              <button type="button" class="qty-btn" data-delta="1">+</button>
             </div>
           </div>
         </div>
 
-        <div class="total" id="totalBox">총 수량: 0장</div>
+        <div class="paybox" id="paybox">
+          <div class="row"><span>선택 수량</span><strong id="qTotal">0 장</strong></div>
+          <div class="row"><span>단가(뒷면 옵션)</span><strong id="unitPrice">—</strong></div>
+          <div class="row"><span>소계</span><strong id="subtotal">—</strong></div>
+          <div class="row"><span>배송비</span><strong id="shipping">₩0</strong></div>
+          <div class="row total"><span>총 결제금액</span><strong id="grandTotal">₩0</strong></div>
+          <div class="acc">입금 계좌: <b>농협 302-1235-6391-61 (예금주: 한리)</b></div>
+          <div class="note">주문서 제출 후 위 계좌로 입금해 주세요. (입금자명=주문자명)</div>
+        </div>
 
         <div class="actions">
           <button type="submit" class="btn success lg" id="btnSubmit">주문 제출</button>
@@ -365,9 +247,14 @@
   </main>
 
   <script>
-    /* ★ 여기를 너의 Apps Script 웹앱 URL로 교체하세요 */
+    /* ★ Apps Script 웹앱 URL로 교체 */
     const ENDPOINT = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID/exec';
     const $ = (s)=>document.querySelector(s);
+
+    /* 상수(가격) */
+    const PRICE_NO_BACK = 16000;    // 없음
+    const PRICE_TEXTBACK = 22000;   // 텍스트형
+    const SHIPPING = 4000;          // 주문당
 
     /* 전화번호 자동 하이픈 */
     const onlyDigits = s => (s||'').replace(/[^\d]/g,'');
@@ -377,6 +264,8 @@
       if (d.length <= 7) return d.slice(0,3) + '-' + d.slice(3);
       return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7);
     };
+    const nf = new Intl.NumberFormat('ko-KR');
+
     const phoneInput = $('#phone');
     phoneInput.addEventListener('input', ()=>{
       const v = format344(phoneInput.value);
@@ -385,14 +274,12 @@
     });
     phoneInput.addEventListener('blur', ()=> phoneInput.value = format344(phoneInput.value));
 
-    /* 주소 찾기(카카오 우편번호) */
+    /* 주소 찾기 */
     function openPostcode(){
       new daum.Postcode({
         oncomplete: function(data){
-          var road = data.roadAddress || '';
-          var zone = data.zonecode || '';
-          $('#postcode').value = zone;
-          $('#addr1').value = road || (data.address || '');
+          $('#postcode').value = data.zonecode || '';
+          $('#addr1').value = data.roadAddress || data.address || '';
           $('#addr2').focus();
         }
       }).open();
@@ -400,38 +287,24 @@
     document.getElementById('btnFindAddr').addEventListener('click', openPostcode);
 
     /* 라디오 pill 비주얼 */
-    function wirePillGroup(groupEl, variant){
+    function wirePillGroup(groupEl){
       groupEl.addEventListener('click', (e)=>{
         const label = e.target.closest('.radio'); if(!label) return;
         const input = label.querySelector('input[type="radio"]'); if(!input) return;
         groupEl.querySelectorAll('.radio').forEach(lb=>{
-          lb.classList.remove('selected','selected-black','selected-white');
+          lb.classList.remove('selected');
           const i = lb.querySelector('input[type="radio"]'); if(i) i.checked = false;
         });
-        input.checked = true;
-        if(variant === 'color'){
-          const col = label.dataset.color;
-          if(col === 'black') label.classList.add('selected-black');
-          else label.classList.add('selected-white');
-        }else{
-          label.classList.add('selected');
-        }
+        input.checked = true; label.classList.add('selected');
         groupEl.classList.remove('invalid');
+        if(groupEl.id === 'designGroup') updateTotals();
       });
     }
-    wirePillGroup(document.getElementById('colorGroup'),'color');
-    wirePillGroup(document.getElementById('designGroup'),'design');
+    wirePillGroup(document.getElementById('colorGroup'));
+    wirePillGroup(document.getElementById('designGroup'));
 
-    /* 스텝퍼 */
+    /* 스텝퍼 + 합계 */
     const sizesWrap = document.getElementById('sizesWrap');
-    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-    function updateTotal(){
-      let t = 0;
-      sizesWrap.querySelectorAll('.size-box input[type="number"]').forEach(i=>{
-        const n = parseInt(i.value,10) || 0; t += n;
-      });
-      document.getElementById('totalBox').textContent = '총 수량: ' + t + '장';
-    }
     sizesWrap.addEventListener('click', (e)=>{
       const btn = e.target.closest('.qty-btn'); if(!btn) return;
       const box = btn.closest('.size-box');
@@ -439,44 +312,65 @@
       const delta = parseInt(btn.dataset.delta,10);
       const min = parseInt(input.min||'0',10);
       const max = parseInt(input.max||'99',10);
-      const next = clamp((parseInt(input.value,10)||0)+delta, min, max);
+      const next = Math.max(min, Math.min(max, (parseInt(input.value,10)||0)+delta));
       input.value = next;
-      updateTotal();
+      updateTotals();
     });
 
+    function getQtyTotal(){
+      let t = 0;
+      sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> t += (parseInt(i.value,10)||0) );
+      return t;
+    }
+    function getUnitPrice(){
+      const d = (document.querySelector('input[name="design"]:checked')||{}).value || '';
+      if(d === '텍스트형') return PRICE_TEXTBACK;
+      if(d === '없음') return PRICE_NO_BACK;
+      return null;
+    }
+    function updateTotals(){
+      const qty = getQtyTotal();
+      const unit = getUnitPrice();
+      const shipping = qty>0 ? SHIPPING : 0;
+      const subtotal = unit ? unit * qty : 0;
+      const grand = subtotal + shipping;
+
+      $('#qTotal').textContent   = `${qty} 장`;
+      $('#unitPrice').textContent= unit ? `₩${nf.format(unit)}` : '—';
+      $('#subtotal').textContent = unit ? `₩${nf.format(subtotal)}` : '—';
+      $('#shipping').textContent = `₩${nf.format(shipping)}`;
+      $('#grandTotal').textContent= `₩${nf.format(grand)}`;
+    }
+    updateTotals();
+
     /* 상태 표시 */
-    function showStatusOk(msg){ document.getElementById('status').innerHTML = `<span class="notice notice-ok">${msg}</span>`; }
-    function showStatusErr(msg){ document.getElementById('status').innerHTML = `<span class="notice notice-err">${msg}</span>`; }
+    function showStatusOk(msg){ document.getElementById('status').innerHTML = `<span style="font-weight:700;color:#065f46">${msg}</span>`; }
+    function showStatusErr(msg){ document.getElementById('status').innerHTML = `<span style="font-weight:700;color:#b91c1c">${msg}</span>`; }
 
     /* 검증 */
     function validate(){
       const issues = [];
       ['custName','phone','postcode','addr1','addr2'].forEach(id=>document.getElementById(id).classList.remove('invalid'));
+      document.getElementById('colorGroup').classList.remove('invalid');
+      document.getElementById('designGroup').classList.remove('invalid');
 
-      const name = document.getElementById('custName').value.trim();
-      const phoneDigits = onlyDigits(document.getElementById('phone').value);
-      const postcode = document.getElementById('postcode').value.trim();
-      const addr1 = document.getElementById('addr1').value.trim();
-      const addr2 = document.getElementById('addr2').value.trim();
+      const name = $('#custName').value.trim();
+      const phoneDigits = onlyDigits($('#phone').value);
+      const postcode = $('#postcode').value.trim();
+      const addr1 = $('#addr1').value.trim();
+      const addr2 = $('#addr2').value.trim();
       const color = (document.querySelector('input[name="color"]:checked')||{}).value || '';
       const design= (document.querySelector('input[name="design"]:checked')||{}).value || '';
+      const qtyTotal = getQtyTotal();
 
-      let qtyTotal = 0;
-      sizesWrap.querySelectorAll('.size-box input[type="number"]').forEach(i=> qtyTotal += (parseInt(i.value,10)||0) );
-
-      if(!name){ issues.push('주문자 명'); document.getElementById('custName').classList.add('invalid'); }
-      if(phoneDigits.length !== 11){ issues.push('전화번호(11자리)'); document.getElementById('phone').classList.add('invalid'); }
-      if(!postcode){ issues.push('우편번호'); document.getElementById('postcode').classList.add('invalid'); }
-      if(!addr1){ issues.push('도로명 주소'); document.getElementById('addr1').classList.add('invalid'); }
-      if(!addr2){ issues.push('상세 주소'); document.getElementById('addr2').classList.add('invalid'); }
-      if(!color){ issues.push('티셔츠 색상'); document.getElementById('colorGroup').classList.add('invalid'); }
-      if(!design){ issues.push('뒷면 디자인'); document.getElementById('designGroup').classList.add('invalid'); }
-      if(qtyTotal <= 0){
-        issues.push('사이즈별 수량(최소 1장)');
-        sizesWrap.querySelectorAll('input[type="number"]').forEach(i=>i.classList.add('invalid'));
-      }else{
-        sizesWrap.querySelectorAll('input[type="number"]').forEach(i=>i.classList.remove('invalid'));
-      }
+      if(!name){ issues.push('주문자 명'); $('#custName').classList.add('invalid'); }
+      if(phoneDigits.length !== 11){ issues.push('전화번호(11자리)'); $('#phone').classList.add('invalid'); }
+      if(!postcode){ issues.push('우편번호'); $('#postcode').classList.add('invalid'); }
+      if(!addr1){ issues.push('도로명 주소'); $('#addr1').classList.add('invalid'); }
+      if(!addr2){ issues.push('상세 주소'); $('#addr2').classList.add('invalid'); }
+      if(!color){ issues.push('티셔츠 색상'); $('#colorGroup').classList.add('invalid'); }
+      if(!design){ issues.push('뒷면 옵션'); $('#designGroup').classList.add('invalid'); }
+      if(qtyTotal <= 0){ issues.push('사이즈별 수량(최소 1장)'); }
 
       if(issues.length){
         alert('다음 항목을 확인해 주세요:\n- ' + issues.join('\n- '));
@@ -485,23 +379,21 @@
       return true;
     }
 
-    /* 데이터 묶기 & 전송 */
+    /* 제출 데이터 */
     function buildFormData(){
       const fd = new FormData();
       fd.set('form', 'tshirt_order');
-      fd.set('customerName', document.getElementById('custName').value.trim());
-      fd.set('phone', document.getElementById('phone').value.trim());
-      fd.set('phone_norm', onlyDigits(document.getElementById('phone').value));
-      fd.set('postcode', document.getElementById('postcode').value.trim());
-      fd.set('address1', document.getElementById('addr1').value.trim());
-      fd.set('address2', document.getElementById('addr2').value.trim());
-      fd.set('address_full', `${document.getElementById('addr1').value.trim()} ${document.getElementById('addr2').value.trim()}`.trim());
-      const color = (document.querySelector('input[name="color"]:checked')||{}).value || '';
-      const design= (document.querySelector('input[name="design"]:checked')||{}).value || '';
-      fd.set('color', color);
-      fd.set('design', design);
+      fd.set('customerName', $('#custName').value.trim());
+      fd.set('phone', $('#phone').value.trim());
+      fd.set('phone_norm', onlyDigits($('#phone').value));
+      fd.set('postcode', $('#postcode').value.trim());
+      fd.set('address1', $('#addr1').value.trim());
+      fd.set('address2', $('#addr2').value.trim());
+      fd.set('address_full', `${$('#addr1').value.trim()} ${$('#addr2').value.trim()}`.trim());
+      fd.set('color', (document.querySelector('input[name="color"]:checked')||{}).value || '');
+      fd.set('design', (document.querySelector('input[name="design"]:checked')||{}).value || '');
 
-      // 사이즈 값 수집
+      // 사이즈 수집
       const sizes = {};
       sizesWrap.querySelectorAll('.size-box').forEach(box=>{
         const sz = box.dataset.size;
@@ -509,9 +401,18 @@
         sizes[sz] = val;
         fd.set('qty_'+sz, val);
       });
-      const total = Object.values(sizes).map(v=>parseInt(v,10)||0).reduce((a,b)=>a+b,0);
+      const qtyTotal = getQtyTotal();
+      const unit = getUnitPrice() || 0;
+      const subtotal = unit * qtyTotal;
+      const shipping = qtyTotal>0 ? SHIPPING : 0;
+      const grand = subtotal + shipping;
+
       fd.set('sizes_json', JSON.stringify(sizes));
-      fd.set('qty_total', String(total));
+      fd.set('qty_total', String(qtyTotal));
+      fd.set('unit_price', String(unit));
+      fd.set('subtotal', String(subtotal));
+      fd.set('shipping', String(shipping));
+      fd.set('grand_total', String(grand));
       fd.set('submittedAt', new Date().toISOString());
       return fd;
     }
@@ -519,10 +420,10 @@
     /* 초기화 */
     document.getElementById('btnReset').addEventListener('click', ()=>{
       document.getElementById('orderForm').reset();
-      document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected','selected-black','selected-white'));
+      document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected'));
       document.querySelectorAll('.invalid').forEach(el=>el.classList.remove('invalid'));
       sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> i.value = '0');
-      updateTotal();
+      updateTotals();
       showStatusOk('초기화 완료');
     });
 
@@ -542,9 +443,9 @@
           showStatusOk('주문이 접수되었습니다. 감사합니다!');
           alert('주문이 접수되었습니다. 감사합니다!');
           document.getElementById('orderForm').reset();
-          document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected','selected-black','selected-white'));
+          document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected'));
           sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> i.value = '0');
-          updateTotal();
+          updateTotals();
         }else{
           console.error('Server response:', data);
           showStatusErr('서버 응답 오류가 발생했습니다.');
@@ -558,7 +459,6 @@
         btn.disabled = false; btn.textContent = '주문 제출';
       }
     });
-
   </script>
 </body>
 </html>
