@@ -15,7 +15,7 @@
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
     .wrap{max-width:980px;margin:0 auto;padding:24px}
 
-    /* NAV (상단 로고 제거, Home만 표시) */
+    /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 16px}
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
@@ -37,9 +37,12 @@
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:18px}
 
-    /* PRODUCT — 단일 컬럼(이미지 크게, 설명 하단) */
+    /* PRODUCT — 이미지 크게(+설명 하단) */
     .prod-figure{border:1px solid var(--muted);border-radius:12px;overflow:hidden;background:#f3f4f6;display:block}
-    .prod-figure img{width:100%;height:auto;display:block;object-fit:contain;aspect-ratio:4/3}
+    .prod-figure img{
+      width:100%;height:auto;display:block;object-fit:contain;
+      aspect-ratio:5/4; /* ⬅ 더 크게(세로 비율 확대) */
+    }
     .prod-desc{margin-top:12px}
     .prod-desc h3{margin:0 0 8px}
     .prod-desc p{margin:0 0 10px;color:var(--sub)}
@@ -85,6 +88,13 @@
     .paybox .acc{margin-top:6px;color:#111827}
     .paybox .note{color:#6b7280;font-size:13px;margin-top:6px}
 
+    /* TABLE (사이즈표) */
+    .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff;overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
+    tbody td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+    tbody tr:hover{background:#fafafa}
+
     /* 하단 버튼 중앙정렬 + 위 간격 소폭 */
     .actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
   </style>
@@ -107,7 +117,7 @@
       </div>
     </section>
 
-    <!-- 제품 소개 (이미지 크게 + 설명 하단) -->
+    <!-- 제품 소개 -->
     <section class="card" aria-labelledby="hdr-prod">
       <div class="inner">
         <figure class="prod-figure">
@@ -117,7 +127,7 @@
           <h3 id="hdr-prod">누누 케릭터 티셔츠</h3>
           <p>귀여운 누에와 하루를 함께 시작해보세요! 부드러운 코튼 원단에 귀여운 누에을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 뒷면 옵션 없음·텍스트형 중 선택 가능합니다. 누에엥~</p>
           <ul class="bullets">
-            <li><b>가격</b> — 뒷면 옵션 <u>없음 16,000원</u> · <u>텍스트형 22,000원</u> (장당)</li>
+            <li><b>가격</b> — 뒷면 옵션 <u>없음 16,000원</u> · <u>텍스트형 23,000원</u> (장당)</li>
             <li><b>배송비</b> — 4,000원(주문당)</li>
             <li><b>입금 계좌</b> — 농협 <u>302-1235-6391-61</u> (예금주: 한리)</li>
             <li>사이즈: S · M · L · XL · 2XL</li>
@@ -171,12 +181,12 @@
               <label class="radio"><input type="radio" name="color" value="검은색" hidden/><span>검은색</span></label>
             </div>
           </div>
-          <!-- 뒷면 옵션 (2종) -->
+          <!-- 뒷면 옵션 -->
           <div>
             <label>뒷면 옵션 <span class="req">*</span></label>
             <div class="radios" id="designGroup" role="radiogroup" aria-label="뒷면 옵션">
               <label class="radio"><input type="radio" name="design" value="없음" hidden/><span>없음 (₩16,000)</span></label>
-              <label class="radio"><input type="radio" name="design" value="텍스트형" hidden/><span>텍스트형 (₩22,000)</span></label>
+              <label class="radio"><input type="radio" name="design" value="텍스트형" hidden/><span>텍스트형 (₩23,000)</span></label>
             </div>
             <div class="subnote">※ 한 주문서에는 하나의 뒷면 옵션만 선택 가능합니다. 옵션이 다르면 주문을 나눠 주세요.</div>
           </div>
@@ -184,13 +194,11 @@
       </div>
     </section>
 
-    <!-- 사이즈 수량 + 자동 합계 -->
+    <!-- 사이즈 수량 -->
     <form id="orderForm" class="card" style="margin-top:16px" novalidate>
       <div class="inner">
         <h2 style="margin:0 0 12px">사이즈별 수량</h2>
-
         <div class="sizes" id="sizesWrap">
-          <!-- S ~ 2XL -->
           <div class="size-box" data-size="S"><h4>S</h4>
             <div class="stepper">
               <button type="button" class="qty-btn" data-delta="-1">−</button>
@@ -245,6 +253,29 @@
         <div id="status" role="status" aria-live="polite"></div>
       </div>
     </form>
+
+    <!-- 사이즈 표 -->
+    <section class="card" style="margin-top:16px" aria-labelledby="hdr-size">
+      <div class="inner">
+        <h2 id="hdr-size" style="margin:0 0 12px">사이즈 정보</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Size (cm)</th>
+                <th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>총기장</td><td>66</td><td>70</td><td>74</td><td>77</td><td>81</td></tr>
+              <tr><td>어깨너비</td><td>45.5</td><td>48</td><td>50</td><td>53</td><td>55</td></tr>
+              <tr><td>가슴너비</td><td>47</td><td>51</td><td>54</td><td>56</td><td>59</td></tr>
+              <tr><td>소매길이</td><td>19</td><td>19.5</td><td>21</td><td>23</td><td>25</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -254,7 +285,7 @@
 
     /* 상수(가격) */
     const PRICE_NO_BACK = 16000;    // 없음
-    const PRICE_TEXTBACK = 22000;   // 텍스트형
+    const PRICE_TEXTBACK = 23000;   // 텍스트형(수정)
     const SHIPPING = 4000;          // 주문당
 
     /* 전화번호 자동 하이픈 */
