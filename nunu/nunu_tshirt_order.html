@@ -6,7 +6,7 @@
   <title>누에 티셔츠 주문</title>
   <style>
     :root{
-      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --bg:#ffffff; --paper:#ffffff; --ink:#0f172a; --sub:#6b7280;
       --pri:#4b5563; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
       --shadow:0 10px 30px rgba(17,24,39,.08);
       --green:#059669; --blue:#1e3a8a;
@@ -38,17 +38,17 @@
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:18px}
 
-    /* PRODUCT (이미지 + 설명) */
-    .product{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+    /* PRODUCT (이미지 + 요약설명) */
+    .product{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}
     @media (max-width:920px){.product{grid-template-columns:1fr}}
-    .prod-figure{border:1px solid var(--muted);border-radius:12px;overflow:hidden;background:#f3f4f6;display:grid;grid-template-columns:1fr 1fr;gap:1px}
-    .prod-figure img{width:100%;height:100%;object-fit:cover;display:block;aspect-ratio:1/1}
+    .prod-figure{border:1px solid var(--muted);border-radius:12px;overflow:hidden;background:#f3f4f6;display:block}
+    .prod-figure img{width:100%;height:100%;display:block;object-fit:contain;aspect-ratio:4/3}
     .prod-desc h3{margin:0 0 8px}
     .prod-desc p{margin:0 0 10px;color:var(--sub)}
     .bullets{margin:8px 0 0;padding-left:18px}
     .bullets li{margin:4px 0}
 
-    /* FORM */
+    /* FORM 공통 */
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media (max-width:720px){.grid{grid-template-columns:1fr}}
     label{font-weight:700;display:block;margin-bottom:6px}
@@ -95,6 +95,14 @@
     .actions{display:flex;gap:12px;justify-content:center;padding:16px}
     .addr-row{display:grid;grid-template-columns:140px 1fr auto;gap:10px}
     @media (max-width:720px){.addr-row{grid-template-columns:1fr;}}
+
+    /* ===== 상품 정보 표 ===== */
+    .table-wrap{margin-top:10px;border:1px solid var(--muted);border-radius:12px;background:#fff;overflow:auto}
+    table.spec{width:100%;border-collapse:separate;border-spacing:0;min-width:560px}
+    .spec thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
+    .spec tbody td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+    .spec tbody tr:hover{background:#fafafa}
+    .spec .num{ text-align:center; }
   </style>
   <!-- 다음(카카오) 우편번호 검색 위젯 -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -117,32 +125,115 @@
       </div>
     </section>
 
-    <!-- 제품 소개 (이미지 + 설명) -->
+    <!-- 제품 소개 (이미지 + 간단 설명) -->
     <section class="card" aria-labelledby="hdr-prod">
       <div class="inner product">
         <figure class="prod-figure" aria-label="제품 이미지">
-          <!-- 샘플 이미지 2장 (원하는 이미지로 교체) -->
-          <img src="assets/tshirt/tee_front.jpg" alt="티셔츠 앞면 예시" onerror="this.style.opacity=.2; this.alt='이미지 준비중'">
-          <img src="assets/tshirt/tee_back.jpg"  alt="티셔츠 뒷면 예시" onerror="this.style.opacity=.2; this.alt='이미지 준비중'">
+          <img src="https://www.hanri.net/nunu/nunu_tshirt_image.png" alt="누에 티셔츠 제품 이미지" onerror="this.style.opacity=.25; this.alt='이미지 준비중'">
         </figure>
         <div class="prod-desc">
           <h3 id="hdr-prod">누누 실크웜 티셔츠</h3>
           <p>부드러운 코튼 원단에 누에 심볼을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 세 가지 뒷면 디자인 옵션을 제공합니다.</p>
           <ul class="bullets">
-            <li>원단: 100% Cotton (200~210g/㎡)</li>
             <li>색상: 흰색 / 검은색</li>
             <li>뒷면 옵션: 로고형 / 텍스트형 / 심볼+문구</li>
             <li>사이즈: S · M · L · XL · 2XL</li>
-            <li>세탁: 뒤집어 약한 세탁 권장</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- 주문자 정보 -->
+    <!-- 상품 정보 + 사이즈 표 -->
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-info">
       <div class="inner">
-        <h2 id="hdr-info" style="margin:0 0 12px">주문자 정보</h2>
+        <h2 id="hdr-info" style="margin:0 0 8px">상품 정보</h2>
+
+        <div style="display:grid;grid-template-columns:1fr;gap:10px">
+          <div>
+            <p style="margin:0 0 8px"><strong>도톰한 17수 라운드 티셔츠</strong> 입니다. 오래입어도 쉽게 모양이 변하지 않는 상품입니다.</p>
+            <ul class="bullets">
+              <li>소재 : 면 100% <span style="color:var(--sub)">(애쉬: 면 95%, 폴리에스터 5% / 모쿠그레이: 면 80%, 폴리에스터 20%)</span></li>
+              <li>제조사 : Printstar</li>
+              <li>제조국 : Made in China</li>
+              <li>사이즈 : S, M, L, XL, 2XL</li>
+              <li>핏 : 정사이즈 (남녀공용)</li>
+              <li>신축성 : 신축성 좋음</li>
+              <li>감촉 : 부드러운 감촉</li>
+              <li>두께 : 도톰한 소재</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style="margin:10px 0 6px">세탁방법</h3>
+            <ul class="bullets">
+              <li>드라이클리닝 또는 단독 손세탁 가능합니다.</li>
+              <li>찬물에 뒤집어 세탁해 주십시오.</li>
+              <li>표백제를 사용하거나 물에 장시간(30분 이상) 담가두지 마세요.</li>
+              <li>마찰에 의한 보푸라기, 올 뜯김이 발생할 수 있습니다.</li>
+              <li>건조기 사용 불가합니다. 세탁 후 그늘에서 건조 바랍니다.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style="margin:10px 0 6px">사이즈 정보</h3>
+            <div class="table-wrap">
+              <table class="spec" aria-label="티셔츠 사이즈 표">
+                <thead>
+                  <tr>
+                    <th>Size (cm)</th>
+                    <th class="num">S</th>
+                    <th class="num">M</th>
+                    <th class="num">L</th>
+                    <th class="num">XL</th>
+                    <th class="num">2XL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>총기장</td>
+                    <td class="num">66</td>
+                    <td class="num">70</td>
+                    <td class="num">74</td>
+                    <td class="num">77</td>
+                    <td class="num">81</td>
+                  </tr>
+                  <tr>
+                    <td>어깨너비</td>
+                    <td class="num">45.5</td>
+                    <td class="num">48</td>
+                    <td class="num">50</td>
+                    <td class="num">53</td>
+                    <td class="num">55</td>
+                  </tr>
+                  <tr>
+                    <td>가슴너비</td>
+                    <td class="num">47</td>
+                    <td class="num">51</td>
+                    <td class="num">54</td>
+                    <td class="num">56</td>
+                    <td class="num">59</td>
+                  </tr>
+                  <tr>
+                    <td>소매길이</td>
+                    <td class="num">19</td>
+                    <td class="num">19.5</td>
+                    <td class="num">21</td>
+                    <td class="num">23</td>
+                    <td class="num">25</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="subnote">※ 측정 위치에 따라 ±1~2cm 오차가 있을 수 있습니다.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 주문자 정보 -->
+    <section class="card" style="margin-top:16px" aria-labelledby="hdr-orderer">
+      <div class="inner">
+        <h2 id="hdr-orderer" style="margin:0 0 12px">주문자 정보</h2>
 
         <div class="grid">
           <div>
@@ -156,7 +247,7 @@
             <div class="subnote">입력 시 자동으로 000-0000-0000 형식으로 변환됩니다.</div>
           </div>
 
-          <!-- 주소: 쇼핑몰 방식(우편번호 검색) -->
+          <!-- 주소 -->
           <div style="grid-column:1/-1">
             <label>집 주소 <span class="req">*</span></label>
             <div class="addr-row" style="margin-bottom:8px">
@@ -220,7 +311,6 @@
         <h2 style="margin:0 0 12px">사이즈별 수량</h2>
 
         <div class="sizes" id="sizesWrap">
-          <!-- 스텝퍼 박스 5개 (S/M/L/XL/2XL) -->
           <div class="size-box" data-size="S">
             <h4>S</h4>
             <div class="stepper">
