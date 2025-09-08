@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>누누 캐릭터 티셔츠 주문</title>
+  <title>🐛누누 캐릭터 티셔츠 주문</title>
   <style>
     :root{
       --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
@@ -140,18 +140,18 @@
           <img src="https://www.hanri.net/nunu/nunu_tshirt_image.png" alt="누누 캐릭터 티셔츠" id="prodImg">
           <span class="zoom-hint">탭/클릭 시 크게 보기</span>
         </div>
-        <h1>누누 캐릭터 티셔츠</h1>
+        <h1>🐛누누 캐릭터 티셔츠</h1>
         <p class="lead">
           귀여운 누에와 하루를 함께 시작해보세요! 부드러운 코튼 원단에 귀여운 누에를 더한 데일리 티셔츠입니다.
           흰색/검은색 2가지 색상과 뒷면 옵션 없음·텍스트형 중 선택 가능합니다. 누에엥~
         </p>
         <ul class="bullets">
-          <li><b>소재</b>: 면 100% (애쉬: 면 95% + 폴리 5%, 모쿠그레이: 면 80% + 폴리 20%)</li>
+          <li><b>소재</b>: 면 100%</li>
           <li><b>제조사/제조국</b>: Printstar / Made in China</li>
-          <li><b>핏</b>: 정사이즈(남녀공용) · <b>신축성</b>: 좋음 · <b>감촉</b>: 부드러움 · <b>두께</b>: 도톰</li>
-          <li><b>뒷면 옵션</b>: 없음 <b>16,000원</b> / 텍스트형 <b>23,000원</b> (품목가)</li>
-          <li><b>배송비</b>: 4,000원 (주문 건당 고정)</li>
-          <li><b>입금 계좌</b>: 한리 농협 302-1235-6391-61</li>
+          <li><b>핏</b>: 정사이즈(남녀공용) · <b>신축성</b>: 좋음 · <b>감촉</b>: 부드러움 · <b>두께</b>: 도톰 (17수)</li>
+          <li><b>뒷면 옵션</b>: 없음 <b>18,000원</b> / 텍스트형 <b>26,000원</b> (품목가)</li>
+          <li><b>배송비</b>: 4,000원</li>
+          <li><b>입금 계좌</b>: 한리 농협 302-1235-6391-61 / 010-4044-0220</li>
           <li style="color:#b45309"><b>안내</b>: 뒷면 옵션이 다른 경우에는 <u>옵션별로 주문을 나눠</u> 주세요.</li>
         </ul>
       </div>
@@ -162,7 +162,7 @@
       <div class="inner">
         <h3 id="schedule-title">신청·제작·배송 안내</h3>
         <ul>
-          <li><b>신청(입금) 기간</b> : <u>9월 9일 ~ 9월 10일</u> (2일)</li>
+          <li><b>신청(입금) 기간</b> : <u>9월 9일 ~ 9월 10일</u> (2일) / 기한내 미입금시 자동 취소됩니다.</li>
           <li><b>주문(제작) 예정일</b> : <u>9월 11일</u></li>
           <li><b>배송 일정</b> : 마플 측 티셔츠 수령 후 발송 · <u>다음 주(9월 16일 ~ 19일)</u> 중 배송</li>
         </ul>
@@ -330,8 +330,8 @@
     SIZES.forEach(s=> sizeWrap.appendChild(makeSizeBox(s)));
 
     /* 가격 */
-    const PRICE_NONE = 16000;
-    const PRICE_TEXT = 23000;
+    const PRICE_NONE = 18000;
+    const PRICE_TEXT = 26000;
     const SHIPPING = 4000;
 
     function unitPrice(){
@@ -410,7 +410,7 @@
       fd.set('back', (document.querySelector('input[name="back"]:checked')||{}).value || '');
       ['S','M','L','XL','2XL'].forEach(s=> fd.set(`qty_${s}`, counts[s]||0));
       const cnt = ['S','M','L','XL','2XL'].reduce((a,s)=>a+(counts[s]||0),0);
-      const unit = (document.querySelector('input[name="back"]:checked')||{}).value==='text' ? 23000 : 16000;
+      const unit = (document.querySelector('input[name="back"]:checked')||{}).value==='text' ? 26000 : 18000;
       const subtotal = unit * cnt; const shipping = cnt>0 ? 4000 : 0; const total = subtotal + shipping;
       fd.set('qty_total', cnt);
       fd.set('unit_price', unit); fd.set('subtotal', subtotal); fd.set('shipping', shipping); fd.set('total', total);
