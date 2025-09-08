@@ -37,14 +37,18 @@
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:18px}
 
-    /* PRODUCT — 큰 이미지 + 하단 설명 */
+    /* PRODUCT — 컨테이너에 비율을 주고, 이미지는 100% 채움 */
     .prod-figure{
       position:relative; border:1px solid var(--muted); border-radius:12px; overflow:hidden;
       background:#f3f4f6; display:block; cursor:zoom-in; touch-action:pan-y;
+      aspect-ratio: 5 / 4;                /* 데스크톱 기본 비율 */
+      max-height: 72vh;                   /* 화면을 넘치지 않도록 */
+    }
+    @media (max-width: 720px){
+      .prod-figure{ aspect-ratio: 4 / 5;  max-height: 70vh; } /* 모바일 세로형 비율 */
     }
     .prod-figure img{
-      width:100%; height:auto; display:block; object-fit:contain;
-      aspect-ratio:5/4;
+      width:100%; height:100%; display:block; object-fit:contain;
       transition: transform .22s ease, transform-origin .12s ease;
       will-change: transform;
     }
@@ -208,7 +212,7 @@
       </div>
     </section>
 
-    <!-- ⬇⬇⬇ 사이즈 정보 (여기로 이동) -->
+    <!-- 사이즈 정보 -->
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-size">
       <div class="inner">
         <h2 id="hdr-size" style="margin:0 0 12px">사이즈 정보</h2>
@@ -230,9 +234,8 @@
         </div>
       </div>
     </section>
-    <!-- ⬆⬆⬆ 여기까지 이동 -->
 
-    <!-- 사이즈 수량 -->
+    <!-- 사이즈 수량 & 결제 요약 -->
     <form id="orderForm" class="card" style="margin-top:16px" novalidate>
       <div class="inner">
         <h2 style="margin:0 0 12px">사이즈별 수량</h2>
@@ -293,15 +296,17 @@
     </form>
   </main>
 
+  <!-- 카카오 우편번호 SDK -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script>
     /* ★ Apps Script 웹앱 URL로 교체 */
     const ENDPOINT = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID/exec';
     const $ = (s)=>document.querySelector(s);
 
-    /* 상수(가격) */
-    const PRICE_NO_BACK = 16000;    // 없음
-    const PRICE_TEXTBACK = 23000;   // 텍스트형
-    const SHIPPING = 4000;          // 주문당
+    /* 가격 상수 */
+    const PRICE_NO_BACK = 16000;
+    const PRICE_TEXTBACK = 23000;
+    const SHIPPING = 4000;
     const nf = new Intl.NumberFormat('ko-KR');
 
     /* 전화번호 자동 하이픈 */
@@ -332,7 +337,7 @@
     }
     document.getElementById('btnFindAddr').addEventListener('click', openPostcode);
 
-    /* 라디오 pill 비주얼 */
+    /* 라디오 pill */
     function wirePillGroup(groupEl){
       groupEl.addEventListener('click', (e)=>{
         const label = e.target.closest('.radio'); if(!label) return;
@@ -349,7 +354,7 @@
     wirePillGroup(document.getElementById('colorGroup'));
     wirePillGroup(document.getElementById('designGroup'));
 
-    /* 스텝퍼 + 합계 */
+    /* 수량 스텝퍼 + 합계 */
     const sizesWrap = document.getElementById('sizesWrap');
     sizesWrap.addEventListener('click', (e)=>{
       const btn = e.target.closest('.qty-btn'); if(!btn) return;
@@ -389,7 +394,7 @@
     }
     updateTotals();
 
-    /* 이미지 줌: 마우스 오버/이동 시 확대 & 이동, 모바일 탭 토글 */
+    /* 이미지 줌: 데스크톱 hover, 모바일 탭 토글 */
     (function setupZoom(){
       const fig = document.getElementById('prodFigure');
       const img = document.getElementById('prodImg');
@@ -406,7 +411,6 @@
       fig.addEventListener('pointerenter', (e)=>{ active = true; fig.dataset.zoom='on'; setOrigin(e.clientX, e.clientY); });
       fig.addEventListener('pointerleave', ()=>{ active = false; fig.dataset.zoom='off'; img.style.transformOrigin='center center'; });
       fig.addEventListener('pointermove', (e)=>{ if(active) setOrigin(e.clientX, e.clientY); });
-      // 모바일/펜: 탭으로 토글
       fig.addEventListener('pointerdown', (e)=>{
         if(e.pointerType !== 'mouse'){
           active = !active;
@@ -531,6 +535,33 @@
 
     /* 합계 최초 계산 */
     updateTotals();
+
+    /* 줌 원점 보정 (이미 위에서 설정) */
+    (function setupZoom(){
+      const fig = document.getElementById('prodFigure');
+      const img = document.getElementById('prodImg');
+      if(!fig || !img) return;
+      let active = false;
+
+      const setOrigin = (clientX, clientY)=>{
+        const rect = fig.getBoundingClientRect();
+        const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+        const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+        img.style.transformOrigin = `${x}% ${y}%`;
+      };
+
+      fig.addEventListener('pointerenter', (e)=>{ active = true; fig.dataset.zoom='on'; setOrigin(e.clientX, e.clientY); });
+      fig.addEventListener('pointerleave', ()=>{ active = false; fig.dataset.zoom='off'; img.style.transformOrigin='center center'; });
+      fig.addEventListener('pointermove', (e)=>{ if(active) setOrigin(e.clientX, e.clientY); });
+      fig.addEventListener('pointerdown', (e)=>{
+        if(e.pointerType !== 'mouse'){
+          active = !active;
+          fig.dataset.zoom = active ? 'on' : 'off';
+          if(active) setOrigin(e.clientX, e.clientY);
+          else img.style.transformOrigin='center center';
+        }
+      });
+    })();
   </script>
 </body>
 </html>
