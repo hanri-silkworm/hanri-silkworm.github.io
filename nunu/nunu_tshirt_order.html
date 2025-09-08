@@ -41,11 +41,14 @@
     .p-hero .lead{margin:0;color:var(--sub)}
     .media{
       position:relative; border:1px solid var(--muted); border-radius:14px; overflow:hidden; background:#f3f4f6;
+      cursor: zoom-in;
     }
     .media img{
       display:block; width:100%; height:auto; transform-origin:center center; transition:transform .18s ease;
     }
-    .media.zoomed img{ transform: scale(1.25); }
+    /* ✅ 확대 배율 3배 */
+    .media.zoomed{ cursor: zoom-out; }
+    .media.zoomed img{ transform: scale(3); }
     .zoom-hint{
       position:absolute; right:10px; bottom:10px; background:rgba(17,24,39,.6); color:#fff;
       font-size:12px; padding:6px 8px; border-radius:999px;
@@ -85,11 +88,23 @@
 
     /* 사이즈 정보 표 */
     .size-wrap{margin-top:12px}
-    .size-table{width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--muted); border-radius:12px; overflow:hidden; background:#fff; table-layout:fixed}
-    .size-table th, .size-table td{padding:10px 12px; border-bottom:1px solid #f1f5f9; text-align:center; white-space:nowrap}
+    .size-scroll{overflow:auto; -webkit-overflow-scrolling:touch}
+    .size-table{
+      width:100%; min-width: 640px;            /* ✅ 모바일 겹침 방지: 최소 가로폭 부여 */
+      border-collapse:separate; border-spacing:0; border:1px solid var(--muted);
+      border-radius:12px; overflow:hidden; background:#fff; table-layout:fixed;
+    }
+    .size-table th, .size-table td{
+      padding:10px 12px; border-bottom:1px solid #f1f5f9; text-align:center; white-space:nowrap
+    }
     .size-table thead th{background:#f8fafc; color:#334155}
+    /* ✅ 첫 칼럼/사이즈 칼럼 최소폭으로 겹침 방지 */
+    .size-table th:first-child, .size-table td:first-child{min-width: 120px;}
+    .size-table th:not(:first-child), .size-table td:not(:first-child){min-width: 80px;}
+    @media (max-width:560px){
+      .size-table th, .size-table td{ padding:8px 10px; font-size:14px; }
+    }
     .size-note{color:var(--sub); font-size:12px; margin-top:6px}
-    .size-scroll{overflow:auto} /* 작은 화면에서 가로 스크롤 허용 */
 
     /* 사이즈별 수량 */
     .sizes{display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px}
@@ -123,15 +138,13 @@
     .summary .line{
       display:flex; align-items:center; justify-content:space-between;
       border:1px solid var(--muted); border-radius:10px; padding:10px 12px; background:#fff;
-      min-width:0; /* flex 자식 말줄임 허용 */
+      min-width:0;
     }
     .summary .line span{
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; margin-right:10px;
     }
     .summary .line b{ white-space:nowrap; flex:0 0 auto; }
     .summary .total{grid-column:1/-1; font-weight:900; font-size:18px; color:#111827; border-color:#cbd5e1}
-
-    /* 모바일에서 한 줄 보장 + 단일 컬럼 */
     @media (max-width:560px){
       .summary{ grid-template-columns:1fr; }
       .summary .line{ font-size:15px; }
@@ -157,7 +170,7 @@
       <div class="inner p-hero">
         <div class="media" id="media">
           <img src="https://www.hanri.net/nunu/nunu_tshirt_image.png" alt="누누 캐릭터 티셔츠" id="prodImg">
-          <span class="zoom-hint">탭/클릭 시 확대</span>
+          <span class="zoom-hint">탭/클릭 시 크게 보기</span>
         </div>
         <h1>누누 캐릭터 티셔츠</h1>
         <p class="lead">
@@ -277,7 +290,7 @@
     /* ===== 설정: Apps Script 웹앱 URL ===== */
     const ENDPOINT = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ← 스크립트 웹앱 URL로 교체
 
-    /* 이미지 확대 */
+    /* 이미지 확대 (3배) + 마우스 기준 이동 */
     const media = document.getElementById('media');
     media.addEventListener('click', ()=> media.classList.toggle('zoomed'));
     media.addEventListener('mousemove', (e)=>{
@@ -414,7 +427,7 @@
       [buyer,phone,postcode,addr1].forEach(i=> i.classList.remove('invalid'));
 
       if(!buyer.value.trim()){ errs.push('주문자 명'); buyer.classList.add('invalid'); }
-      const d = onlyDigits(phone.value); if(d.length!==11){ errs.push('전화번호(11자리)'); phone.classList.add('invalid'); }
+      const d = (phone.value||'').replace(/[^\d]/g,''); if(d.length!==11){ errs.push('전화번호(11자리)'); phone.classList.add('invalid'); }
       if(!postcode.value.trim()){ errs.push('우편번호'); postcode.classList.add('invalid'); }
       if(!addr1.value.trim()){ errs.push('주소'); addr1.classList.add('invalid'); }
       if(totalCount()===0){ errs.push('주문 수량'); }
@@ -441,7 +454,7 @@
       const cnt = totalCount();
       fd.set('qty_total', cnt);
 
-      const unit = unitPrice();
+      const unit = (document.querySelector('input[name="back"]:checked')||{}).value==='text' ? 23000 : 16000;
       const subtotal = unit * cnt;
       const shipping = cnt>0 ? 4000 : 0;
       const total = subtotal + shipping;
@@ -488,7 +501,5 @@
       }
     });
   </script>
-
-  <!-- 다음 우편번호 스크립트 끝 -->
 </body>
 </html>
