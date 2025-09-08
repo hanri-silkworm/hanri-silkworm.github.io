@@ -15,7 +15,7 @@
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
     .wrap{max-width:980px;margin:0 auto;padding:24px}
 
-    /* NAV (상단 로고 제거, 버튼만) */
+    /* NAV (상단 로고 제거, Home만 표시) */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 16px}
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
@@ -37,11 +37,10 @@
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:18px}
 
-    /* PRODUCT */
-    .product{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}
-    @media (max-width:920px){.product{grid-template-columns:1fr}}
+    /* PRODUCT — 단일 컬럼(이미지 크게, 설명 하단) */
     .prod-figure{border:1px solid var(--muted);border-radius:12px;overflow:hidden;background:#f3f4f6;display:block}
-    .prod-figure img{width:100%;height:100%;display:block;object-fit:contain;aspect-ratio:4/3}
+    .prod-figure img{width:100%;height:auto;display:block;object-fit:contain;aspect-ratio:4/3}
+    .prod-desc{margin-top:12px}
     .prod-desc h3{margin:0 0 8px}
     .prod-desc p{margin:0 0 10px;color:var(--sub)}
     .bullets{margin:8px 0 0;padding-left:18px}
@@ -85,6 +84,9 @@
     .paybox .row.total{font-weight:900;border-top:1px solid #e5e7eb;padding-top:8px}
     .paybox .acc{margin-top:6px;color:#111827}
     .paybox .note{color:#6b7280;font-size:13px;margin-top:6px}
+
+    /* 하단 버튼 중앙정렬 + 위 간격 소폭 */
+    .actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
   </style>
   <!-- 카카오 우편번호 -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -93,7 +95,6 @@
   <header class="nav">
     <div class="nav-inner wrap">
       <a class="btn" href="index.html">Home</a>
-      <a class="btn primary" href="3rd_leaderboard.html">제 3회 리더보드</a>
     </div>
   </header>
 
@@ -106,15 +107,15 @@
       </div>
     </section>
 
-    <!-- 제품 소개 -->
+    <!-- 제품 소개 (이미지 크게 + 설명 하단) -->
     <section class="card" aria-labelledby="hdr-prod">
-      <div class="inner product">
+      <div class="inner">
         <figure class="prod-figure">
           <img src="https://www.hanri.net/nunu/nunu_tshirt_image.png" alt="누에 티셔츠 제품 이미지" onerror="this.style.opacity=.25; this.alt='이미지 준비중'">
         </figure>
         <div class="prod-desc">
-          <h3 id="hdr-prod">누누 실크웜 티셔츠</h3>
-          <p>부드러운 코튼 원단에 누에 심볼을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 <b>뒷면 옵션 없음·텍스트형</b> 중 선택 가능합니다.</p>
+          <h3 id="hdr-prod">누누 케릭터 티셔츠</h3>
+          <p>귀여운 누에와 하루를 함께 시작해보세요! 부드러운 코튼 원단에 귀여운 누에을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 뒷면 옵션 없음·텍스트형 중 선택 가능합니다. 누에엥~</p>
           <ul class="bullets">
             <li><b>가격</b> — 뒷면 옵션 <u>없음 16,000원</u> · <u>텍스트형 22,000원</u> (장당)</li>
             <li><b>배송비</b> — 4,000원(주문당)</li>
@@ -355,7 +356,7 @@
       document.getElementById('designGroup').classList.remove('invalid');
 
       const name = $('#custName').value.trim();
-      const phoneDigits = onlyDigits($('#phone').value);
+      const phoneDigits = ( $('#phone').value || '' ).replace(/[^\d]/g,'');
       const postcode = $('#postcode').value.trim();
       const addr1 = $('#addr1').value.trim();
       const addr2 = $('#addr2').value.trim();
@@ -385,7 +386,7 @@
       fd.set('form', 'tshirt_order');
       fd.set('customerName', $('#custName').value.trim());
       fd.set('phone', $('#phone').value.trim());
-      fd.set('phone_norm', onlyDigits($('#phone').value));
+      fd.set('phone_norm', ($('#phone').value||'').replace(/[^\d]/g,''));
       fd.set('postcode', $('#postcode').value.trim());
       fd.set('address1', $('#addr1').value.trim());
       fd.set('address2', $('#addr2').value.trim());
@@ -395,7 +396,7 @@
 
       // 사이즈 수집
       const sizes = {};
-      sizesWrap.querySelectorAll('.size-box').forEach(box=>{
+      document.querySelectorAll('.size-box').forEach(box=>{
         const sz = box.dataset.size;
         const val = box.querySelector('input[type="number"]').value || '0';
         sizes[sz] = val;
@@ -404,7 +405,7 @@
       const qtyTotal = getQtyTotal();
       const unit = getUnitPrice() || 0;
       const subtotal = unit * qtyTotal;
-      const shipping = qtyTotal>0 ? SHIPPING : 0;
+      const shipping = qtyTotal>0 ? 4000 : 0;
       const grand = subtotal + shipping;
 
       fd.set('sizes_json', JSON.stringify(sizes));
@@ -422,7 +423,7 @@
       document.getElementById('orderForm').reset();
       document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected'));
       document.querySelectorAll('.invalid').forEach(el=>el.classList.remove('invalid'));
-      sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> i.value = '0');
+      document.querySelectorAll('.size-box input[type="number"]').forEach(i=> i.value = '0');
       updateTotals();
       showStatusOk('초기화 완료');
     });
@@ -444,7 +445,7 @@
           alert('주문이 접수되었습니다. 감사합니다!');
           document.getElementById('orderForm').reset();
           document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected'));
-          sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> i.value = '0');
+          document.querySelectorAll('.size-box input[type="number"]').forEach(i=> i.value = '0');
           updateTotals();
         }else{
           console.error('Server response:', data);
