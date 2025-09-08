@@ -48,10 +48,8 @@
       transition: transform .22s ease, transform-origin .12s ease;
       will-change: transform;
     }
-    /* 확대 상태 */
     .prod-figure[data-zoom="on"]{ cursor:zoom-out; }
     .prod-figure[data-zoom="on"] img{ transform:scale(1.9); }
-    /* 작은 힌트 배지 */
     .zoom-hint{
       position:absolute; right:10px; bottom:10px;
       background:rgba(17,24,39,.65); color:#fff; font-size:12px;
@@ -210,6 +208,30 @@
       </div>
     </section>
 
+    <!-- ⬇⬇⬇ 사이즈 정보 (여기로 이동) -->
+    <section class="card" style="margin-top:16px" aria-labelledby="hdr-size">
+      <div class="inner">
+        <h2 id="hdr-size" style="margin:0 0 12px">사이즈 정보</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Size (cm)</th>
+                <th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>총기장</td><td>66</td><td>70</td><td>74</td><td>77</td><td>81</td></tr>
+              <tr><td>어깨너비</td><td>45.5</td><td>48</td><td>50</td><td>53</td><td>55</td></tr>
+              <tr><td>가슴너비</td><td>47</td><td>51</td><td>54</td><td>56</td><td>59</td></tr>
+              <tr><td>소매길이</td><td>19</td><td>19.5</td><td>21</td><td>23</td><td>25</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <!-- ⬆⬆⬆ 여기까지 이동 -->
+
     <!-- 사이즈 수량 -->
     <form id="orderForm" class="card" style="margin-top:16px" novalidate>
       <div class="inner">
@@ -269,29 +291,6 @@
         <div id="status" role="status" aria-live="polite"></div>
       </div>
     </form>
-
-    <!-- 사이즈 표 -->
-    <section class="card" style="margin-top:16px" aria-labelledby="hdr-size">
-      <div class="inner">
-        <h2 id="hdr-size" style="margin:0 0 12px">사이즈 정보</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Size (cm)</th>
-                <th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>총기장</td><td>66</td><td>70</td><td>74</td><td>77</td><td>81</td></tr>
-              <tr><td>어깨너비</td><td>45.5</td><td>48</td><td>50</td><td>53</td><td>55</td></tr>
-              <tr><td>가슴너비</td><td>47</td><td>51</td><td>54</td><td>56</td><td>59</td></tr>
-              <tr><td>소매길이</td><td>19</td><td>19.5</td><td>21</td><td>23</td><td>25</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
   </main>
 
   <script>
@@ -529,6 +528,9 @@
         btn.disabled = false; btn.textContent = '주문 제출';
       }
     });
+
+    /* 합계 최초 계산 */
+    updateTotals();
   </script>
 </body>
 </html>
