@@ -16,7 +16,7 @@
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
     .wrap{max-width:980px;margin:0 auto;padding:20px 16px}
 
-    /* NAV (브랜드 문구 제거, 홈만) */
+    /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:10px 16px}
     .btn{
@@ -30,11 +30,11 @@
     .btn.lg{font-size:16px; padding:10px 18px; min-height:42px; min-width:140px}
     @media (min-width:768px){ .btn.lg{font-size:17px; padding:12px 22px; min-width:180px} }
 
-    /* 카드 공통 */
+    /* 카드 */
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:16px}
 
-    /* 히어로: 이미지 크게 + 설명은 이미지 아래 */
+    /* 히어로: 이미지 크게 + 설명은 아래 */
     .hero{margin:16px auto;border-radius:20px}
     .p-hero{display:flex;flex-direction:column;gap:12px}
     .p-hero h1{margin:0;font-size:clamp(22px,4vw,30px);letter-spacing:-.2px}
@@ -51,12 +51,13 @@
       font-size:12px; padding:6px 8px; border-radius:999px;
     }
 
-    /* 설명 리스트 */
+    /* 리스트 */
     .bullets{margin:8px 0 0; padding-left:18px; color:#374151}
     .bullets li{margin:4px 0}
 
     /* 섹션 타이틀 */
     h2{margin:0 0 8px;font-size:20px}
+    h3{margin:10px 0 8px; font-size:18px}
 
     /* 입력 */
     label{font-weight:700;display:block;margin-bottom:6px}
@@ -82,11 +83,13 @@
     }
     .radio input{accent-color:#2563eb}
 
-    /* 사이즈 표 (옵션 선택과 수량 사이에 위치) */
-    .size-table{width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--muted); border-radius:12px; overflow:hidden; background:#fff}
-    .size-table th, .size-table td{padding:10px 12px; border-bottom:1px solid #f1f5f9; text-align:center}
+    /* 사이즈 정보 표 */
+    .size-wrap{margin-top:12px}
+    .size-table{width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--muted); border-radius:12px; overflow:hidden; background:#fff; table-layout:fixed}
+    .size-table th, .size-table td{padding:10px 12px; border-bottom:1px solid #f1f5f9; text-align:center; white-space:nowrap}
     .size-table thead th{background:#f8fafc; color:#334155}
     .size-note{color:var(--sub); font-size:12px; margin-top:6px}
+    .size-scroll{overflow:auto} /* 작은 화면에서 가로 스크롤 허용 */
 
     /* 사이즈별 수량 */
     .sizes{display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px}
@@ -104,8 +107,6 @@
       width:64px; text-align:center; padding:10px; border-radius:10px; border:1px solid var(--muted); background:#fff;
       font-size:16px;
     }
-
-    /* 모바일 축소 */
     @media (max-width: 720px){
       .sizes{ grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
       .stepper button{ width:40px; height:40px; }
@@ -119,8 +120,22 @@
 
     /* 요약/가격 */
     .summary{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    .summary .line{display:flex; align-items:center; justify-content:space-between; border:1px solid var(--muted); border-radius:10px; padding:10px 12px; background:#fff}
+    .summary .line{
+      display:flex; align-items:center; justify-content:space-between;
+      border:1px solid var(--muted); border-radius:10px; padding:10px 12px; background:#fff;
+      min-width:0; /* flex 자식 말줄임 허용 */
+    }
+    .summary .line span{
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; margin-right:10px;
+    }
+    .summary .line b{ white-space:nowrap; flex:0 0 auto; }
     .summary .total{grid-column:1/-1; font-weight:900; font-size:18px; color:#111827; border-color:#cbd5e1}
+
+    /* 모바일에서 한 줄 보장 + 단일 컬럼 */
+    @media (max-width:560px){
+      .summary{ grid-template-columns:1fr; }
+      .summary .line{ font-size:15px; }
+    }
 
     .actions{display:flex;gap:12px;justify-content:center;margin-top:10px}
     #status{min-height:24px;text-align:center;margin-top:6px}
@@ -137,7 +152,7 @@
   </header>
 
   <main class="wrap">
-    <!-- 히어로: 이미지 크게 + 설명은 아래 -->
+    <!-- 히어로 -->
     <section class="card hero">
       <div class="inner p-hero">
         <div class="media" id="media">
@@ -209,27 +224,32 @@
           </div>
         </div>
 
-        <!-- 사이즈 표 (옵션과 수량 사이) -->
-        <div style="margin-top:12px">
-          <table class="size-table" aria-label="사이즈 정보 표">
-            <thead><tr><th>사이즈</th><th>가슴단면(cm)</th><th>총장(cm)</th></tr></thead>
-            <tbody>
-              <tr><td>S</td><td>49</td><td>65</td></tr>
-              <tr><td>M</td><td>52</td><td>69</td></tr>
-              <tr><td>L</td><td>55</td><td>73</td></tr>
-              <tr><td>XL</td><td>58</td><td>77</td></tr>
-              <tr><td>2XL</td><td>63</td><td>81</td></tr>
-            </tbody>
-          </table>
+        <!-- 사이즈 정보 (타이틀 + 표) -->
+        <div class="size-wrap">
+          <h3>사이즈 정보</h3>
+          <div class="size-scroll">
+            <table class="size-table" aria-label="사이즈 정보 표">
+              <thead>
+                <tr>
+                  <th>Size (cm)</th>
+                  <th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>총기장</td><td>66</td><td>70</td><td>74</td><td>77</td><td>81</td></tr>
+                <tr><td>어깨너비</td><td>45.5</td><td>48</td><td>50</td><td>53</td><td>55</td></tr>
+                <tr><td>가슴너비</td><td>47</td><td>51</td><td>54</td><td>56</td><td>59</td></tr>
+                <tr><td>소매길이</td><td>19</td><td>19.5</td><td>21</td><td>23</td><td>25</td></tr>
+              </tbody>
+            </table>
+          </div>
           <div class="size-note">* 측정 방식에 따라 ±2~3cm 오차가 있을 수 있습니다.</div>
         </div>
       </div>
 
       <div class="inner" style="border-top:1px solid #f1f5f9; margin-top:8px">
         <h2>사이즈별 수량</h2>
-        <div class="sizes" id="sizes">
-          <!-- JS로 생성 -->
-        </div>
+        <div class="sizes" id="sizes"><!-- JS로 생성 --></div>
       </div>
 
       <div class="inner" style="border-top:1px solid #f1f5f9; margin-top:8px">
@@ -254,10 +274,10 @@
   <!-- 다음 우편번호 서비스 -->
   <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script>
-    /* ===== 설정: Apps Script 웹앱 URL (스프레드시트 연결) ===== */
-    const ENDPOINT = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ← 여기에 교체
+    /* ===== 설정: Apps Script 웹앱 URL ===== */
+    const ENDPOINT = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ← 스크립트 웹앱 URL로 교체
 
-    /* ===== 이미지 확대(hover/tap) ===== */
+    /* 이미지 확대 */
     const media = document.getElementById('media');
     media.addEventListener('click', ()=> media.classList.toggle('zoomed'));
     media.addEventListener('mousemove', (e)=>{
@@ -269,7 +289,7 @@
       img.style.transformOrigin = x+'% '+y+'%';
     });
 
-    /* ===== 휴대폰 포맷 ===== */
+    /* 휴대폰 포맷(3-4-4) */
     const phone = document.getElementById('phone');
     const onlyDigits = s => (s||'').replace(/[^\d]/g,'');
     const fmt344 = d => {
@@ -285,7 +305,7 @@
     });
     phone.addEventListener('blur', ()=> phone.value = fmt344(phone.value));
 
-    /* ===== 주소 검색 ===== */
+    /* 주소 검색 */
     document.getElementById('btnFindAddr').addEventListener('click', ()=>{
       new daum.Postcode({
         oncomplete: function(data) {
@@ -296,7 +316,7 @@
       }).open();
     });
 
-    /* ===== 사이즈/수량 렌더 & 합계 ===== */
+    /* 사이즈/수량 */
     const SIZES = ['S','M','L','XL','2XL'];
     const sizeWrap = document.getElementById('sizes');
     const counts = Object.fromEntries(SIZES.map(s=>[s,0]));
@@ -316,7 +336,7 @@
     }
     SIZES.forEach(s=> sizeWrap.appendChild(makeSizeBox(s)));
 
-    // 가격 구성
+    /* 가격 */
     const PRICE_NONE = 16000;
     const PRICE_TEXT = 23000;
     const SHIPPING = 4000;
@@ -344,7 +364,6 @@
     }
     recalc();
 
-    // 스텝퍼 동작
     sizeWrap.addEventListener('click', (e)=>{
       const btn = e.target.closest('button[data-size]');
       if(!btn) return;
@@ -369,7 +388,7 @@
       r.addEventListener('change', recalc);
     });
 
-    /* ===== 제출/초기화 ===== */
+    /* 제출/초기화 */
     const statusEl = document.getElementById('status');
     const showErr = msg => statusEl.innerHTML = `<span class="notice notice-err">${msg}</span>`;
     const showOk  = msg => statusEl.innerHTML = `<span class="notice notice-ok">${msg}</span>`;
@@ -418,14 +437,13 @@
       fd.set('color', (document.querySelector('input[name="color"]:checked')||{}).value || '');
       fd.set('back', (document.querySelector('input[name="back"]:checked')||{}).value || '');
 
-      // 사이즈 수량
-      SIZES.forEach(s=> fd.set(`qty_${s}`, counts[s]||0));
-      fd.set('qty_total', totalCount());
+      ['S','M','L','XL','2XL'].forEach(s=> fd.set(`qty_${s}`, counts[s]||0));
+      const cnt = totalCount();
+      fd.set('qty_total', cnt);
 
-      // 금액
       const unit = unitPrice();
-      const subtotal = unit * totalCount();
-      const shipping = totalCount()>0 ? 4000 : 0;
+      const subtotal = unit * cnt;
+      const shipping = cnt>0 ? 4000 : 0;
       const total = subtotal + shipping;
 
       fd.set('unit_price', unit);
@@ -444,9 +462,7 @@
       btn.disabled = true; btn.textContent = '전송 중…';
 
       try{
-        if(!ENDPOINT || ENDPOINT.startsWith('YOUR_')){
-          throw new Error('endpoint not set');
-        }
+        if(!ENDPOINT || ENDPOINT.startsWith('YOUR_')) throw new Error('endpoint not set');
         const res = await fetch(ENDPOINT, { method:'POST', body: buildForm() });
         const data = await res.json().catch(()=>({ok:res.ok}));
         if(res.ok && (data.ok===true || data.status==='ok')){
@@ -472,5 +488,7 @@
       }
     });
   </script>
+
+  <!-- 다음 우편번호 스크립트 끝 -->
 </body>
 </html>
