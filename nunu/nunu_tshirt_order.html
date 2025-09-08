@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>누에 티셔츠 주문</title>
+  <style>
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --pri:#4b5563; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
+      --shadow:0 10px 30px rgba(17,24,39,.08);
+      --green:#059669; --blue:#1e3a8a;
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+
+    /* NAV (브랜드 텍스트 제거, 우측 버튼만) */
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 16px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
+    .btn.primary{background:var(--pri);color:#fff;border:0}
+    .btn.success{background:var(--green);color:#fff;border:0}
+    .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+    .btn.lg{font-size:16px;padding:10px 18px;min-height:42px;min-width:140px}
+
+    /* HERO */
+    .hero{margin:20px auto 14px;border-radius:24px;background:
+      radial-gradient(1200px 600px at 10% -10%, #f3f4f6, transparent 60%),
+      radial-gradient(1200px 600px at 110% 10%, #eef2f7, transparent 60%),
+      var(--paper);box-shadow:var(--shadow)}
+    .hero-inner{display:grid;gap:8px;padding:24px}
+    .hero h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:-.3px;line-height:1.15;text-align:center}
+    .hero .sub{margin:6px 0 0;color:var(--sub);font-weight:600;text-align:center}
+
+    /* CARD */
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .card .inner{padding:18px}
+
+    /* PRODUCT (이미지 + 설명) */
+    .product{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+    @media (max-width:920px){.product{grid-template-columns:1fr}}
+    .prod-figure{border:1px solid var(--muted);border-radius:12px;overflow:hidden;background:#f3f4f6;display:grid;grid-template-columns:1fr 1fr;gap:1px}
+    .prod-figure img{width:100%;height:100%;object-fit:cover;display:block;aspect-ratio:1/1}
+    .prod-desc h3{margin:0 0 8px}
+    .prod-desc p{margin:0 0 10px;color:var(--sub)}
+    .bullets{margin:8px 0 0;padding-left:18px}
+    .bullets li{margin:4px 0}
+
+    /* FORM */
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:720px){.grid{grid-template-columns:1fr}}
+    label{font-weight:700;display:block;margin-bottom:6px}
+    .req{color:var(--danger)}
+    .subnote{color:var(--sub);font-size:12px;margin-top:4px}
+    input[type="text"], input[type="tel"], textarea, select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted); outline:none; background:#fff;
+    }
+    textarea{min-height:84px; resize:vertical}
+    input:focus, textarea:focus, select:focus{box-shadow:0 0 0 3px var(--ring)}
+    .invalid{border-color:#ef4444 !important; box-shadow:0 0 0 2px rgba(239,68,68,.2) !important}
+
+    /* Radio pills */
+    .radios{display:flex;gap:10px;flex-wrap:wrap}
+    .radio{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--muted);border-radius:999px;cursor:pointer;background:#fff;user-select:none}
+    .radio input{accent-color:#2563eb}
+    .radio:hover{box-shadow:0 6px 18px rgba(15,23,42,.06)}
+    .radio.selected{border-color:#93c5fd;background:#eff6ff;color:#1e3a8a}
+    .radio.selected-black{background:#111827;color:#fff;border-color:#111827}
+    .radio.selected-white{background:#fff;border-color:#cbd5e1;color:#111827; box-shadow: inset 0 0 0 2px #e5e7eb;}
+
+    /* SIZE STEPPER */
+    .sizes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    @media (max-width:900px){.sizes{grid-template-columns:repeat(3,1fr)}}
+    .size-box{border:1px solid var(--muted);border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:8px}
+    .size-box h4{margin:0;font-size:14px}
+    .stepper{display:flex;align-items:center;justify-content:center;gap:8px}
+    .stepper button{
+      width:34px;height:34px;border-radius:10px;border:1px solid var(--muted);background:#fff;cursor:pointer;font-size:18px;line-height:1
+    }
+    .stepper button:active{transform:translateY(1px)}
+    .stepper input{
+      width:64px;text-align:center;padding:8px 6px;border-radius:10px;border:1px solid var(--muted);background:#fff;
+    }
+    .stepper input[readonly]{background:#fff}
+    .total{margin-top:10px;font-weight:800;color:var(--blue)}
+
+    /* 상태 안내 — 텍스트만 */
+    #status{min-height:24px;text-align:center;margin-top:6px}
+    .notice{background:none!important;border:0!important;border-radius:0!important;padding:0!important;display:inline!important;font-weight:700}
+    .notice-ok{color:#065f46}
+    .notice-err{color:#b91c1c}
+
+    .actions{display:flex;gap:12px;justify-content:center;padding:16px}
+    .addr-row{display:grid;grid-template-columns:140px 1fr auto;gap:10px}
+    @media (max-width:720px){.addr-row{grid-template-columns:1fr;}}
+  </style>
+  <!-- 다음(카카오) 우편번호 검색 위젯 -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+  <!-- NAV: 버튼만 노출 (브랜드 텍스트 제거) -->
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="btn" href="index.html">Home</a>
+      <a class="btn primary" href="3rd_leaderboard.html">제 3회 리더보드</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>누에 티셔츠 주문</h1>
+        <div class="sub">주문자 정보와 옵션(색상·뒷면 디자인·사이즈별 수량)을 선택하면 스프레드시트로 저장됩니다.</div>
+      </div>
+    </section>
+
+    <!-- 제품 소개 (이미지 + 설명) -->
+    <section class="card" aria-labelledby="hdr-prod">
+      <div class="inner product">
+        <figure class="prod-figure" aria-label="제품 이미지">
+          <!-- 샘플 이미지 2장 (원하는 이미지로 교체) -->
+          <img src="assets/tshirt/tee_front.jpg" alt="티셔츠 앞면 예시" onerror="this.style.opacity=.2; this.alt='이미지 준비중'">
+          <img src="assets/tshirt/tee_back.jpg"  alt="티셔츠 뒷면 예시" onerror="this.style.opacity=.2; this.alt='이미지 준비중'">
+        </figure>
+        <div class="prod-desc">
+          <h3 id="hdr-prod">누누 실크웜 티셔츠</h3>
+          <p>부드러운 코튼 원단에 누에 심볼을 더한 데일리 티셔츠입니다. 흰색/검은색 2가지 색상과 세 가지 뒷면 디자인 옵션을 제공합니다.</p>
+          <ul class="bullets">
+            <li>원단: 100% Cotton (200~210g/㎡)</li>
+            <li>색상: 흰색 / 검은색</li>
+            <li>뒷면 옵션: 로고형 / 텍스트형 / 심볼+문구</li>
+            <li>사이즈: S · M · L · XL · 2XL</li>
+            <li>세탁: 뒤집어 약한 세탁 권장</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 주문자 정보 -->
+    <section class="card" style="margin-top:16px" aria-labelledby="hdr-info">
+      <div class="inner">
+        <h2 id="hdr-info" style="margin:0 0 12px">주문자 정보</h2>
+
+        <div class="grid">
+          <div>
+            <label for="custName">주문자 명 <span class="req">*</span></label>
+            <input id="custName" type="text" placeholder="예: 홍길동"/>
+          </div>
+
+          <div>
+            <label for="phone">전화번호 <span class="req">*</span></label>
+            <input id="phone" type="tel" inputmode="tel" maxlength="13" placeholder="예: 010-1234-5678"/>
+            <div class="subnote">입력 시 자동으로 000-0000-0000 형식으로 변환됩니다.</div>
+          </div>
+
+          <!-- 주소: 쇼핑몰 방식(우편번호 검색) -->
+          <div style="grid-column:1/-1">
+            <label>집 주소 <span class="req">*</span></label>
+            <div class="addr-row" style="margin-bottom:8px">
+              <input id="postcode" type="text" placeholder="우편번호" readonly/>
+              <input id="addr1" type="text" placeholder="도로명 주소" readonly/>
+              <button type="button" class="btn" id="btnFindAddr">주소 찾기</button>
+            </div>
+            <input id="addr2" type="text" placeholder="상세 주소 (동/호수 등)"/>
+            <div class="subnote">‘주소 찾기’로 우편번호/도로명 주소를 채운 뒤, 상세주소를 입력하세요.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 옵션 -->
+    <section class="card" style="margin-top:16px" aria-labelledby="hdr-opt">
+      <div class="inner">
+        <h2 id="hdr-opt" style="margin:0 0 12px">옵션 선택</h2>
+
+        <div class="grid">
+          <!-- 색상 -->
+          <div>
+            <label>티셔츠 색상 <span class="req">*</span></label>
+            <div class="radios" id="colorGroup" role="radiogroup" aria-label="티셔츠 색상">
+              <label class="radio" data-color="white">
+                <input type="radio" name="color" value="white" hidden/>
+                <span>흰색</span>
+              </label>
+              <label class="radio" data-color="black">
+                <input type="radio" name="color" value="black" hidden/>
+                <span>검은색</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 뒷면 디자인 -->
+          <div>
+            <label>뒷면 디자인 <span class="req">*</span></label>
+            <div class="radios" id="designGroup" role="radiogroup" aria-label="뒷면 디자인">
+              <label class="radio">
+                <input type="radio" name="design" value="로고형" hidden/>
+                <span>로고형</span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="design" value="텍스트형" hidden/>
+                <span>텍스트형</span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="design" value="심볼+문구" hidden/>
+                <span>심볼+문구</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 사이즈 수량 -->
+    <form id="orderForm" class="card" style="margin-top:16px" novalidate>
+      <div class="inner">
+        <h2 style="margin:0 0 12px">사이즈별 수량</h2>
+
+        <div class="sizes" id="sizesWrap">
+          <!-- 스텝퍼 박스 5개 (S/M/L/XL/2XL) -->
+          <div class="size-box" data-size="S">
+            <h4>S</h4>
+            <div class="stepper">
+              <button type="button" class="qty-btn" data-delta="-1" aria-label="S 수량 감소">−</button>
+              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="S 수량 표시">
+              <button type="button" class="qty-btn" data-delta="1" aria-label="S 수량 증가">+</button>
+            </div>
+          </div>
+          <div class="size-box" data-size="M">
+            <h4>M</h4>
+            <div class="stepper">
+              <button type="button" class="qty-btn" data-delta="-1" aria-label="M 수량 감소">−</button>
+              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="M 수량 표시">
+              <button type="button" class="qty-btn" data-delta="1" aria-label="M 수량 증가">+</button>
+            </div>
+          </div>
+          <div class="size-box" data-size="L">
+            <h4>L</h4>
+            <div class="stepper">
+              <button type="button" class="qty-btn" data-delta="-1" aria-label="L 수량 감소">−</button>
+              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="L 수량 표시">
+              <button type="button" class="qty-btn" data-delta="1" aria-label="L 수량 증가">+</button>
+            </div>
+          </div>
+          <div class="size-box" data-size="XL">
+            <h4>XL</h4>
+            <div class="stepper">
+              <button type="button" class="qty-btn" data-delta="-1" aria-label="XL 수량 감소">−</button>
+              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="XL 수량 표시">
+              <button type="button" class="qty-btn" data-delta="1" aria-label="XL 수량 증가">+</button>
+            </div>
+          </div>
+          <div class="size-box" data-size="2XL">
+            <h4>2XL</h4>
+            <div class="stepper">
+              <button type="button" class="qty-btn" data-delta="-1" aria-label="2XL 수량 감소">−</button>
+              <input type="number" value="0" min="0" max="99" step="1" readonly aria-label="2XL 수량 표시">
+              <button type="button" class="qty-btn" data-delta="1" aria-label="2XL 수량 증가">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="total" id="totalBox">총 수량: 0장</div>
+
+        <div class="actions">
+          <button type="submit" class="btn success lg" id="btnSubmit">주문 제출</button>
+          <button type="button" class="btn lg" id="btnReset">초기화</button>
+        </div>
+        <div id="status" role="status" aria-live="polite"></div>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    /* ★ 여기를 너의 Apps Script 웹앱 URL로 교체하세요 */
+    const ENDPOINT = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID/exec';
+    const $ = (s)=>document.querySelector(s);
+
+    /* 전화번호 자동 하이픈 */
+    const onlyDigits = s => (s||'').replace(/[^\d]/g,'');
+    const format344 = d => {
+      d = onlyDigits(d).slice(0,11);
+      if (d.length <= 3) return d;
+      if (d.length <= 7) return d.slice(0,3) + '-' + d.slice(3);
+      return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7);
+    };
+    const phoneInput = $('#phone');
+    phoneInput.addEventListener('input', ()=>{
+      const v = format344(phoneInput.value);
+      phoneInput.value = v;
+      phoneInput.setSelectionRange(v.length, v.length);
+    });
+    phoneInput.addEventListener('blur', ()=> phoneInput.value = format344(phoneInput.value));
+
+    /* 주소 찾기(카카오 우편번호) */
+    function openPostcode(){
+      new daum.Postcode({
+        oncomplete: function(data){
+          var road = data.roadAddress || '';
+          var zone = data.zonecode || '';
+          $('#postcode').value = zone;
+          $('#addr1').value = road || (data.address || '');
+          $('#addr2').focus();
+        }
+      }).open();
+    }
+    document.getElementById('btnFindAddr').addEventListener('click', openPostcode);
+
+    /* 라디오 pill 비주얼 */
+    function wirePillGroup(groupEl, variant){
+      groupEl.addEventListener('click', (e)=>{
+        const label = e.target.closest('.radio'); if(!label) return;
+        const input = label.querySelector('input[type="radio"]'); if(!input) return;
+        groupEl.querySelectorAll('.radio').forEach(lb=>{
+          lb.classList.remove('selected','selected-black','selected-white');
+          const i = lb.querySelector('input[type="radio"]'); if(i) i.checked = false;
+        });
+        input.checked = true;
+        if(variant === 'color'){
+          const col = label.dataset.color;
+          if(col === 'black') label.classList.add('selected-black');
+          else label.classList.add('selected-white');
+        }else{
+          label.classList.add('selected');
+        }
+        groupEl.classList.remove('invalid');
+      });
+    }
+    wirePillGroup(document.getElementById('colorGroup'),'color');
+    wirePillGroup(document.getElementById('designGroup'),'design');
+
+    /* 스텝퍼 */
+    const sizesWrap = document.getElementById('sizesWrap');
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+    function updateTotal(){
+      let t = 0;
+      sizesWrap.querySelectorAll('.size-box input[type="number"]').forEach(i=>{
+        const n = parseInt(i.value,10) || 0; t += n;
+      });
+      document.getElementById('totalBox').textContent = '총 수량: ' + t + '장';
+    }
+    sizesWrap.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.qty-btn'); if(!btn) return;
+      const box = btn.closest('.size-box');
+      const input = box.querySelector('input[type="number"]');
+      const delta = parseInt(btn.dataset.delta,10);
+      const min = parseInt(input.min||'0',10);
+      const max = parseInt(input.max||'99',10);
+      const next = clamp((parseInt(input.value,10)||0)+delta, min, max);
+      input.value = next;
+      updateTotal();
+    });
+
+    /* 상태 표시 */
+    function showStatusOk(msg){ document.getElementById('status').innerHTML = `<span class="notice notice-ok">${msg}</span>`; }
+    function showStatusErr(msg){ document.getElementById('status').innerHTML = `<span class="notice notice-err">${msg}</span>`; }
+
+    /* 검증 */
+    function validate(){
+      const issues = [];
+      ['custName','phone','postcode','addr1','addr2'].forEach(id=>document.getElementById(id).classList.remove('invalid'));
+
+      const name = document.getElementById('custName').value.trim();
+      const phoneDigits = onlyDigits(document.getElementById('phone').value);
+      const postcode = document.getElementById('postcode').value.trim();
+      const addr1 = document.getElementById('addr1').value.trim();
+      const addr2 = document.getElementById('addr2').value.trim();
+      const color = (document.querySelector('input[name="color"]:checked')||{}).value || '';
+      const design= (document.querySelector('input[name="design"]:checked')||{}).value || '';
+
+      let qtyTotal = 0;
+      sizesWrap.querySelectorAll('.size-box input[type="number"]').forEach(i=> qtyTotal += (parseInt(i.value,10)||0) );
+
+      if(!name){ issues.push('주문자 명'); document.getElementById('custName').classList.add('invalid'); }
+      if(phoneDigits.length !== 11){ issues.push('전화번호(11자리)'); document.getElementById('phone').classList.add('invalid'); }
+      if(!postcode){ issues.push('우편번호'); document.getElementById('postcode').classList.add('invalid'); }
+      if(!addr1){ issues.push('도로명 주소'); document.getElementById('addr1').classList.add('invalid'); }
+      if(!addr2){ issues.push('상세 주소'); document.getElementById('addr2').classList.add('invalid'); }
+      if(!color){ issues.push('티셔츠 색상'); document.getElementById('colorGroup').classList.add('invalid'); }
+      if(!design){ issues.push('뒷면 디자인'); document.getElementById('designGroup').classList.add('invalid'); }
+      if(qtyTotal <= 0){
+        issues.push('사이즈별 수량(최소 1장)');
+        sizesWrap.querySelectorAll('input[type="number"]').forEach(i=>i.classList.add('invalid'));
+      }else{
+        sizesWrap.querySelectorAll('input[type="number"]').forEach(i=>i.classList.remove('invalid'));
+      }
+
+      if(issues.length){
+        alert('다음 항목을 확인해 주세요:\n- ' + issues.join('\n- '));
+        return false;
+      }
+      return true;
+    }
+
+    /* 데이터 묶기 & 전송 */
+    function buildFormData(){
+      const fd = new FormData();
+      fd.set('form', 'tshirt_order');
+      fd.set('customerName', document.getElementById('custName').value.trim());
+      fd.set('phone', document.getElementById('phone').value.trim());
+      fd.set('phone_norm', onlyDigits(document.getElementById('phone').value));
+      fd.set('postcode', document.getElementById('postcode').value.trim());
+      fd.set('address1', document.getElementById('addr1').value.trim());
+      fd.set('address2', document.getElementById('addr2').value.trim());
+      fd.set('address_full', `${document.getElementById('addr1').value.trim()} ${document.getElementById('addr2').value.trim()}`.trim());
+      const color = (document.querySelector('input[name="color"]:checked')||{}).value || '';
+      const design= (document.querySelector('input[name="design"]:checked')||{}).value || '';
+      fd.set('color', color);
+      fd.set('design', design);
+
+      // 사이즈 값 수집
+      const sizes = {};
+      sizesWrap.querySelectorAll('.size-box').forEach(box=>{
+        const sz = box.dataset.size;
+        const val = box.querySelector('input[type="number"]').value || '0';
+        sizes[sz] = val;
+        fd.set('qty_'+sz, val);
+      });
+      const total = Object.values(sizes).map(v=>parseInt(v,10)||0).reduce((a,b)=>a+b,0);
+      fd.set('sizes_json', JSON.stringify(sizes));
+      fd.set('qty_total', String(total));
+      fd.set('submittedAt', new Date().toISOString());
+      return fd;
+    }
+
+    /* 초기화 */
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      document.getElementById('orderForm').reset();
+      document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected','selected-black','selected-white'));
+      document.querySelectorAll('.invalid').forEach(el=>el.classList.remove('invalid'));
+      sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> i.value = '0');
+      updateTotal();
+      showStatusOk('초기화 완료');
+    });
+
+    /* 제출 */
+    document.getElementById('orderForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      showStatusOk('');
+      if(!validate()) return;
+
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true; btn.textContent = '전송 중…';
+
+      try{
+        const res = await fetch(ENDPOINT, { method:'POST', body: buildFormData() });
+        const data = await res.json().catch(()=>({ok:res.ok}));
+        if(res.ok && data && data.ok){
+          showStatusOk('주문이 접수되었습니다. 감사합니다!');
+          alert('주문이 접수되었습니다. 감사합니다!');
+          document.getElementById('orderForm').reset();
+          document.querySelectorAll('.radio').forEach(lb=>lb.classList.remove('selected','selected-black','selected-white'));
+          sizesWrap.querySelectorAll('input[type="number"]').forEach(i=> i.value = '0');
+          updateTotal();
+        }else{
+          console.error('Server response:', data);
+          showStatusErr('서버 응답 오류가 발생했습니다.');
+          alert('서버 응답 오류가 발생했습니다.');
+        }
+      }catch(err){
+        console.error(err);
+        showStatusErr('네트워크 오류가 발생했습니다.');
+        alert('네트워크 오류가 발생했습니다.');
+      }finally{
+        btn.disabled = false; btn.textContent = '주문 제출';
+      }
+    });
+
+  </script>
+</body>
+</html>
