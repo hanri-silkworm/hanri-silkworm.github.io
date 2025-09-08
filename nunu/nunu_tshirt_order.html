@@ -33,6 +33,7 @@
     /* 카드 */
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card .inner{padding:16px}
+    .card + .card{margin-top:18px}            /* 섹션 간 기본 간격 */
 
     /* 히어로 */
     .hero{margin:16px auto;border-radius:20px}
@@ -52,7 +53,7 @@
     .bullets li{margin:4px 0}
 
     /* 공지 박스 */
-    .notice{ background:linear-gradient(180deg,#f3f4f6 0%,#fff 100%); border:1px solid var(--muted); border-left:4px solid #cbd5e1; border-radius:14px; }
+    .notice{ background:linear-gradient(180deg,#f3f4f6 0%,#fff 100%); border:1px solid var(--muted); border-left:4px solid #cbd5e1; border-radius:14px; margin-bottom:22px } /* ← 간격 추가 */
     .notice .inner{ padding:14px 16px; }
     .notice h3{ margin:0 0 6px; font-size:18px; }
     .notice ul{ margin:6px 0 0; padding-left:18px; }
@@ -117,7 +118,7 @@
     .summary .total{grid-column:1/-1; font-weight:900; font-size:18px; color:#111827; border-color:#cbd5e1}
     @media (max-width:560px){ .summary{ grid-template-columns:1fr; } .summary .line{ font-size:15px; } }
 
-    .actions{display:flex;gap:12px;justify-content:center;margin-top:10px}
+    .actions{display:flex;gap:12px;justify-content:center;margin-top:14px} /* ← 버튼 위 간격 살짝 키움 */
     #status{min-height:24px;text-align:center;margin-top:6px}
     .notice-text{font-weight:700}
     .notice-ok{color:#065f46}
@@ -265,7 +266,7 @@
   <!-- 다음 우편번호 서비스 -->
   <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script>
-    /* ===== 설정: Apps Script 웹앱 URL (네가 준 URL로 연결) ===== */
+    /* ===== Apps Script 웹앱 URL ===== */
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxsCD2ODHssKJWLRL5PXR2IIWSwizcHjpX6cjy2YfsObh13Aso0Ir-uHicWGmNs7TRGRQ/exec';
 
     /* 이미지 확대 */
@@ -436,13 +437,19 @@
 
       try{
         const res = await fetch(ENDPOINT, { method:'POST', body: buildForm() });
-        const data = await res.json().catch(()=>({ok:res.ok}));
-        if(res.ok && (data.ok===true || data.status==='ok')){
+
+        // ---- 응답 관대 처리: 2xx면 성공으로 간주, JSON 없으면 본문 텍스트 검사 ----
+        const text = await res.text().catch(()=> '');
+        let data = null;
+        try{ data = text ? JSON.parse(text) : null; }catch(_){}
+        const ok2xx = res.ok;
+        const looksOk = data?.ok === true || data?.status === 'ok' || /ok|success/i.test(text||'');
+        if(ok2xx && (looksOk || !data)) {
           showOk('주문이 접수되었습니다. 감사합니다!');
           alert('주문이 접수되었습니다. 감사합니다!');
           document.getElementById('btnReset').click();
         }else{
-          console.error('server resp:', data);
+          console.error('Server response:', {status: res.status, text});
           showErr('서버 응답 오류가 발생했습니다.');
           alert('서버 응답 오류가 발생했습니다.');
         }
