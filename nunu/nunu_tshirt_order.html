@@ -6,51 +6,56 @@
   <title>누에 티셔츠 주문</title>
   <style>
     :root{
+      /* 색상/그림자 */
       --bg:#ffffff; --paper:#ffffff; --ink:#0f172a; --sub:#6b7280;
       --pri:#4b5563; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
       --shadow:0 10px 30px rgba(17,24,39,.08);
       --green:#059669; --blue:#1e3a8a; --danger:#ef4444;
+
+      /* 여백·라운드(뷰포트에 따라 유동) */
+      --pad: clamp(14px, 2.5vw, 24px);
+      --radius: 16px;
+      --touch: 44px; /* 최소 터치 영역 */
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
-    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    .wrap{max-width:980px;margin:0 auto;padding:var(--pad)}
 
     /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
-    .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 16px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
+    .nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:10px var(--pad)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600;min-height:var(--touch)}
     .btn.primary{background:var(--pri);color:#fff;border:0}
     .btn.success{background:var(--green);color:#fff;border:0}
     .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
-    .btn.lg{font-size:16px;padding:10px 18px;min-height:42px;min-width:140px}
+    .btn.lg{font-size:clamp(15px,1.2vw,16px);padding:10px 18px;min-width:140px}
 
     /* HERO */
-    .hero{margin:20px auto 14px;border-radius:24px;background:
+    .hero{margin:clamp(14px,2vw,20px) auto 14px;border-radius:24px;background:
       radial-gradient(1200px 600px at 10% -10%, #f3f4f6, transparent 60%),
       radial-gradient(1200px 600px at 110% 10%, #eef2f7, transparent 60%),
       var(--paper);box-shadow:var(--shadow)}
-    .hero-inner{display:grid;gap:8px;padding:24px}
+    .hero-inner{display:grid;gap:8px;padding:var(--pad)}
     .hero h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:-.3px;line-height:1.15;text-align:center}
-    .hero .sub{margin:6px 0 0;color:var(--sub);font-weight:600;text-align:center}
+    .hero .sub{margin:6px 0 0;color:var(--sub);font-weight:600;text-align:center;font-size:clamp(13px,1.6vw,15px)}
 
     /* CARD */
-    .card{background:var(--paper);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-    .card .inner{padding:18px}
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .inner{padding:clamp(14px,2vw,18px)}
+    h2{margin:0 0 12px;font-size:clamp(18px,2.2vw,20px)}
 
-    /* PRODUCT — 컨테이너에 비율을 주고, 이미지는 100% 채움 */
+    /* PRODUCT : 전체 UI 비율 대응 */
     .prod-figure{
       position:relative; border:1px solid var(--muted); border-radius:12px; overflow:hidden;
       background:#f3f4f6; display:block; cursor:zoom-in; touch-action:pan-y;
-      aspect-ratio: 5 / 4;                /* 데스크톱 기본 비율 */
-      max-height: 72vh;                   /* 화면을 넘치지 않도록 */
+      aspect-ratio: 5 / 4; max-height: 72vh; /* 화면 넘침 방지 */
     }
     @media (max-width: 720px){
-      .prod-figure{ aspect-ratio: 4 / 5;  max-height: 70vh; } /* 모바일 세로형 비율 */
+      .prod-figure{ aspect-ratio: 4 / 5; max-height: 70vh; }
     }
     .prod-figure img{
       width:100%; height:100%; display:block; object-fit:contain;
-      transition: transform .22s ease, transform-origin .12s ease;
-      will-change: transform;
+      transition: transform .22s ease, transform-origin .12s ease; will-change: transform;
     }
     .prod-figure[data-zoom="on"]{ cursor:zoom-out; }
     .prod-figure[data-zoom="on"] img{ transform:scale(1.9); }
@@ -61,66 +66,81 @@
     }
 
     .prod-desc{margin-top:12px}
-    .prod-desc h3{margin:0 0 8px}
-    .prod-desc p{margin:0 0 10px;color:var(--sub)}
+    .prod-desc h3{margin:0 0 8px;font-size:clamp(18px,2.4vw,20px)}
+    .prod-desc p{margin:0 0 10px;color:var(--sub);font-size:clamp(14px,1.8vw,16px)}
     .bullets{margin:8px 0 0;padding-left:18px}
     .bullets li{margin:4px 0}
 
-    /* FORM */
+    /* GRID 유틸 (모바일 비율 최적화) */
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    @media (max-width:720px){.grid{grid-template-columns:1fr}}
-    label{font-weight:700;display:block;margin-bottom:6px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    label{font-weight:700;display:block;margin-bottom:6px;font-size:clamp(14px,1.7vw,16px)}
     .req{color:var(--danger)}
-    .subnote{color:var(--sub);font-size:12px;margin-top:4px}
+    .subnote{color:var(--sub);font-size:clamp(12px,1.6vw,13px);margin-top:4px}
+
     input[type="text"], input[type="tel"], textarea, select{
-      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted); outline:none; background:#fff;
+      width:100%; padding:12px; border-radius:10px; border:1px solid var(--muted); outline:none; background:#fff;
+      font-size:clamp(14px,1.7vw,16px); min-height:var(--touch);
     }
     textarea{min-height:84px; resize:vertical}
     input:focus, textarea:focus, select:focus{box-shadow:0 0 0 3px var(--ring)}
     .invalid{border-color:#ef4444 !important; box-shadow:0 0 0 2px rgba(239,68,68,.2) !important}
 
-    /* Radio pills */
+    /* 주소 행(모바일에서 자동 스택) */
+    .addr-row{display:grid;grid-template-columns:160px 1fr auto;gap:10px;margin-bottom:8px}
+    @media (max-width:720px){
+      .addr-row{grid-template-columns:1fr 1fr;grid-auto-rows:minmax(var(--touch),auto)}
+      .addr-row .btn{grid-column:1 / -1}
+    }
+
+    /* Radio pills (터치 44px 확보) */
     .radios{display:flex;gap:10px;flex-wrap:wrap}
-    .radio{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--muted);border-radius:999px;cursor:pointer;background:#fff;user-select:none}
+    .radio{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--muted);border-radius:999px;cursor:pointer;background:#fff;user-select:none;min-height:var(--touch)}
     .radio input{accent-color:#2563eb}
     .radio:hover{box-shadow:0 6px 18px rgba(15,23,42,.06)}
     .radio.selected{border-color:#93c5fd;background:#eff6ff;color:#1e3a8a}
 
-    /* SIZE STEPPER */
+    /* SIZE STEPPER (모바일 2~3열로 재배치) */
     .sizes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
     @media (max-width:900px){.sizes{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:560px){.sizes{grid-template-columns:repeat(2,1fr)}}
     .size-box{border:1px solid var(--muted);border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:8px}
-    .size-box h4{margin:0;font-size:14px}
+    .size-box h4{margin:0;font-size:clamp(13px,1.7vw,14px)}
     .stepper{display:flex;align-items:center;justify-content:center;gap:8px}
-    .stepper button{width:34px;height:34px;border-radius:10px;border:1px solid var(--muted);background:#fff;cursor:pointer;font-size:18px;line-height:1}
+    .stepper button{width:var(--touch);height:var(--touch);border-radius:10px;border:1px solid var(--muted);background:#fff;cursor:pointer;font-size:20px;line-height:1}
     .stepper button:active{transform:translateY(1px)}
-    .stepper input{width:64px;text-align:center;padding:8px 6px;border-radius:10px;border:1px solid var(--muted);background:#fff}
+    .stepper input{width:64px;text-align:center;padding:10px;border-radius:10px;border:1px solid var(--muted);background:#fff;font-size:16px}
     .stepper input[readonly]{background:#fff}
-    .total{margin-top:10px;font-weight:800;color:var(--blue)}
 
-    /* SUMMARY */
+    /* SUMMARY (작은 화면에서 행을 세로로) */
     .paybox{margin-top:12px;border:1px dashed #cbd5e1;border-radius:12px;padding:12px}
-    .paybox .row{display:flex;justify-content:space-between;gap:10px;margin:4px 0}
+    .paybox .row{display:flex;justify-content:space-between;gap:10px;margin:4px 0;font-size:clamp(14px,1.8vw,16px)}
     .paybox .row.total{font-weight:900;border-top:1px solid #e5e7eb;padding-top:8px}
     .paybox .acc{margin-top:6px;color:#111827}
-    .paybox .note{color:#6b7280;font-size:13px;margin-top:6px}
+    .paybox .note{color:#6b7280;font-size:clamp(12px,1.6vw,13px);margin-top:6px}
+    @media (max-width:560px){
+      .paybox .row{flex-direction:column;align-items:flex-start}
+    }
 
-    /* TABLE (사이즈표) */
-    .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff;overflow:auto}
+    /* TABLE (사이즈표: 터치 스크롤) */
+    .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:separate;border-spacing:0}
     thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
     tbody td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
     tbody tr:hover{background:#fafafa}
 
     /* 하단 버튼 중앙정렬 + 위 간격 소폭 */
-    .actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
+    .actions{display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+    @media (max-width:560px){
+      .actions .btn{flex:1 1 45%}
+    }
   </style>
   <!-- 카카오 우편번호 -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
   <header class="nav">
-    <div class="nav-inner wrap">
+    <div class="nav-inner">
       <a class="btn" href="index.html">Home</a>
     </div>
   </header>
@@ -139,7 +159,7 @@
       <div class="inner">
         <figure class="prod-figure" id="prodFigure" aria-label="제품 이미지 확대 가능">
           <img id="prodImg" src="https://www.hanri.net/nunu/nunu_tshirt_image.png" alt="누에 티셔츠 제품 이미지" onerror="this.style.opacity=.25; this.alt='이미지 준비중'">
-          <div class="zoom-hint">🔍 마우스로 확대 / 모바일 탭</div>
+          <div class="zoom-hint">🔍 탭/마우스로 확대</div>
         </figure>
         <div class="prod-desc">
           <h3 id="hdr-prod">누누 케릭터 티셔츠</h3>
@@ -149,8 +169,7 @@
             <li><b>배송비</b> — 4,000원(주문당)</li>
             <li><b>입금 계좌</b> — 농협 <u>302-1235-6391-61</u> (예금주: 한리)</li>
             <li>사이즈: S · M · L · XL · 2XL</li>
-            <li>소재: 면100% (애쉬 95/5, 모쿠그레이 80/20)</li>
-            <li>핏: 정사이즈(남녀공용) · 신축성 좋음 · 도톰한 17수</li>
+            <li>소재: 면100% · 도톰한 17수 · 신축성 좋음</li>
           </ul>
           <p class="sub" style="margin-top:8px"><b>안내</b> — 뒷면 옵션이 다른 경우 <u>각 옵션별로 주문서를 따로 제출</u>해 주세요. (예: 없음 2장 / 텍스트형 1장 ⇒ 2건으로 접수)</p>
         </div>
@@ -160,7 +179,7 @@
     <!-- 주문자 정보 -->
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-orderer">
       <div class="inner">
-        <h2 id="hdr-orderer" style="margin:0 0 12px">주문자 정보</h2>
+        <h2 id="hdr-orderer">주문자 정보</h2>
         <div class="grid">
           <div>
             <label for="custName">주문자 명 <span class="req">*</span></label>
@@ -171,10 +190,11 @@
             <input id="phone" type="tel" inputmode="tel" maxlength="13" placeholder="예: 010-1234-5678"/>
             <div class="subnote">입력 시 자동으로 000-0000-0000 형식으로 변환됩니다.</div>
           </div>
+
           <!-- 주소 -->
           <div style="grid-column:1/-1">
             <label>집 주소 <span class="req">*</span></label>
-            <div class="addr-row" style="display:grid;grid-template-columns:140px 1fr auto;gap:10px;margin-bottom:8px">
+            <div class="addr-row">
               <input id="postcode" type="text" placeholder="우편번호" readonly/>
               <input id="addr1" type="text" placeholder="도로명 주소" readonly/>
               <button type="button" class="btn" id="btnFindAddr">주소 찾기</button>
@@ -189,9 +209,8 @@
     <!-- 옵션 -->
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-opt">
       <div class="inner">
-        <h2 id="hdr-opt" style="margin:0 0 12px">옵션 선택</h2>
+        <h2 id="hdr-opt">옵션 선택</h2>
         <div class="grid">
-          <!-- 색상 -->
           <div>
             <label>티셔츠 색상 <span class="req">*</span></label>
             <div class="radios" id="colorGroup" role="radiogroup" aria-label="티셔츠 색상">
@@ -199,7 +218,6 @@
               <label class="radio"><input type="radio" name="color" value="검은색" hidden/><span>검은색</span></label>
             </div>
           </div>
-          <!-- 뒷면 옵션 -->
           <div>
             <label>뒷면 옵션 <span class="req">*</span></label>
             <div class="radios" id="designGroup" role="radiogroup" aria-label="뒷면 옵션">
@@ -215,7 +233,7 @@
     <!-- 사이즈 정보 -->
     <section class="card" style="margin-top:16px" aria-labelledby="hdr-size">
       <div class="inner">
-        <h2 id="hdr-size" style="margin:0 0 12px">사이즈 정보</h2>
+        <h2 id="hdr-size">사이즈 정보</h2>
         <div class="table-wrap">
           <table>
             <thead>
@@ -238,7 +256,7 @@
     <!-- 사이즈 수량 & 결제 요약 -->
     <form id="orderForm" class="card" style="margin-top:16px" novalidate>
       <div class="inner">
-        <h2 style="margin:0 0 12px">사이즈별 수량</h2>
+        <h2>사이즈별 수량</h2>
         <div class="sizes" id="sizesWrap">
           <div class="size-box" data-size="S"><h4>S</h4>
             <div class="stepper">
@@ -296,7 +314,7 @@
     </form>
   </main>
 
-  <!-- 카카오 우편번호 SDK -->
+  <!-- 카카오 우편번호 SDK(이미 head에도 있지만, 일부 환경 호환 위해 중복 로딩 방지 체크 가능) -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script>
     /* ★ Apps Script 웹앱 URL로 교체 */
@@ -394,7 +412,7 @@
     }
     updateTotals();
 
-    /* 이미지 줌: 데스크톱 hover, 모바일 탭 토글 */
+    /* 이미지 줌: 데스크톱 hover, 모바일 탭 토글 (비율 유지) */
     (function setupZoom(){
       const fig = document.getElementById('prodFigure');
       const img = document.getElementById('prodImg');
@@ -425,7 +443,7 @@
     function showStatusOk(msg){ document.getElementById('status').innerHTML = `<span style="font-weight:700;color:#065f46">${msg}</span>`; }
     function showStatusErr(msg){ document.getElementById('status').innerHTML = `<span style="font-weight:700;color:#b91c1c">${msg}</span>`; }
 
-    /* 검증 */
+    /* 검증 (모바일에서도 동일 기준) */
     function validate(){
       const issues = [];
       ['custName','phone','postcode','addr1','addr2'].forEach(id=>document.getElementById(id).classList.remove('invalid'));
@@ -433,7 +451,7 @@
       document.getElementById('designGroup').classList.remove('invalid');
 
       const name = $('#custName').value.trim();
-      const phoneDigits = ( $('#phone').value || '' ).replace(/[^\d]/g,'');
+      const phoneDigits = ($('#phone').value || '').replace(/[^\d]/g,'');
       const postcode = $('#postcode').value.trim();
       const addr1 = $('#addr1').value.trim();
       const addr2 = $('#addr2').value.trim();
@@ -536,7 +554,7 @@
     /* 합계 최초 계산 */
     updateTotals();
 
-    /* 줌 원점 보정 (이미 위에서 설정) */
+    /* 줌 원점(모바일 탭/데스크톱 마우스) */
     (function setupZoom(){
       const fig = document.getElementById('prodFigure');
       const img = document.getElementById('prodImg');
