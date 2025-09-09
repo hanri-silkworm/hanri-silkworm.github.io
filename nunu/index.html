@@ -95,7 +95,6 @@
       background:#fff; border:1px solid #e5e7eb; color:#374151; font-weight:800; letter-spacing:.2px; font-size:13px;
     }
     .badge .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
-    .badge .amt{ opacity:.9; font-weight:900 }
     .badge.gold { border-color:#f59e0b; color:#92400e; background:linear-gradient(180deg,#fff7ed,#fff) }
     .badge.gold .dot{ background:#f59e0b }
     .badge.silver{ border-color:#cbd5e1; color:#334155; background:linear-gradient(180deg,#f3f4f6,#fff) }
@@ -125,7 +124,7 @@
     .faq summary{
       list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
       padding:12px 16px;border:1px solid #d1d5db;border-radius:var(--radius);
-      background:#f3f4f6;color:var(--pri-2);font-weight:700;
+      background:#f3f4f6;color:#4b5563;font-weight:700;
       transition:background .15s ease, border-color .15s ease, box-shadow .15s ease, color .15s ease;
     }
     .faq summary::-webkit-details-marker{display:none}
@@ -138,42 +137,26 @@
       background:var(--paper);color:var(--ink);
     }
     .faq summary:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ring)}
+
     footer{margin:48px 0 12px;color:var(--sub);text-align:center;font-size:14px}
     .tag{display:inline-flex;gap:8px;align-items:center}
     .tag svg{width:16px;height:16px}
 
 /* === Sponsor palette tweak (Gold > Silver > Bronze 시각 우선순위) === */
 :root{
-  --gold-bg1:#fff4c4;    /* 밝은 금빛 */
-  --gold-bd:#f2b21d;     /* 선명한 골드 테두리 */
-  --gold-ink:#8b5e00;    /* 골드 텍스트 */
-
-  --silver-bg1:#f4f6f8;  /* 기존 유지 */
-  --silver-bd:#cbd5e1;
-  --silver-ink:#334155;
-
-  --bronze-bg1:#f8efe6;  /* 은은한 동색(채도↓, 명도↑) */
-  --bronze-bd:#e2b08d;   /* 부드러운 테두리 */
-  --bronze-ink:#7a4e2e;  /* 잉크색도 낮은 대비 */
-  --bronze-dot:#d9a66c;  /* 포인트 점 */
+  --gold-bg1:#fff4c4; --gold-bd:#f2b21d; --gold-ink:#8b5e00;
+  --silver-bg1:#f4f6f8; --silver-bd:#cbd5e1; --silver-ink:#334155;
+  --bronze-bg1:#f8efe6; --bronze-bd:#e2b08d; --bronze-ink:#7a4e2e; --bronze-dot:#d9a66c;
 }
-
-/* 등급 라벨(전설명: .pill-tier.*) */
 .pill-tier.gold   { background:linear-gradient(180deg,var(--gold-bg1),#fff);   border-color:var(--gold-bd);   color:var(--gold-ink); }
 .pill-tier.silver { background:linear-gradient(180deg,var(--silver-bg1),#fff); border-color:var(--silver-bd); color:var(--silver-ink); }
 .pill-tier.bronze { background:linear-gradient(180deg,var(--bronze-bg1),#fff); border-color:var(--bronze-bd); color:var(--bronze-ink); }
-
-/* 배지(전설명: .badge.*) */
 .badge.gold   { border-color:var(--gold-bd);   color:var(--gold-ink);   background:linear-gradient(180deg,var(--gold-bg1),#fff); }
 .badge.silver { border-color:var(--silver-bd); color:var(--silver-ink); background:linear-gradient(180deg,var(--silver-bg1),#fff); }
 .badge.bronze { border-color:var(--bronze-bd); color:var(--bronze-ink); background:linear-gradient(180deg,var(--bronze-bg1),#fff); }
-
-/* 배지 점 색상 */
 .badge.gold .dot   { background:var(--gold-bd); }
 .badge.silver .dot { background:#94a3b8; }
 .badge.bronze .dot { background:var(--bronze-dot); }
-
-
   </style>
 </head>
 <body>
@@ -272,9 +255,7 @@
           <span class="pill-tier bronze">🥉 1만원 이상</span>
         </div>
         <p class="sponsor-desc">여러분의 응원으로 대회가 더 즐겁고 풍성해집니다. 감사합니다!</p>
-        <ul id="sponsorList" class="sponsor-list">
-          <!-- JS로 배지 채워짐 -->
-        </ul>
+        <ul id="sponsorList" class="sponsor-list"></ul>
       </div>
     </section>
 
@@ -346,7 +327,7 @@
         </details>
         <details>
           <summary>사진·영상은 어디에서 볼 수 있나요?</summary>
-          <div>각 회차 아카이브 페이지 하단의 "기념사진" 섹션에 정리합니다.</div>
+          <div>각 회차 아카이브 페이지 하단의 "기념사진" 섀션에 정리합니다.</div>
         </details>
         <details>
           <summary>참가 설문을 여러 번 제출해도 되나요?</summary>
@@ -368,27 +349,22 @@
     const btnApplyHero = document.getElementById('btn-apply-hero');
     if (btnApplyHero) btnApplyHero.addEventListener('click', (e)=>{e.preventDefault(); alert('준비중입니다!');});
 
-    /* 후원자 데이터 (금액: 원 단위) */
+    /* 후원자 데이터 (금액은 등급 계산만에 사용, 화면에는 표시하지 않음) */
     const SPONSORS = [
-      { name: '우리집 한지혜'},
-      { name: '중앙대학교 연구실 김지산'},
-      { name: '중앙대학교 연구실 정선'},
-      { name: '중앙대학교 연구실 조세현'},
+      { name: '우리집 한지혜', amount: 100000 },           // 금
+      { name: '중앙대학교 연구실 김지산', amount: 50000 },  // 은
+      { name: '중앙대학교 연구실 정선', amount: 50000 },    // 은
+      { name: '중앙대학교 연구실 조세현', amount: 20000 },  // 동
     ];
 
-    /* 금액 → 등급 매핑 (>=10만: gold, >=5만: silver, >=1만: bronze) */
     function tierOf(amt){
       if (amt >= 100000) return 'gold';
       if (amt >= 50000)  return 'silver';
       if (amt >= 10000)  return 'bronze';
       return 'default';
     }
-    function formatMan(amt){
-      // 10000원 단위로 딱 떨어지면 'n만원', 아니면 '12,345원'
-      return (amt % 10000 === 0) ? (amt/10000)+'만원' : amt.toLocaleString('ko-KR')+'원';
-    }
 
-    /* 렌더 */
+    /* 렌더: 이름만 표시 */
     const sponsorListEl = document.getElementById('sponsorList');
     function renderSponsors(list){
       sponsorListEl.innerHTML = '';
@@ -399,17 +375,16 @@
         sponsorListEl.appendChild(li);
         return;
       }
-      // 금액 내림차순 정렬
-      const sorted = list.slice().sort((a,b)=> b.amount - a.amount);
+      // 금액 내림차순 정렬(시각 우선순위 유지), 하지만 텍스트는 이름만
+      const sorted = list.slice().sort((a,b)=> (b.amount||0) - (a.amount||0));
       sorted.forEach(({name, amount})=>{
-        const tier = tierOf(amount);
+        const tier = tierOf(amount||0);
         const li = document.createElement('li');
         li.className = 'badge ' + tier;
         const icon = tier==='gold' ? '🥇' : tier==='silver' ? '🥈' : tier==='bronze' ? '🥉' : '•';
         li.innerHTML = `
           <span class="dot" aria-hidden="true"></span>
           <span class="who">${icon} ${name}</span>
-          <span class="amt">${formatMan(amount)}</span>
         `;
         sponsorListEl.appendChild(li);
       });
