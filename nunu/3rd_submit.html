@@ -168,6 +168,17 @@
       header.nav .nav-inner > div{ display:flex; gap:8px; flex-wrap:nowrap; }
       header.nav .btn{ font-size:14px; padding:8px 10px; white-space:nowrap; }
     }
+      /* 참여 확인(퀵 체크) */
+    .quick{margin:10px 0 0; padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#f8fafc; text-align:center; display:flex; justify-content:center}
+    .quick-row{display:inline-flex; gap:8px; align-items:center; justify-content:center; flex-wrap:nowrap}
+    .quick input[type="tel"]{ width:clamp(220px, 50vw, 280px); max-width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted) }
+    #quick-status{ min-height:22px; text-align:center; margin-top:6px }
+    @media (max-width:480px){ .quick-row{ flex-wrap:wrap } .quick .btn{ width:auto } }
+      /* 상품 안내 박스 */
+    .prize-box{ margin:10px 0 0; padding:12px; border:1px dashed #d1d5db; border-radius:12px; background:#fafafa }
+    .prize-box strong{ display:block; text-align:center; margin-bottom:6px }
+    .prize-list{ list-style:none; padding:0; margin:0; text-align:center; color:#111827 }
+    .prize-list li{ margin:4px 0 }
   </style>
 </head>
 <body>
@@ -186,14 +197,18 @@
       <div class="hero-grid">
         <h1>제 3회 대회 참가 제출지</h1>
         <div class="welcome" style="margin:8px 0 0; font-size:15px; color:#111827">
-          <p style="margin:0">
-            <strong>한리의 누에 고치 성별 맞추기 대회</strong>에 오신 것을 환영합니다! 🎉🐛 </p>
-          <p>
-              바쁘신 와중에도 기꺼이 참가해 주셔서 진심으로 감사합니다. 이번 대회는 <strong>올해 마지막 대회</strong>로, 한 해 동안 함께해 주신 <strong>관심과 응원</strong>을 따뜻하게 마무리하는 자리입니다. ✨ 오늘만큼은 <strong>귀여운 누에</strong>들을 더욱 사랑해 주시고, <strong>섬세한 관찰</strong>로 <strong>고치 속 비밀</strong>을 즐겁게 추측해 주세요. 🔍 여러분의 <strong>따뜻한 시선과 응원</strong>이 작은 생명들을 더욱 빛나게 합니다. ❤️ <strong>즐거운 참여</strong>와 <strong>선의의 경쟁</strong>을 기대합니다. 🙌🏆
-          </p>
+          <p style="margin:0"><strong>한리의 누에 고치 성별 맞추기 대회</strong>에 오신 것을 환영합니다! 🎉🐛</p>
+          <p>바쁘신 와중에도 기꺼이 참가해 주셔서 진심으로 감사합니다. 이번 대회는 <strong>올해 마지막 대회</strong>로, 한 해 동안 함께해 주신 <strong>관심과 응원</strong>을 따뜻하게 마무리하는 자리입니다. ✨ 오늘만큼은 <strong>귀여운 누에</strong>들을 더욱 사랑해 주시고, <strong>섬세한 관찰</strong>로 <strong>고치 속 비밀</strong>을 즐겁게 추측해 주세요. 🔍 여러분의 <strong>따뜻한 시선과 응원</strong>이 작은 생명들을 더욱 빛나게 합니다. ❤️ <strong>즐거운 참여</strong>와 <strong>선의의 경쟁</strong>을 기대합니다. 🙌🏆</p>
+          <div class="prize-box" aria-label="상품 안내">
+            <strong>🎁 상품 안내</strong>
+            <ul class="prize-list">
+              <li>🥇 1등 : 치킨 기프티콘 / 누에 굿즈 (추후 공개)</li>
+              <li>🥈 2등 : 배민 기프티콘 / 누에 굿즈</li>
+              <li>🥉 3등 : 스타벅스 기프티콘 / 누에 굿즈</li>
+            </ul>
+          </div>
           <p style="margin:8px 0 0; color:#6b7280; font-weight:600; text-align:center">주최: 한리 / 후원 : 한지혜, 중앙대학교 화학/생물정보학 연구실 구성원</p>
         </div>
-      </div>
       </div>
     </section>
 
@@ -221,6 +236,13 @@
           </div>
         </div>
         <label class="agree" id="agreeWrap"><input type="checkbox" id="agree"/> 개인정보 수집·이용에 동의합니다.</label>
+        <div class="quick" role="region" aria-label="참여 확인">
+          <div class="quick-row">
+            <input id="quick-phone" type="tel" inputmode="tel" maxlength="13" placeholder="휴대폰 번호 (예: 010-1234-5678)">
+            <button type="button" class="btn primary" id="btn-quick-check">참여 확인하기</button>
+          </div>
+          <div id="quick-status"></div>
+        </div>
       </div>
     </section>
 
@@ -542,6 +564,45 @@
       const data = await res.json();
       if(data && data.ok === false) throw new Error('dup-check server error');
       return !!(data && data.exists);
+    }
+
+    // 참여 확인(퀵 체크)
+    const quickPhone = document.getElementById('quick-phone');
+    if (quickPhone){
+      quickPhone.addEventListener('input', ()=>{
+        const v = format344(quickPhone.value);
+        quickPhone.value = v;
+        quickPhone.setSelectionRange(v.length, v.length);
+      });
+      quickPhone.addEventListener('blur', ()=>{
+        quickPhone.value = format344(quickPhone.value);
+      });
+    }
+    const quickBtn = document.getElementById('btn-quick-check');
+    if (quickBtn){
+      quickBtn.addEventListener('click', async ()=>{
+        const st = document.getElementById('quick-status');
+        const digits = onlyDigits((quickPhone?.value||'')).slice(0,11);
+        st.innerHTML = '';
+        if(digits.length !== 11){
+          st.innerHTML = '<span class="notice notice-err">휴대폰 번호 11자리를 입력하십시오.</span>';
+          quickPhone?.focus();
+          return;
+        }
+        const prev = quickBtn.textContent; quickBtn.disabled = true; quickBtn.textContent = '확인 중…';
+        try{
+          const exists = await checkPhoneDuplicate(digits);
+          if(exists){
+            st.innerHTML = '<span class="notice notice-ok">이미 참여 기록이 있습니다. <a href="3rd_leaderboard.html">리더보드</a>에서 확인하십시오.</span>';
+          }else{
+            st.innerHTML = '<span class="notice">아직 제출 기록이 없습니다. 지금 참여해 주십시오!</span>';
+          }
+        }catch(err){
+          st.innerHTML = '<span class="notice notice-err">확인 중 오류가 발생했습니다.</span>';
+        }finally{
+          quickBtn.disabled = false; quickBtn.textContent = prev;
+        }
+      });
     }
 
     // 제출 데이터
