@@ -558,24 +558,34 @@
 
     // 중복 확인
     async function checkPhoneDuplicate(phoneInput){
-      // 번호 정규화
-      const digits = onlyDigits(phoneInput).slice(0,11);
-      const hyphen = format344(digits);
+      // 1) 입력 정규화: 하이픈 제거, 선행 0 제거 버전까지 모두 생성
+      const raw = String(phoneInput || '');
+      const digits = onlyDigits(raw).slice(0,11);                 // 예: 01045297136
+      const digitsNoLead0 = digits.replace(/^0+/, '');            // 예: 1045297136 (시트 phone_norm과 동일 케이스)
+      const hyphen = format344(digits);                            // 예: 010-4529-7136
+      const hyphenNoLead0 = format344(digitsNoLead0);              // 예: 1-0452-97136 (서버 구현에 따라 무시될 수 있음)
+
       const editionEl = document.getElementById('edition');
       const edition = editionEl ? (editionEl.value || '').trim() : '';
-      const t = Date.now().toString(); // 캐시 무효화
+      const t = Date.now().toString(); // 캐시 무효화용 파라미터
 
-      // 다양한 서버 스펙 대응: phone / phone_norm, 하이픈 유무, edition 유무
+      // 2) 서버 스펙 대응: phone / phone_norm, 하이픈 유무, 선행 0 제거, edition 유무 모두 시도
       const base = [
         { action:'checkPhone', phone: digits, t },
         { action:'checkPhone', phone: hyphen, t },
         { action:'checkPhone', phone_norm: digits, t },
+        { action:'checkPhone', phone: digitsNoLead0, t },
+        { action:'checkPhone', phone_norm: digitsNoLead0, t },
+        { action:'checkPhone', phone: hyphenNoLead0, t },
       ];
       const candidates = edition ? [
         ...base,
         { action:'checkPhone', phone: digits, edition, t },
         { action:'checkPhone', phone: hyphen, edition, t },
         { action:'checkPhone', phone_norm: digits, edition, t },
+        { action:'checkPhone', phone: digitsNoLead0, edition, t },
+        { action:'checkPhone', phone_norm: digitsNoLead0, edition, t },
+        { action:'checkPhone', phone: hyphenNoLead0, edition, t },
       ] : base;
 
       const existsByData = (data)=>{
@@ -603,15 +613,6 @@
           if (existsByData(data)) return true;
         }catch(_){ /* 다음 방식 시도 */ }
       }
-      return false;
-    }?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}&t=${Date.now()}`;
-      const res = await fetch(url, { method:'GET', cache:'no-store' });
-      if(!res.ok) throw new Error('dup-check http error');
-      const data = await res.json().catch(()=>null);
-      if(!data) return false;
-      if (typeof data.exists !== 'undefined') return Boolean(data.exists);
-      if (data.error === 'duplicate_phone') return true;
-      if (typeof data.count !== 'undefined') return Number(data.count) > 0;
       return false;
     }
 
