@@ -572,7 +572,7 @@
           const res = await fetch(`${ENDPOINT}?${qs}`, { method:'GET', cache:'no-store' });
           if(!res.ok) continue;
           const data = await res.json().catch(()=>null);
-          if(!data) continue;
+          if(!data || data.ok === false) continue;
           // exists가 불리언/문자/숫자 등 어떤 형태여도 true로 인식
           const existsStr = (data.exists !== undefined && data.exists !== null) ? String(data.exists).toLowerCase() : '';
           const countNum = (data.count !== undefined && data.count !== null) ? Number(data.count) : NaN;
@@ -584,12 +584,6 @@
         }
       }
       return false;
-    }?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}`;
-      const res = await fetch(url, { method:'GET', cache:'no-store' });
-      if(!res.ok) throw new Error('dup-check http error');
-      const data = await res.json();
-      if(data && data.ok === false) throw new Error('dup-check server error');
-      return !!(data && data.exists);
     }
 
     // 참여 확인(퀵 체크)
