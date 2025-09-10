@@ -172,7 +172,7 @@
     .quick{margin:10px 0 0; padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#f8fafc; text-align:center; display:flex; justify-content:center}
     .quick-row{display:inline-flex; gap:8px; align-items:center; justify-content:center; flex-wrap:nowrap}
     .quick input[type="tel"]{ width:clamp(220px, 50vw, 280px); max-width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted) }
-    #quick-status{ min-height:22px; text-align:center; margin-top:6px }
+    #quick-status{ min-height:22px; text-align:center; margin-top:8px }
     @media (max-width:480px){ .quick-row{ flex-wrap:wrap } .quick .btn{ width:auto } }
       /* 상품 안내 박스 */
     .prize-box{ margin:10px 0 0; padding:12px; border:1px dashed #d1d5db; border-radius:12px; background:#fafafa }
@@ -561,8 +561,58 @@
       const editionEl = document.getElementById('edition');
       const edition = (editionEl && editionEl.value) ? editionEl.value.trim() : '';
       const hyphen = format344(phoneDigits);
-      const candidates = [
-        { phone: phoneDigits, edition },          // 숫자만(01012345678)
+      const cacheBust = Date.now().toString();
+
+      // 1) GET 우선(에디션 없이) → 2) GET(에디션 포함) → 3) POST(둘 다)
+      const tries = [
+        { m:'GET',  p:{ action:'checkPhone', phone: phoneDigits, t: cacheBust } },
+        { m:'GET',  p:{ action:'checkPhone', phone: hyphen,      t: cacheBust } },
+        { m:'GET',  p:{ action:'checkPhone', phone_norm: phoneDigits, t: cacheBust } },
+        { m:'GET',  p:{ action:'checkPhone', phone: phoneDigits, edition, t: cacheBust } },
+        { m:'GET',  p:{ action:'checkPhone', phone: hyphen,      edition, t: cacheBust } },
+        { m:'GET',  p:{ action:'checkPhone', phone_norm: phoneDigits, edition, t: cacheBust } },
+        { m:'POST', b:{ action:'checkPhone', phone: phoneDigits } },
+        { m:'POST', b:{ action:'checkPhone', phone: hyphen } },
+        { m:'POST', b:{ action:'checkPhone', phone_norm: phoneDigits } },
+        { m:'POST', b:{ action:'checkPhone', phone: phoneDigits, edition } },
+        { m:'POST', b:{ action:'checkPhone', phone: hyphen,      edition } },
+        { m:'POST', b:{ action:'checkPhone', phone_norm: phoneDigits, edition } },
+      ];
+
+      const isExists = (data)=>{
+        if (!data) return false;
+        // 가장 흔한 형태
+        if (typeof data.exists !== 'undefined'){
+          const v = String(data.exists).toLowerCase();
+          if (v === 'true' || v === '1' || v === 'yes' || v === 'y') return true;
+        }
+        // 카운트로 전달되는 경우
+        if (typeof data.count !== 'undefined'){
+          const n = Number(data.count); if (!Number.isNaN(n) && n > 0) return true;
+        }
+        // 배열/행으로 전달되는 경우
+        if (Array.isArray(data) && data.length > 0) return true;
+        if (Array.isArray(data.rows) && data.rows.length > 0) return true;
+        return false;
+      };
+
+      for (const t of tries){
+        try{
+          let res, data;
+          if (t.m === 'GET'){
+            const qs = new URLSearchParams(t.p).toString();
+            res = await fetch(`${ENDPOINT}?${qs}`, { method:'GET', cache:'no-store' });
+          }else{
+            res = await fetch(ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(t.b) });
+          }
+          if (!res.ok) continue;
+          data = await res.json().catch(()=>null);
+          // console.debug('checkPhone resp', t, data);
+          if (isExists(data)) return true;
+        }catch(_){ /* 다음 시도 계속 */ }
+      }
+      return false;
+    },          // 숫자만(01012345678)
         { phone: hyphen, edition },               // 하이픈 포함(010-1234-5678)
         { phone_norm: phoneDigits, edition }      // 정규화 필드 사용
       ];
