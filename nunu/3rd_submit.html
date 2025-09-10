@@ -558,7 +558,33 @@
 
     // 중복 확인
     async function checkPhoneDuplicate(phoneDigits){
-      const url = `${ENDPOINT}?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}`;
+      const editionEl = document.getElementById('edition');
+      const edition = (editionEl && editionEl.value) ? editionEl.value.trim() : '';
+      const hyphen = format344(phoneDigits);
+      const candidates = [
+        { phone: phoneDigits, edition },          // 숫자만(01012345678)
+        { phone: hyphen, edition },               // 하이픈 포함(010-1234-5678)
+        { phone_norm: phoneDigits, edition }      // 정규화 필드 사용
+      ];
+      for (const q of candidates){
+        try{
+          const qs = new URLSearchParams({ action:'checkPhone', ...q }).toString();
+          const res = await fetch(`${ENDPOINT}?${qs}`, { method:'GET', cache:'no-store' });
+          if(!res.ok) continue;
+          const data = await res.json().catch(()=>null);
+          if(!data) continue;
+          // exists가 불리언/문자/숫자 등 어떤 형태여도 true로 인식
+          const existsStr = (data.exists !== undefined && data.exists !== null) ? String(data.exists).toLowerCase() : '';
+          const countNum = (data.count !== undefined && data.count !== null) ? Number(data.count) : NaN;
+          if (existsStr === 'true' || existsStr === '1' || existsStr === 'yes' || existsStr === 'y') return true;
+          if (!Number.isNaN(countNum) && countNum > 0) return true;
+        }catch(err){
+          // 다음 후보 방식으로 재시도
+          continue;
+        }
+      }
+      return false;
+    }?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}`;
       const res = await fetch(url, { method:'GET', cache:'no-store' });
       if(!res.ok) throw new Error('dup-check http error');
       const data = await res.json();
