@@ -48,6 +48,8 @@
     .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid transparent}
     .pill.live{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
     .pill.upcoming{background:#eff6ff;color:#1e3a8a;border-color:#bfdbfe}
+    /* 회색 배지(완료 표기용) */
+    .pill.muted{background:#f3f4f6;color:#4b5563;border-color:#e5e7eb}
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
     /* 안내 패널(회색 톤) */
@@ -98,9 +100,6 @@
     .badge.gold { border-color:#f59e0b; color:#92400e; background:linear-gradient(180deg,#fff7ed,#fff) }
     .badge.silver{ border-color:#cbd5e1; color:#334155; background:linear-gradient(180deg,#f3f4f6,#fff) }
     .badge.bronze{ border-color:#d97706; color:#7c2d12; background:linear-gradient(180deg,#fde68a,#fff) }
-    .badge.gold .dot{ background:#f59e0b }
-    .badge.silver .dot{ background:#94a3b8 }
-    .badge.bronze .dot{ background:#f59e0b }
 
     /* SECTIONS / CARDS / FAQ */
     .section{margin:40px 0;text-align:center}
@@ -138,21 +137,29 @@
     .tag{display:inline-flex;gap:8px;align-items:center}
     .tag svg{width:16px;height:16px}
 
-/* === Sponsor palette tweak (Gold > Silver > Bronze 시각 우선순위) === */
-:root{
-  --gold-bg1:#fff4c4; --gold-bd:#f2b21d; --gold-ink:#8b5e00;
-  --silver-bg1:#f4f6f8; --silver-bd:#cbd5e1; --silver-ink:#334155;
-  --bronze-bg1:#f8efe6; --bronze-bd:#e2b08d; --bronze-ink:#7a4e2e; --bronze-dot:#d9a66c;
-}
-.pill-tier.gold   { background:linear-gradient(180deg,var(--gold-bg1),#fff);   border-color:var(--gold-bd);   color:var(--gold-ink); }
-.pill-tier.silver { background:linear-gradient(180deg,var(--silver-bg1),#fff); border-color:var(--silver-bd); color:var(--silver-ink); }
-.pill-tier.bronze { background:linear-gradient(180deg,var(--bronze-bg1),#fff); border-color:var(--bronze-bd); color:var(--bronze-ink); }
-.badge.gold   { border-color:var(--gold-bd);   color:var(--gold-ink);   background:linear-gradient(180deg,var(--gold-bg1),#fff); }
-.badge.silver { border-color:var(--silver-bd); color:var(--silver-ink); background:linear-gradient(180deg,var(--silver-bg1),#fff); }
-.badge.bronze { border-color:var(--bronze-bd); color:var(--bronze-ink); background:linear-gradient(180deg,var(--bronze-bg1),#fff); }
-.badge.gold .dot   { background:var(--gold-bd); }
-.badge.silver .dot { background:#94a3b8; }
-.badge.bronze .dot { background:var(--bronze-dot); }
+    /* === Sponsor palette tweak (Gold > Silver > Bronze 시각 우선순위) === */
+    :root{
+      --gold-bg1:#fff4c4; --gold-bd:#f2b21d; --gold-ink:#8b5e00;
+      --silver-bg1:#f4f6f8; --silver-bd:#cbd5e1; --silver-ink:#334155;
+      --bronze-bg1:#f8efe6; --bronze-bd:#e2b08d; --bronze-ink:#7a4e2e; --bronze-dot:#d9a66c;
+    }
+    .pill-tier.gold   { background:linear-gradient(180deg,var(--gold-bg1),#fff);   border-color:var(--gold-bd);   color:var(--gold-ink); }
+    .pill-tier.silver { background:linear-gradient(180deg,var(--silver-bg1),#fff); border-color:var(--silver-bd); color:var(--silver-ink); }
+    .pill-tier.bronze { background:linear-gradient(180deg,var(--bronze-bg1),#fff); border-color:var(--bronze-bd); color:var(--bronze-ink); }
+    .badge.gold   { border-color:var(--gold-bd);   color:var(--gold-ink);   background:linear-gradient(180deg,var(--gold-bg1),#fff); }
+    .badge.silver { border-color:var(--silver-bd); color:var(--silver-ink); background:linear-gradient(180deg,var(--silver-bg1),#fff); }
+    .badge.bronze { border-color:var(--bronze-bd); color:var(--bronze-ink); background:linear-gradient(180deg,var(--bronze-bg1),#fff); }
+
+    /* ===== 모바일 최적화 ===== */
+    @media (max-width: 540px){
+      .wrap{ padding:18px; }
+      .hero-grid{ padding:24px 18px; gap:16px; }
+      .card-grid{ gap:14px; }
+      .card{ flex:1 1 100%; max-width:100%; }
+      .card .cover{ height:auto; aspect-ratio:16/9; } /* 비율 고정 */
+      .nav-inner{ padding:10px 14px; gap:10px; }
+      .btn{ padding:8px 10px; font-size:14px; }
+    }
   </style>
 </head>
 <body>
@@ -165,7 +172,7 @@
       <nav class="nav-actions">
         <a class="btn" href="#sponsors">후원자</a>
         <a class="btn" href="#archive">아카이브</a>
-        <a class="btn" href="2nd_leaderboard.html">제 2회 리더보드</a>
+        <!-- 제 2회 리더보드 버튼 제거됨 -->
         <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html" id="btn-apply">제 3회 참여하기</a>
       </nav>
     </div>
@@ -175,8 +182,9 @@
   <main id="home" class="wrap hero">
     <div class="hero-grid">
       <section>
-        <div class="pill live">제 2회 완료 · 2025/08/11 ~ 2025/08/25</div>
+        <!-- 요청: 진행중 먼저, 완료는 뒤 + 회색 -->
         <div class="pill live">제 3회 진행중 2025/09/11 ~</div>
+        <div class="pill muted">제 2회 완료 · 2025/08/11 ~ 2025/08/25</div>
 
         <h1>🐛누에의 비밀을 맞혀보세요
           <span class="sub">이벤트 참가 & 아카이브</span>
@@ -291,7 +299,7 @@
           </div>
         </article>
 
-        <!-- ✅ 제 3회 카드: 참여확인 버튼 제거 + 안내문 추가 -->
+        <!-- ✅ 제 3회 카드 -->
         <article class="card">
           <div class="cover" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
