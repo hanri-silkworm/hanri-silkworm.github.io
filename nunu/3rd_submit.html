@@ -160,6 +160,14 @@
       .btn.kakao{ width:auto }
       .photo{ width:100%; height:clamp(180px,58vw,260px); }
     }
+      /* 모바일 네비: 버튼 1줄 유지 */
+    @media (max-width:480px){
+      .nav-inner{ gap:8px; padding:10px 12px; }
+      .nav-inner > .brand{ flex:1 1 auto; min-width:0; max-width:55%; }
+      .brand{ font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      header.nav .nav-inner > div{ display:flex; gap:8px; flex-wrap:nowrap; }
+      header.nav .btn{ font-size:14px; padding:8px 10px; white-space:nowrap; }
+    }
   </style>
 </head>
 <body>
@@ -179,7 +187,9 @@
         <h1>제 3회 대회 참가 제출지</h1>
         <div class="welcome" style="margin:8px 0 0; font-size:15px; color:#111827">
           <p style="margin:0">
-            <strong>한리의 누에 고치 성별 맞추기 대회</strong>에 오신 것을 환영합니다! 🎉🐛 바쁘신 와중에도 기꺼이 참가해 주셔서 진심으로 감사합니다. 이번 대회는 <strong>올해 마지막 대회</strong>로, 한 해 동안 함께해 주신 <strong>관심과 응원</strong>을 따뜻하게 마무리하는 자리입니다. ✨ 오늘만큼은 <strong>귀여운 누에</strong>들을 더욱 사랑해 주시고, <strong>섬세한 관찰</strong>로 <strong>고치 속 비밀</strong>을 즐겁게 추측해 주세요. 🔍🧵 여러분의 <strong>따뜻한 시선과 응원</strong>이 작은 생명들을 더욱 빛나게 합니다. ❤️ <strong>즐거운 참여</strong>와 <strong>선의의 경쟁</strong>을 기대합니다. 🙌🏆
+            <strong>한리의 누에 고치 성별 맞추기 대회</strong>에 오신 것을 환영합니다! 🎉🐛 </p>
+          <p>
+              바쁘신 와중에도 기꺼이 참가해 주셔서 진심으로 감사합니다. 이번 대회는 <strong>올해 마지막 대회</strong>로, 한 해 동안 함께해 주신 <strong>관심과 응원</strong>을 따뜻하게 마무리하는 자리입니다. ✨ 오늘만큼은 <strong>귀여운 누에</strong>들을 더욱 사랑해 주시고, <strong>섬세한 관찰</strong>로 <strong>고치 속 비밀</strong>을 즐겁게 추측해 주세요. 🔍 여러분의 <strong>따뜻한 시선과 응원</strong>이 작은 생명들을 더욱 빛나게 합니다. ❤️ <strong>즐거운 참여</strong>와 <strong>선의의 경쟁</strong>을 기대합니다. 🙌🏆
           </p>
           <p style="margin:8px 0 0; color:#6b7280; font-weight:600; text-align:center">주최: 한리 / 후원 : 한지혜, 중앙대학교 화학/생물정보학 연구실 구성원</p>
         </div>
@@ -242,7 +252,8 @@
               <div class="announce-text">
                 <strong id="alert-title">공지 받기(오픈채팅방)</strong>
                 <p>
-                  해당 대회에 대한 공지를 받으려면 오픈채팅방에 참여하십시오.
+                  해당 대회에 대한 공지를 받으려면 오픈채팅방에 참여하십시오.</p>
+                <p>
                   이 방에서는 <b>대회 시작·종료 알림</b>, <b>누에가 나방으로 우화할 때 공지</b>, <b>수상자 발표</b>를 안내합니다.
                 </p>
               </div>
