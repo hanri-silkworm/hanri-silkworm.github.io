@@ -23,7 +23,7 @@
 
     /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
+    .nav-inner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
     .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
     .brand strong{font-weight:800;letter-spacing:.2px}
     .nav-actions{display:flex;gap:8px;align-items:center;justify-content:center}
@@ -33,6 +33,30 @@
     .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
     .btn.disabled,.btn[aria-disabled="true"]{opacity:.7;cursor:not-allowed;pointer-events:none}
     header.nav .wrap{max-width:1120px;padding:20px 24px}
+
+    /* 햄버거 버튼 (모바일 전용) */
+    .hamburger{
+      display:none; align-items:center; justify-content:center; gap:8px;
+      padding:8px 10px; border-radius:10px; border:1px solid var(--muted);
+      background:var(--paper); color:var(--ink); cursor:pointer;
+    }
+    .hamburger svg{width:22px;height:22px}
+    .hamburger[aria-expanded="true"]{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+
+    /* 모바일 드로어 */
+    .mobile-drawer{
+      position:absolute; right:18px; top:calc(100% + 8px);
+      background:var(--paper); border:1px solid var(--muted); border-radius:14px;
+      box-shadow:var(--shadow); min-width:240px; padding:8px; display:none;
+    }
+    .mobile-drawer.open{ display:block; }
+    .mobile-drawer a{
+      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+      text-decoration:none; color:var(--ink); font-weight:800;
+    }
+    .mobile-drawer a:hover{ background:#f3f4f6; }
+    .mobile-drawer a.primary{ background:var(--pri); color:#fff; }
+    .mobile-drawer a.primary:hover{ filter:brightness(.95); }
 
     /* HERO */
     .hero{position:relative;margin:24px auto 12px;border-radius:24px;background:
@@ -48,7 +72,6 @@
     .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid transparent}
     .pill.live{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
     .pill.upcoming{background:#eff6ff;color:#1e3a8a;border-color:#bfdbfe}
-    /* 회색 배지(완료 표기용) */
     .pill.muted{background:#f3f4f6;color:#4b5563;border-color:#e5e7eb}
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
@@ -151,12 +174,14 @@
     .badge.bronze { border-color:var(--bronze-bd); color:var(--bronze-ink); background:linear-gradient(180deg,var(--bronze-bg1),#fff); }
 
     /* ===== 모바일 최적화 ===== */
-    @media (max-width: 540px){
+    @media (max-width: 720px){
       .wrap{ padding:18px; }
+      .nav-actions{ display:none; }         /* 데스크탑 메뉴 숨김 */
+      .hamburger{ display:inline-flex; }    /* 햄버거 표시 */
       .hero-grid{ padding:24px 18px; gap:16px; }
       .card-grid{ gap:14px; }
       .card{ flex:1 1 100%; max-width:100%; }
-      .card .cover{ height:auto; aspect-ratio:16/9; } /* 비율 고정 */
+      .card .cover{ height:auto; aspect-ratio:16/9; } /* 카드 비율 고정 */
       .nav-inner{ padding:10px 14px; gap:10px; }
       .btn{ padding:8px 10px; font-size:14px; }
     }
@@ -169,12 +194,27 @@
       <a class="brand" href="index.html" aria-label="누에 대회 홈">
         <strong>🐛누에 고치 성별 맞추기 대회</strong>
       </a>
-      <nav class="nav-actions">
+
+      <!-- 데스크탑 메뉴 -->
+      <nav class="nav-actions" aria-label="주요 링크">
         <a class="btn" href="#sponsors">후원자</a>
         <a class="btn" href="#archive">아카이브</a>
-        <!-- 제 2회 리더보드 버튼 제거됨 -->
         <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html" id="btn-apply">제 3회 참여하기</a>
       </nav>
+
+      <!-- 모바일 햄버거 -->
+      <button id="hamburger" class="hamburger" aria-label="메뉴 열기" aria-controls="mobileDrawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- 모바일 드로어 -->
+      <div id="mobileDrawer" class="mobile-drawer" role="menu" aria-label="모바일 메뉴">
+        <a role="menuitem" href="#sponsors">후원자</a>
+        <a role="menuitem" href="#archive">아카이브</a>
+        <a role="menuitem" class="primary" href="https://www.hanri.net/nunu/3rd_submit.html">제 3회 참여하기</a>
+      </div>
     </div>
   </header>
 
@@ -182,7 +222,7 @@
   <main id="home" class="wrap hero">
     <div class="hero-grid">
       <section>
-        <!-- 요청: 진행중 먼저, 완료는 뒤 + 회색 -->
+        <!-- 진행중 먼저, 완료는 뒤 + 회색 -->
         <div class="pill live">제 3회 진행중 2025/09/11 ~</div>
         <div class="pill muted">제 2회 완료 · 2025/08/11 ~ 2025/08/25</div>
 
@@ -356,6 +396,40 @@
         e.preventDefault();
         alert('준비중입니다!');
       }
+    });
+
+    /* 모바일 햄버거 드로어 */
+    const ham = document.getElementById('hamburger');
+    const drawer = document.getElementById('mobileDrawer');
+
+    function closeDrawer(){
+      drawer.classList.remove('open');
+      ham.setAttribute('aria-expanded','false');
+    }
+    function openDrawer(){
+      drawer.classList.add('open');
+      ham.setAttribute('aria-expanded','true');
+    }
+    function toggleDrawer(){
+      if (drawer.classList.contains('open')) closeDrawer(); else openDrawer();
+    }
+
+    ham?.addEventListener('click', (e)=>{ e.stopPropagation(); toggleDrawer(); });
+
+    // 바깥 클릭/ESC/리사이즈 닫기
+    document.addEventListener('click', (e)=>{
+      if (!drawer.classList.contains('open')) return;
+      if (e.target.closest('#mobileDrawer') || e.target.closest('#hamburger')) return;
+      closeDrawer();
+    });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeDrawer(); });
+    window.addEventListener('resize', ()=>{
+      if (window.innerWidth > 720) closeDrawer();
+    });
+
+    // 모바일 메뉴에서 항목 클릭 시 자동 닫기
+    drawer.querySelectorAll('a').forEach(a=>{
+      a.addEventListener('click', ()=> closeDrawer());
     });
 
     /* 후원자 데이터 (금액은 등급 계산만에 사용, 화면에는 표시하지 않음) */
