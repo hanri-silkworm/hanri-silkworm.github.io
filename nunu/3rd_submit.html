@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>참가 제출지 – 누에 고치 성별 맞추기 대회</title>
+  <title>참가 제출지 – 제 3회 누에 고치 성별 맞추기 대회</title>
   <style>
     :root{
       --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
@@ -12,6 +12,12 @@
       --green:#059669; --blue:#1e3a8a; --blue-bd:#bfdbfe; --blue-bg:#eff6ff;
       --rose:#9d174d; --rose-bd:#fbcfe8; --rose-bg:#fdf2f8;
       --danger:#ef4444; --danger-bd:#fecaca; --danger-bg:#fef2f2;
+
+      /* 타입 컬러 */
+      --gold:#f59e0b; --gold-bg:#fff7ed;
+      --mimic:#7c3aed; --mimic-bg:#f5f3ff;
+      --trap:#b91c1c; --trap-bg:#fef2f2;
+      --normal:#374151; --normal-bg:#f3f4f6;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
@@ -54,28 +60,46 @@
     input.invalid{border-color:var(--danger); box-shadow:0 0 0 2px rgba(239,68,68,.2)}
     .checkbox-invalid{outline:2px solid rgba(239,68,68,.6); outline-offset:3px; border-radius:6px; padding:2px}
 
-    fieldset{border:1px solid var(--muted);border-radius:14px;padding:14px;transition:border-color .12s ease}
+    fieldset{border:1px solid var(--muted);border-radius:14px;padding:14px;transition:border-color .12s ease, box-shadow .12s ease, background .12s ease}
     fieldset.invalid{border-color:var(--danger-bd)}
     legend{font-weight:800;color:var(--blue);padding:0 6px}
     .qgrid{display:grid;grid-template-columns:140px 1fr 1fr;gap:14px;align-items:center}
     @media (max-width:900px){.qgrid{grid-template-columns:1fr}}
-    .photo{width:140px;height:140px;border-radius:12px;background:#f3f4f6;border:1px solid var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .photo{width:140px;height:140px;border-radius:12px;background:#f3f4f6;border:1px solid var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
     .photo img{max-width:100%;max-height:100%;display:block}
     .name{font-weight:800}
 
-    .radios{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .radio{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--muted);border-radius:999px;cursor:pointer;transition: all .12s ease;background:#fff}
-    .radio input{accent-color:#2563eb}
-    .radio:hover{box-shadow:0 6px 18px rgba(15,23,42,.06)}
-    .radio.selected-f{background:var(--rose-bg);border-color:var(--rose-bd);color:var(--rose)}
-    .radio.selected-m{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)}
-
-    /* ===== 상태 안내문구: 텍스트만(배경/테두리/라운드 없음) ===== */
-    #status{min-height:24px; text-align:center; margin-top:6px}
-    .notice{
-      background:none !important; border:0 !important; border-radius:0 !important;
-      padding:0 !important; display:inline !important; font-weight:700;
+    /* 타입 배지 & 칩 */
+    .flag{
+      position:absolute; left:8px; top:8px; padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:800; border:1px solid transparent; display:inline-flex; align-items:center; gap:6px;
+      background:#fff;
     }
+    .flag i{font-style:normal}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid transparent;
+      font-size:12px; font-weight:800; width:fit-content;
+    }
+
+    /* 타입별 컬러링 */
+    fieldset.type-normal{border-color:#e5e7eb; background:linear-gradient(180deg,var(--normal-bg),#fff 45%);}
+    fieldset.type-gold{border-color:var(--gold); background:linear-gradient(180deg,var(--gold-bg),#fff 45%); box-shadow:0 6px 20px rgba(245,158,11,.1)}
+    fieldset.type-mimic{border-color:var(--mimic); background:linear-gradient(180deg,var(--mimic-bg),#fff 45%); box-shadow:0 6px 20px rgba(124,58,237,.08)}
+    fieldset.type-trap{border-color:var(--trap); background:linear-gradient(180deg,var(--trap-bg),#fff 45%); box-shadow:0 6px 20px rgba(185,28,28,.08)}
+
+    .flag.normal{color:var(--normal); border-color:#d1d5db; background:#fff}
+    .flag.gold{color:var(--gold); border-color:#fcd34d; background:#fffdf4}
+    .flag.mimic{color:var(--mimic); border-color:#ddd6fe; background:#faf7ff}
+    .flag.trap{color:var(--trap); border-color:#fecaca; background:#fff5f5}
+
+    .pill.normal{color:var(--normal); border-color:#d1d5db; background:#fff}
+    .pill.gold{color:var(--gold); border-color:#fcd34d; background:#fffdf4}
+    .pill.mimic{color:var(--mimic); border-color:#ddd6fe; background:#faf7ff}
+    .pill.trap{color:var(--trap); border-color:#fecaca; background:#fff5f5}
+
+    /* 상태 안내문구 */
+    #status{min-height:24px; text-align:center; margin-top:6px}
+    .notice{background:none !important; border:0 !important; border-radius:0 !important; padding:0 !important; display:inline !important; font-weight:700;}
     .notice-ok{color:#065f46}
     .notice-err{color:#b91c1c}
 
@@ -84,6 +108,36 @@
     .hp{position:absolute;left:-9999px;top:-9999px}
 
     .form-section-title{ text-align:center; }
+
+    /* 타입 전설(설명) */
+    .legend-box{margin:16px 0 0; padding:12px; border:1px dashed #d1d5db; border-radius:12px; background:#fafafa}
+    .legend-row{display:flex; gap:8px; flex-wrap:wrap}
+
+    /* 규칙 목록 */
+    .rules{ margin:10px 0 0; padding-left:18px; }
+    .rules li{ margin:4px 0; }
+
+    /* ⬇ 궁금해요(아코디언) */
+    .qa{ margin-top:12px }
+    .qa details{ margin:8px 0; border:0 }
+    .qa summary{
+      list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:10px 12px; border:1px solid #d1d5db; border-radius:10px;
+      background:#f3f4f6; color:#374151; font-weight:800;
+      transition:background .15s ease, border-color .15s ease, box-shadow .15s ease, color .15s ease;
+    }
+    .qa summary::-webkit-details-marker{display:none}
+    .qa summary::after{
+      content:"▸"; font-size:14px; line-height:1; transform-origin:center; transition:transform .15s ease; color:#6b7280
+    }
+    .qa details[open] summary{
+      background:#e5e7eb; border-color:#cbd5e1; border-bottom-left-radius:0; border-bottom-right-radius:0;
+    }
+    .qa details[open] summary::after{ transform:rotate(90deg) }
+    .qa .ans{
+      padding:12px; border:1px solid #cbd5e1; border-top:0; border-bottom-left-radius:10px; border-bottom-right-radius:10px;
+      background:#fff; color:#111827;
+    }
   </style>
 </head>
 <body>
@@ -112,11 +166,11 @@
         <div class="grid">
           <div>
             <label for="nickname">참가자 닉네임 <span class="req" style="color:var(--danger)">*</span></label>
-            <input id="nickname" name="nickname" type="text" placeholder="예: 누르미"/>
+            <input id="nickname" name="nickname" type="text" placeholder="예: 누에엥"/>
           </div>
           <div>
             <label for="realname">참가자 이름 <span class="req" style="color:var(--danger)">*</span></label>
-            <input id="realname" name="realname" type="text" placeholder="예: 홍길동"/>
+            <input id="realname" name="realname" type="text" placeholder="예: 한리"/>
           </div>
           <div>
             <label for="phone">참가자 휴대폰 번호 <span class="req" style="color:var(--danger)">*</span></label>
@@ -125,14 +179,54 @@
           </div>
           <div>
             <label for="edition">회차</label>
-            <input id="edition" name="edition" type="text" value="제 2회" readonly/>
+            <input id="edition" name="edition" type="text" value="제 3회" readonly/>
           </div>
         </div>
         <label class="agree" id="agreeWrap"><input type="checkbox" id="agree"/> 개인정보 수집·이용에 동의합니다.</label>
       </div>
     </section>
 
-    <!-- 20개 문항 (이름·사진 고정) -->
+    <!-- 안내: 타입/점수 규칙 + 공개/채점 규칙 + 궁금해요 -->
+    <section class="card" style="margin-top:12px">
+      <div class="inner">
+        <h2 style="margin:0 0 10px">문항 타입 & 점수 규칙</h2>
+        <div class="legend-box">
+          <div class="legend-row">
+            <span class="pill normal">일반(13) · 정답 +1 / 오답 0</span>
+            <span class="pill gold">황금(2) · 정답 +3 / 오답 0</span>
+            <span class="pill mimic">미믹(위장)(3) · 정답 +2 / 오답 −2</span>
+            <span class="pill trap">함정(2) · 정답 −3 / 오답 0</span>
+          </div>
+
+          <h3 style="margin:12px 0 6px; font-size:16px">공개·채점 운영 규칙</h3>
+          <ol class="rules">
+            <li><b>고치마다 점수가 다릅니다.</b> (각 문항의 <em>타입 배지/점수 칩</em> 확인)</li>
+            <li><b>일반고치</b>는 <u>나방이 되는 즉시</u> 정답과 함께 공개됩니다.</li>
+            <li><b>특수고치(황금/미믹·위장/함정)</b>가 <b>일반고치보다 먼저</b> 나왔을 경우
+              <u>“나방 출현”만 공지</u>되고 정답은 비공개됩니다. 이후 <b>일반고치가 나온 뒤</b> 해당 특수고치 정답을 공개하고 점수를 반영합니다.</li>
+            <li><b>모든 일반고치 공개 이후</b>에도 <b>미믹/함정</b>이 아직 나방이 되지 않았다면,
+              그 고치들은 <u>나오자마자 순차 공개</u>되며 곧바로 점수를 반영합니다.</li>
+          </ol>
+
+          <!-- ⬇ 궁금해요: 버튼 누르면 내용 나오는 Q&A (01만 유지) -->
+          <h3 style="margin:14px 0 6px; font-size:16px">궁금해요</h3>
+          <div class="qa">
+            <details>
+              <summary>왜 누에 고치 색상이 다른가요?</summary>
+              <div class="ans">
+                누에 고치의 색은 뽕잎에서 들어온 색소가 실을 만드는 기관(실샘)까지 얼마나 잘 옮겨져서 쌓이느냐에 따라 달라집니다.
+                타고난 유전자에 따라 이 색소를 실어 나르고 들여보내는 능력이 서로 다른데, 이 능력이 좋으면 색소가 많이 쌓여 고치가 노랗거나 금빛을 띠고,
+                능력이 약하면 색소가 거의 쌓이지 않아 고치가 하얗게 보입니다. 뽕잎의 다른 종류 색소가 더 많이 쌓이면 연두색이나 녹색이 나타나기도 합니다.
+                색소는 주로 고치의 겉부분에 머물기 때문에, 고치를 삶아 겉부분을 벗기는 과정에서 색소가 함께 빠져나가 하얀 실만 남고,
+                이 하얀 실은 염색하기 쉬워 산업에서 널리 사용됩니다. 같은 뽕잎을 먹여도 개체마다 고치 색이 다른 이유는 바로 이 유전자 차이 때문입니다.
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20개 문항 -->
     <form id="form" class="card" enctype="multipart/form-data" style="margin-top:18px" novalidate>
       <div class="inner">
         <h2 class="form-section-title" style="margin:0 0 8px">문항 (총 20문항)</h2>
@@ -153,34 +247,60 @@
     /* ====== 설정: 웹앱 URL ====== */
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxVl9s_cs47BxdB4QhE2HJgLZQKQ3lgAScF50FsYCHy-KEE21Uo92v7cEIXl3a-9fFugw/exec';
 
-    /* 고정 문항(20개): 이름 · 이미지 URL */
+    /* 이미지 기본 경로 (01.png ~ 20.png) */
+    const IMG_BASE = 'https://www.hanri.net/nunu/3rd_photo/';
+
+    /* 타입 매핑: gold[5,17], trap[20,8], mimic[10,3,13], 나머지 normal */
+    const GOLD = new Set([5,17]);
+    const TRAP = new Set([20,8]);
+    const MIMIC = new Set([10,3,13]);
+    function getType(idx1){
+      if(GOLD.has(idx1)) return 'gold';
+      if(TRAP.has(idx1)) return 'trap';
+      if(MIMIC.has(idx1)) return 'mimic';
+      return 'normal';
+    }
+    function typeKorean(t){
+      return t==='gold'?'황금고치':t==='trap'?'함정고치':t==='mimic'?'미믹고치':'일반고치';
+    }
+    function ruleText(t){
+      switch(t){
+        case 'gold': return '정답 +3 / 오답 0';
+        case 'mimic': return '정답 +2 / 오답 −2';
+        case 'trap': return '정답 −3 / 오답 0';
+        default: return '정답 +1 / 오답 0';
+      }
+    }
+    function pad2(n){ return String(n).padStart(2,'0'); }
+
+    /* 문항 이름 */
     const ITEMS = [
-      { name:'누돌이',   image:'assets/silkworms/01.jpg' },
-      { name:'누른자',   image:'assets/silkworms/02.jpg' },
-      { name:'누명스',   image:'assets/silkworms/03.jpg' },
-      { name:'누각이',   image:'assets/silkworms/04.jpg' },
-      { name:'누달곰',   image:'assets/silkworms/05.jpg' },
-      { name:'누하나',   image:'assets/silkworms/06.jpg' },
-      { name:'누둘',     image:'assets/silkworms/07.jpg' },
-      { name:'누셋',     image:'assets/silkworms/08.jpg' },
-      { name:'누넷',     image:'assets/silkworms/09.jpg' },
-      { name:'누다섯',   image:'assets/silkworms/10.jpg' },
-      { name:'누여섯',   image:'assets/silkworms/11.jpg' },
-      { name:'누일곱',   image:'assets/silkworms/12.jpg' },
-      { name:'누여덟',   image:'assets/silkworms/13.jpg' },
-      { name:'누아홉',   image:'assets/silkworms/14.jpg' },
-      { name:'누열',     image:'assets/silkworms/15.jpg' },
-      { name:'누열하나', image:'assets/silkworms/16.jpg' },
-      { name:'누열둘',   image:'assets/silkworms/17.jpg' },
-      { name:'누열셋',   image:'assets/silkworms/18.jpg' },
-      { name:'누열넷',   image:'assets/silkworms/19.jpg' },
-      { name:'누스물',   image:'assets/silkworms/20.jpg' }
+      { name:'01. 누리다' },
+      { name:'02. 누낭비강문합술' },
+      { name:'03. 가복음' },
+      { name:'04. 누워있는 누에' },
+      { name:'05. 누에엥' },
+      { name:'06. 누산기' },
+      { name:'07. 누가 내머리에 똥쌌어' },
+      { name:'08. 누거덩거덩스' },
+      { name:'09. 누에엣' },
+      { name:'10. 누명에서 벗어난 누에' },
+      { name:'11. 누구보다 빠르게' },
+      { name:'12. 누붕이' },
+      { name:'13. 누항사' },
+      { name:'14. 누우면 안돼' },
+      { name:'15. 누누와 윌럼프' },
+      { name:'16. 누누 에스피리투 산투' },
+      { name:'17. 누차 말하지만 누에는 누에엥' },
+      { name:'18. 누진다 초점렌즈' },
+      { name:'19. 누좋' },
+      { name:'20_. 누구야!' }
     ];
 
     const $ = (s)=>document.querySelector(s);
     const Q_TOTAL = ITEMS.length;
 
-    /* ====== 휴대폰 입력: 항상 3-4-4 자동 하이픈 ====== */
+    /* 휴대폰 3-4-4 */
     function onlyDigits(s){ return (s||'').replace(/[^\d]/g,''); }
     function format344(d){
       d = onlyDigits(d).slice(0,11);
@@ -198,18 +318,28 @@
       phoneInput.value = format344(phoneInput.value);
     });
 
-    /* ====== 문항 렌더 ====== */
+    /* 문항 렌더링 */
     const qWrap = $('#questions');
     ITEMS.forEach((it, idx)=>{
       const i = idx + 1;
+      const t = getType(i);
+      const imgUrl = IMG_BASE + pad2(i) + '.png';
+
       const fs = document.createElement('fieldset');
       fs.dataset.index = i;
+      fs.className = `type-${t}`;
       fs.innerHTML = `
         <legend>문항 ${i}</legend>
         <div class="qgrid">
-          <div class="photo"><img src="${it.image}" alt="${it.name} 사진" onerror="this.alt='이미지를 불러올 수 없습니다.'"></div>
+          <div class="photo">
+            <img src="${imgUrl}" alt="${it.name} 사진" onerror="this.alt='이미지를 불러올 수 없습니다.'">
+            <span class="flag ${t}" aria-label="${typeKorean(t)} 배지">
+              <i>${t==='gold'?'🥇':t==='mimic'?'🎭':t==='trap'?'⚠️':'🐛'}</i>${typeKorean(t)}
+            </span>
+          </div>
           <div>
             <div class="name">${it.name}</div>
+            <div class="pill ${t}" aria-label="점수 규칙">${ruleText(t)}</div>
             <div class="subnote">이미지를 참고하여 성별을 선택하십시오.</div>
           </div>
           <div>
@@ -231,7 +361,7 @@
       qWrap.appendChild(fs);
     });
 
-    // 선택 버튼 색상만 토글 + 에러표시 해제
+    // 선택 토글
     function paintGroup(group){
       const labels = group.querySelectorAll('.radio');
       labels.forEach(lb => lb.classList.remove('selected-f','selected-m'));
@@ -265,7 +395,7 @@
       $('#status').textContent = '';
     });
 
-    // 필수 검증 + 상세 표시 + 경고창
+    // 검증
     function validateAllWithAlert(){
       const issues = [];
       const nickname = $('#nickname');
@@ -276,27 +406,22 @@
       [nickname,realname,phone].forEach(i=>i.classList.remove('invalid'));
       $('#agreeWrap').classList.remove('checkbox-invalid');
 
+      const phoneDigits = (phone.value||'').replace(/[^\d]/g,'');
       if(!nickname.value.trim()){
-        issues.push('닉네임');
-        nickname.classList.add('invalid');
+        issues.push('닉네임'); nickname.classList.add('invalid');
       }
       if(!realname.value.trim()){
-        issues.push('이름');
-        realname.classList.add('invalid');
+        issues.push('이름'); realname.classList.add('invalid');
       }
-      const phoneDigits = onlyDigits(phone.value);
       if(!phoneDigits){
-        issues.push('휴대폰 번호');
-        phone.classList.add('invalid');
+        issues.push('휴대폰 번호'); phone.classList.add('invalid');
       }else if(phoneDigits.length !== 11){
-        issues.push('휴대폰 번호(11자리)');
-        phone.classList.add('invalid');
+        issues.push('휴대폰 번호(11자리)'); phone.classList.add('invalid');
       }else{
         phone.value = format344(phone.value);
       }
       if(!agree.checked){
-        issues.push('개인정보 동의');
-        $('#agreeWrap').classList.add('checkbox-invalid');
+        issues.push('개인정보 동의'); $('#agreeWrap').classList.add('checkbox-invalid');
       }
 
       const missingQuestions = [];
@@ -335,7 +460,7 @@
     function showStatusError(msg){ $('#status').innerHTML = `<span class="notice notice-err">${msg}</span>`; }
     function showStatusOk(msg){ $('#status').innerHTML = `<span class="notice notice-ok">${msg}</span>`; }
 
-    // 서버 중복 확인 — 실패 시에도 제출 중단(강제)
+    // 중복 확인
     async function checkPhoneDuplicate(phoneDigits){
       const url = `${ENDPOINT}?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}`;
       const res = await fetch(url, { method:'GET', cache:'no-store' });
@@ -345,7 +470,7 @@
       return !!(data && data.exists);
     }
 
-    // 제출 데이터 묶기
+    // 제출 데이터
     function buildFormData(){
       const fd = new FormData();
       fd.set('edition', $('#edition').value.trim());
@@ -354,13 +479,16 @@
       fd.set('phone', $('#phone').value.trim());
       fd.set('phone_norm', onlyDigits($('#phone').value.trim()));
       fd.set('submittedAt', new Date().toISOString());
-      ITEMS.forEach((it, idx)=>{
-        const i = idx+1;
-        fd.set(`q${i}_name`, it.name);
-        fd.set(`q${i}_imageUrl`, new URL(it.image, location.href).href);
+      for(let i=1;i<=Q_TOTAL;i++){
+        const t = getType(i);
+        const name = ITEMS[i-1].name;
+        const imgUrl = IMG_BASE + pad2(i) + '.png';
         const g = (document.querySelector(`input[name="q${i}_gender"]:checked`)||{}).value || '';
+        fd.set(`q${i}_name`, name);
+        fd.set(`q${i}_imageUrl`, imgUrl);
         fd.set(`q${i}_gender`, g);
-      });
+        fd.set(`q${i}_type`, t);
+      }
       return fd;
     }
 
