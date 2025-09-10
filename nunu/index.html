@@ -95,6 +95,7 @@
     .panel-desc{margin:2px 0 8px;font-size:13px;color:var(--sub)}
     .panel-divider{height:1px;width:100%;margin:8px 0;background:linear-gradient(to right, transparent 0%, #e5e7eb 12%, #e5e7eb 88%, transparent 100%);border-radius:999px}
     .panel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .panel-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
     .panel-list .check{width:18px;height:18px;margin-top:1px;color:#6b7280}
     .panel-foot{display:flex;gap:8px;align-items:center;margin-top:10px;color:#4b5563;font-size:13px}
     .panel-foot svg{width:16px;height:16px;color:#6b7280}
@@ -135,7 +136,7 @@
     }
     .upcoming .inner{ padding:16px 18px; }
 
-    /* 예고 제목: 후원자 제목과 비슷하게 */
+    /* 예고 제목 */
     .up-title{
       grid-area:title;
       margin:0;
@@ -154,29 +155,28 @@
     /* 좌측(텍스트) + 우측(이미지) 레이아웃 */
     .upcoming-grid{
       display:grid;
-      grid-template-columns: 2fr minmax(200px, 0.9fr); /* 이미지 컬럼 살짝 축소 */
+      grid-template-columns: 2fr minmax(200px, 0.9fr);
       grid-template-areas:
         "title image"
         "body  image";
       column-gap:16px;
       row-gap:8px;
-      align-items:start;         /* 상단 정렬 */
+      align-items:start;
     }
 
-    /* 이미지 컨테이너: 텍스트 높이에 맞추되 박스 크기를 살짝 더 작게 + 워터마크 */
+    /* 이미지 컨테이너(워터마크 포함) */
     .up-img{
       grid-area:image;
       align-self:start;
-      position:relative;         /* 🔹 워터마크 배치를 위해 필요 */
+      position:relative;
       background:#ffffff;
       border:1px dashed #a7f3d0;
       border-radius:12px;
       overflow:hidden;
       padding:0;
-      max-height:220px;          /* ⬅️ 더 작게 조정 */
+      max-height:220px;
       display:flex; align-items:center; justify-content:center;
     }
-    /* 워터마크: 아주 흐리게, 중앙 대각선 */
     .up-img::after{
       content:"누에엥";
       position:absolute; inset:0;
@@ -184,14 +184,13 @@
       font-weight:900;
       font-size:clamp(22px, 7vw, 56px);
       letter-spacing:.08em;
-      color:rgba(17,24,39,0.10);  /* 매우 흐림 */
+      color:rgba(17,24,39,0.10);
       transform:rotate(-18deg);
       text-shadow:0 1px 2px rgba(0,0,0,0.06);
       pointer-events:none;
       user-select:none;
       z-index:2;
     }
-    /* 실제 그림 */
     .up-img img{
       width:100%;
       height:100%;
@@ -246,23 +245,40 @@
     .pill-tier.silver { background:linear-gradient(180deg,var(--silver-bg1),#fff); border-color:var(--silver-bd); color:#334155; }
     .pill-tier.bronze { background:linear-gradient(180deg,var(--bronze-bg1),#fff); border-color:var(--bronze-bd); color:#7a4e2d; }
 
-    /* ===== 모바일 최적화 ===== */
+    /* ===== 모바일 최적화 (히어로 박스 타이트하게) ===== */
     @media (max-width: 720px){
       .wrap{ padding:18px; }
+
+      /* 상단 네비 */
       .nav-actions{ display:none; }
       .hamburger{ display:inline-flex; }
-      .hero-grid{ padding:24px 18px; gap:16px; }
-      .card-grid{ gap:14px; }
-      .card{ flex:1 1 100%; max-width:100%; }
-      .card .cover{ height:auto; aspect-ratio:16/9; }
-      .nav-inner{ padding:10px 14px; gap:10px; }
+      .nav-inner{ padding:8px 12px; gap:10px; }
       .btn{ padding:8px 10px; font-size:14px; }
 
-      /* 히어로 배지: 한 줄(넘치면 가로 스크롤) */
-      .pill-row{ flex-wrap:nowrap; overflow:auto; -webkit-overflow-scrolling:touch; }
-      .pill-row .pill{ white-space:nowrap; font-size:11px; padding:5px 8px; }
+      /* 히어로 박스 비율 압축 */
+      .hero{ margin:14px auto 10px; border-radius:18px; }
+      .hero-grid{ padding:16px 14px; gap:12px; }
+      .hero h1{ font-size:clamp(20px,5.2vw,28px); margin-bottom:4px; }
+      .hero h1 .sub{ font-size:clamp(14px,3.8vw,18px); margin-top:4px; }
+      .hero p.lead{ font-size:14px; line-height:1.55; margin-bottom:10px; }
 
-      /* 후원 등급: 한 줄(넘치면 가로 스크롤) */
+      /* 배지(진행중/완료) 더 슬림 */
+      .pill-row{ flex-wrap:nowrap; overflow:auto; -webkit-overflow-scrolling:touch; gap:6px; }
+      .pill-row .pill{ white-space:nowrap; font-size:11px; padding:4px 8px; border-radius:999px; }
+
+      /* 안내 패널도 컴팩트 */
+      .panel.notice{ padding:12px; border-left-width:3px; }
+      .panel-head{ gap:8px; margin-bottom:6px; }
+      .panel-head .ico{ width:16px; height:16px; }
+      .panel-title{ font-size:15px; }
+      .panel-desc{ font-size:12px; margin-bottom:6px; }
+      .panel-list{ gap:6px; }
+      .panel-list li{ grid-template-columns:16px 1fr; gap:6px; }
+      .panel-list .check{ width:16px; height:16px; }
+      .panel-foot{ font-size:12px; margin-top:8px; }
+      .panel-foot svg{ width:14px; height:14px; }
+
+      /* 후원 등급: 한 줄(넘치면 스크롤) */
       .sponsor-legend{ flex-wrap:nowrap; overflow:auto; -webkit-overflow-scrolling:touch; }
       .sponsor-legend .pill-tier{ white-space:nowrap; font-size:11px; padding:6px 8px; }
 
@@ -274,8 +290,8 @@
           "image"
           "body";
       }
-      .up-img{ max-height:170px; }
-      .up-img::after{ font-size:clamp(18px, 9vw, 44px); } /* 모바일 워터마크 크기 보정 */
+      .up-img{ max-height:160px; }
+      .up-img::after{ font-size:clamp(18px, 9vw, 44px); }
     }
   </style>
 </head>
