@@ -558,81 +558,15 @@
 
     // 중복 확인
     async function checkPhoneDuplicate(phoneDigits){
-      const editionEl = document.getElementById('edition');
-      const edition = (editionEl && editionEl.value) ? editionEl.value.trim() : '';
-      const hyphen = format344(phoneDigits);
-      const cacheBust = Date.now().toString();
-
-      // 1) GET 우선(에디션 없이) → 2) GET(에디션 포함) → 3) POST(둘 다)
-      const tries = [
-        { m:'GET',  p:{ action:'checkPhone', phone: phoneDigits, t: cacheBust } },
-        { m:'GET',  p:{ action:'checkPhone', phone: hyphen,      t: cacheBust } },
-        { m:'GET',  p:{ action:'checkPhone', phone_norm: phoneDigits, t: cacheBust } },
-        { m:'GET',  p:{ action:'checkPhone', phone: phoneDigits, edition, t: cacheBust } },
-        { m:'GET',  p:{ action:'checkPhone', phone: hyphen,      edition, t: cacheBust } },
-        { m:'GET',  p:{ action:'checkPhone', phone_norm: phoneDigits, edition, t: cacheBust } },
-        { m:'POST', b:{ action:'checkPhone', phone: phoneDigits } },
-        { m:'POST', b:{ action:'checkPhone', phone: hyphen } },
-        { m:'POST', b:{ action:'checkPhone', phone_norm: phoneDigits } },
-        { m:'POST', b:{ action:'checkPhone', phone: phoneDigits, edition } },
-        { m:'POST', b:{ action:'checkPhone', phone: hyphen,      edition } },
-        { m:'POST', b:{ action:'checkPhone', phone_norm: phoneDigits, edition } },
-      ];
-
-      const isExists = (data)=>{
-        if (!data) return false;
-        // 가장 흔한 형태
-        if (typeof data.exists !== 'undefined'){
-          const v = String(data.exists).toLowerCase();
-          if (v === 'true' || v === '1' || v === 'yes' || v === 'y') return true;
-        }
-        // 카운트로 전달되는 경우
-        if (typeof data.count !== 'undefined'){
-          const n = Number(data.count); if (!Number.isNaN(n) && n > 0) return true;
-        }
-        // 배열/행으로 전달되는 경우
-        if (Array.isArray(data) && data.length > 0) return true;
-        if (Array.isArray(data.rows) && data.rows.length > 0) return true;
-        return false;
-      };
-
-      for (const t of tries){
-        try{
-          let res, data;
-          if (t.m === 'GET'){
-            const qs = new URLSearchParams(t.p).toString();
-            res = await fetch(`${ENDPOINT}?${qs}`, { method:'GET', cache:'no-store' });
-          }else{
-            res = await fetch(ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(t.b) });
-          }
-          if (!res.ok) continue;
-          data = await res.json().catch(()=>null);
-          // console.debug('checkPhone resp', t, data);
-          if (isExists(data)) return true;
-        }catch(_){ /* 다음 시도 계속 */ }
-      }
-      return false;
-    },          // 숫자만(01012345678)
-        { phone: hyphen, edition },               // 하이픈 포함(010-1234-5678)
-        { phone_norm: phoneDigits, edition }      // 정규화 필드 사용
-      ];
-      for (const q of candidates){
-        try{
-          const qs = new URLSearchParams({ action:'checkPhone', ...q }).toString();
-          const res = await fetch(`${ENDPOINT}?${qs}`, { method:'GET', cache:'no-store' });
-          if(!res.ok) continue;
-          const data = await res.json().catch(()=>null);
-          if(!data || data.ok === false) continue;
-          // exists가 불리언/문자/숫자 등 어떤 형태여도 true로 인식
-          const existsStr = (data.exists !== undefined && data.exists !== null) ? String(data.exists).toLowerCase() : '';
-          const countNum = (data.count !== undefined && data.count !== null) ? Number(data.count) : NaN;
-          if (existsStr === 'true' || existsStr === '1' || existsStr === 'yes' || existsStr === 'y') return true;
-          if (!Number.isNaN(countNum) && countNum > 0) return true;
-        }catch(err){
-          // 다음 후보 방식으로 재시도
-          continue;
-        }
-      }
+      // 중복제출 차단에 쓰는 것과 동일한 방식: phone(숫자만)으로 조회
+      const url = `${ENDPOINT}?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}&t=${Date.now()}`;
+      const res = await fetch(url, { method:'GET', cache:'no-store' });
+      if(!res.ok) throw new Error('dup-check http error');
+      const data = await res.json().catch(()=>null);
+      if(!data) return false;
+      if (typeof data.exists !== 'undefined') return Boolean(data.exists);
+      if (data.error === 'duplicate_phone') return true;
+      if (typeof data.count !== 'undefined') return Number(data.count) > 0;
       return false;
     }
 
