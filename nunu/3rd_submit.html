@@ -66,7 +66,12 @@
     .qgrid{display:grid;grid-template-columns:140px 1fr 1fr;gap:14px;align-items:center}
     @media (max-width:900px){.qgrid{grid-template-columns:1fr}}
     .photo{width:140px;height:140px;border-radius:12px;background:#f3f4f6;border:1px solid var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-    .photo img{max-width:100%;max-height:100%;display:block}
+    /* ⬇ 박스 꽉 채우기(중앙 배치, 필요시 크롭) */
+    .photo img{
+      width:100%; height:100%;
+      object-fit:cover; object-position:center;
+      display:block; -webkit-user-drag:none; user-select:none;
+    }
     .name{font-weight:800}
 
     /* 타입 배지 & 칩 */
@@ -82,7 +87,7 @@
     }
 
     /* 타입별 컬러링 */
-    fieldset.type-normal{border-color:#e5e7eb; background:linear-gradient(180deg,var(--normal-bg),#fff 45%);}
+    fieldset.type-normal{border-color:#e5e7eb; background:linear-gradient(180deg,var(--normal-bg),#fff 45%);}  
     fieldset.type-gold{border-color:var(--gold); background:linear-gradient(180deg,var(--gold-bg),#fff 45%); box-shadow:0 6px 20px rgba(245,158,11,.1)}
     fieldset.type-mimic{border-color:var(--mimic); background:linear-gradient(180deg,var(--mimic-bg),#fff 45%); box-shadow:0 6px 20px rgba(124,58,237,.08)}
     fieldset.type-trap{border-color:var(--trap); background:linear-gradient(180deg,var(--trap-bg),#fff 45%); box-shadow:0 6px 20px rgba(185,28,28,.08)}
@@ -138,6 +143,23 @@
       padding:12px; border:1px solid #cbd5e1; border-top:0; border-bottom-left-radius:10px; border-bottom-right-radius:10px;
       background:#fff; color:#111827;
     }
+
+    /* 공지(오픈채팅) 블록 */
+    .announce{
+      margin:12px 0 0; padding:12px; border:1px solid #e5e7eb; border-radius:12px;
+      background:linear-gradient(180deg,#fffbe7,#fff);
+    }
+    .announce-row{ display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center }
+    .announce strong{ display:block; font-size:16px; margin-bottom:4px }
+    .announce p{ margin:0; color:var(--sub) }
+    .btn.kakao{ background:#FEE500; color:#111827; border:0; font-weight:800; white-space:nowrap }
+
+    /* 모바일(폰) 최적화: 사진·버튼 비율 */
+    @media (max-width:720px){
+      .announce-row{ flex-direction:column; align-items:center }
+      .btn.kakao{ width:auto }
+      .photo{ width:100%; height:clamp(180px,58vw,260px); }
+    }
   </style>
 </head>
 <body>
@@ -154,8 +176,14 @@
   <main class="wrap">
     <section class="hero">
       <div class="hero-grid">
-        <h1>참가 제출지</h1>
-        <div class="sub">닉네임·이름·휴대폰을 작성하고, 20문항의 고정된 누에 이름·사진을 보고 성별(암/수)만 선택하십시오.</div>
+        <h1>제 3회 대회 참가 제출지</h1>
+        <div class="welcome" style="margin:8px 0 0; font-size:15px; color:#111827">
+          <p style="margin:0">
+            <strong>한리의 누에 고치 성별 맞추기 대회</strong>에 오신 것을 환영합니다! 🎉🐛 바쁘신 와중에도 기꺼이 참가해 주셔서 진심으로 감사합니다. 이번 대회는 <strong>올해 마지막 대회</strong>로, 한 해 동안 함께해 주신 <strong>관심과 응원</strong>을 따뜻하게 마무리하는 자리입니다. ✨ 오늘만큼은 <strong>귀여운 누에</strong>들을 더욱 사랑해 주시고, <strong>섬세한 관찰</strong>로 <strong>고치 속 비밀</strong>을 즐겁게 추측해 주세요. 🔍🧵 여러분의 <strong>따뜻한 시선과 응원</strong>이 작은 생명들을 더욱 빛나게 합니다. ❤️ <strong>즐거운 참여</strong>와 <strong>선의의 경쟁</strong>을 기대합니다. 🙌🏆
+          </p>
+          <p style="margin:8px 0 0; color:#6b7280; font-weight:600; text-align:center">주최: 한리 / 후원 : 한지혜, 중앙대학교 화학/생물정보학 연구실 구성원</p>
+        </div>
+      </div>
       </div>
     </section>
 
@@ -201,14 +229,27 @@
           <h3 style="margin:12px 0 6px; font-size:16px">공개·채점 운영 규칙</h3>
           <ol class="rules">
             <li><b>고치마다 점수가 다릅니다.</b> (각 문항의 <em>타입 배지/점수 칩</em> 확인)</li>
-            <li><b>일반고치</b>는 <u>나방이 되는 즉시</u> 정답과 함께 공개됩니다.</li>
+            <li><b>일반고치</b>는 <u>누에 나방이 되는 즉시</u> 정답과 함께 공개됩니다.</li>
             <li><b>특수고치(황금/미믹·위장/함정)</b>가 <b>일반고치보다 먼저</b> 나왔을 경우
-              <u>“나방 출현”만 공지</u>되고 정답은 비공개됩니다. 이후 <b>일반고치가 나온 뒤</b> 해당 특수고치 정답을 공개하고 점수를 반영합니다.</li>
+              <u>“누에나방 출현”만 공지</u>되고 정답은 비공개됩니다. 이후 <b>일반고치가 나온 뒤</b> 해당 특수고치 정답을 공개하고 점수를 반영합니다.</li>
             <li><b>모든 일반고치 공개 이후</b>에도 <b>미믹/함정</b>이 아직 나방이 되지 않았다면,
               그 고치들은 <u>나오자마자 순차 공개</u>되며 곧바로 점수를 반영합니다.</li>
           </ol>
 
-          <!-- ⬇ 궁금해요: 버튼 누르면 내용 나오는 Q&A (01만 유지) -->
+          <!-- 공지 받기(오픈채팅) -->
+          <div class="announce" role="region" aria-labelledby="alert-title">
+            <div class="announce-row">
+              <div class="announce-text">
+                <strong id="alert-title">공지 받기(오픈채팅방)</strong>
+                <p>
+                  해당 대회에 대한 공지를 받으려면 오픈채팅방에 참여하십시오.
+                  이 방에서는 <b>대회 시작·종료 알림</b>, <b>누에가 나방으로 우화할 때 공지</b>, <b>수상자 발표</b>를 안내합니다.
+                </p>
+              </div>
+              <a class="btn kakao lg" href="https://open.kakao.com/o/gm703oRh" target="_blank" rel="noopener noreferrer" aria-label="오픈채팅방 새 창에서 열기">🔔 채팅방 참여</a>
+            </div>
+          </div>
+
           <h3 style="margin:14px 0 6px; font-size:16px">궁금해요</h3>
           <div class="qa">
             <details>
@@ -247,7 +288,7 @@
     /* ====== 설정: 웹앱 URL ====== */
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxVl9s_cs47BxdB4QhE2HJgLZQKQ3lgAScF50FsYCHy-KEE21Uo92v7cEIXl3a-9fFugw/exec';
 
-    /* 이미지 기본 경로 (01.png ~ 20.png) */
+    /* 이미지 기본 경로 */
     const IMG_BASE = 'https://www.hanri.net/nunu/3rd_photo/';
 
     /* 타입 매핑: gold[5,17], trap[20,8], mimic[10,3,13], 나머지 normal */
@@ -273,11 +314,24 @@
     }
     function pad2(n){ return String(n).padStart(2,'0'); }
 
+    /* 이름 → 파일명: "{번호}_{이름}.jpg"
+       - 앞의 숫자/구두점 제거 -> 연속 공백은 "_"로 치환 -> 앞뒤 "_" 정리 -> URL 인코딩 */
+    function toFileName(idx, displayName){
+      const num = pad2(idx);
+      const raw = (displayName||'')
+        .replace(/^\s*\d+\s*[\.\-_\)]*\s*/,'');  // "01.", "01_", "01- " 등 제거(여러 기호 허용)
+      const withUnderscore = raw.trim()
+        .replace(/\s+/g,'_')                     // 공백→_
+        .replace(/^_+|_+$/g,'');                 // 앞뒤 _ 제거
+      const encoded = encodeURIComponent(withUnderscore); // 한글/특수문자 안전
+      return `${num}_${encoded}.jpg`;
+    }
+
     /* 문항 이름 */
     const ITEMS = [
       { name:'01. 누리다' },
       { name:'02. 누낭비강문합술' },
-      { name:'03. 가복음' },
+      { name:'03. 누가복음' },
       { name:'04. 누워있는 누에' },
       { name:'05. 누에엥' },
       { name:'06. 누산기' },
@@ -288,13 +342,13 @@
       { name:'11. 누구보다 빠르게' },
       { name:'12. 누붕이' },
       { name:'13. 누항사' },
-      { name:'14. 누우면 안돼' },
+      { name:'14. 누우면안돼' },
       { name:'15. 누누와 윌럼프' },
       { name:'16. 누누 에스피리투 산투' },
       { name:'17. 누차 말하지만 누에는 누에엥' },
       { name:'18. 누진다 초점렌즈' },
       { name:'19. 누좋' },
-      { name:'20_. 누구야!' }
+      { name:'20_. 누구야' }
     ];
 
     const $ = (s)=>document.querySelector(s);
@@ -323,7 +377,8 @@
     ITEMS.forEach((it, idx)=>{
       const i = idx + 1;
       const t = getType(i);
-      const imgUrl = IMG_BASE + pad2(i) + '.png';
+      const fileName = toFileName(i, it.name);
+      const imgUrl = IMG_BASE + fileName;
 
       const fs = document.createElement('fieldset');
       fs.dataset.index = i;
@@ -332,9 +387,9 @@
         <legend>문항 ${i}</legend>
         <div class="qgrid">
           <div class="photo">
-            <img src="${imgUrl}" alt="${it.name} 사진" onerror="this.alt='이미지를 불러올 수 없습니다.'">
+            <img src="${imgUrl}" alt="${it.name} 사진" draggable="false" oncontextmenu="return false" onerror="this.alt='이미지를 불러올 수 없습니다.'">
             <span class="flag ${t}" aria-label="${typeKorean(t)} 배지">
-              <i>${t==='gold'?'🥇':t==='mimic'?'🎭':t==='trap'?'⚠️':'🐛'}</i>${typeKorean(t)}
+              <i>${t==='gold'?'✨':t==='mimic'?'😏':t==='trap'?'⚠️':'🐛'}</i>${typeKorean(t)}
             </span>
           </div>
           <div>
@@ -359,6 +414,14 @@
         </div>
       `;
       qWrap.appendChild(fs);
+    });
+
+    /* 이미지 우클릭/드래그 방지(추가 보호) */
+    document.addEventListener('contextmenu', (e)=>{
+      if(e.target && e.target.tagName==='IMG') e.preventDefault();
+    });
+    document.addEventListener('dragstart', (e)=>{
+      if(e.target && e.target.tagName==='IMG') e.preventDefault();
     });
 
     // 선택 토글
@@ -482,7 +545,8 @@
       for(let i=1;i<=Q_TOTAL;i++){
         const t = getType(i);
         const name = ITEMS[i-1].name;
-        const imgUrl = IMG_BASE + pad2(i) + '.png';
+        const fileName = toFileName(i, name);
+        const imgUrl = IMG_BASE + fileName;
         const g = (document.querySelector(`input[name="q${i}_gender"]:checked`)||{}).value || '';
         fd.set(`q${i}_name`, name);
         fd.set(`q${i}_imageUrl`, imgUrl);
