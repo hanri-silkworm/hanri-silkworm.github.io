@@ -75,7 +75,7 @@
     .pill.muted{background:#f3f4f6;color:#4b5563;border-color:#e5e7eb}
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
-    /* 두 배지를 한 줄로 */
+    /* 두 배지를 묶는 행 */
     .pill-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
 
     /* 안내 패널(회색 톤) */
@@ -92,19 +92,13 @@
     .panel-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
     .panel-head .ico{width:18px;height:18px;color:#6b7280;opacity:.95}
     .panel-title{margin:0;font-size:16px;font-weight:800;letter-spacing:.2px;color:var(--pri-2)}
+    .panel-desc{margin:2px 0 8px;font-size:13px;color:var(--sub)}
     .panel-divider{height:1px;width:100%;margin:8px 0;background:linear-gradient(to right, transparent 0%, #e5e7eb 12%, #e5e7eb 88%, transparent 100%);border-radius:999px}
     .panel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
     .panel-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
     .panel-list .check{width:18px;height:18px;margin-top:1px;color:#6b7280}
     .panel-foot{display:flex;gap:8px;align-items:center;margin-top:10px;color:#4b5563;font-size:13px}
     .panel-foot svg{width:16px;height:16px;color:#6b7280}
-
-    /* 모바일에서 패널 접기/펼치기 버튼 */
-    .panel-toggle{
-      display:none; align-self:flex-start;
-      margin-top:4px; padding:6px 10px; border-radius:999px;
-      border:1px solid #d1d5db; background:#fff; color:#374151; font-weight:800; font-size:12px;
-    }
 
     /* 중앙 래퍼 */
     #content.page{display:grid;justify-items:center;gap:28px;padding:0 24px 24px;}
@@ -121,7 +115,7 @@
     .pill-tier{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; border:1px solid transparent}
     .pill-tier.gold{ background:linear-gradient(180deg,#fef3c7,#fff); border-color:#f59e0b; color:#92400e }
     .pill-tier.silver{ background:linear-gradient(180deg,#f3f4f6,#fff); border-color:#cbd5e1; color:#334155 }
-    .pill-tier.bronze{ background:linear-gradient(180deg,#fde68a,#fff); border-color:#d97706; color:#7a4e2d }
+    .pill-tier.bronze{ background:linear-gradient(180deg,#fde68a,#fff); border-color:#d97706; color:#7a4e2e }
 
     .sponsor-list{ display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none; }
     .badge{
@@ -131,7 +125,7 @@
     .badge .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
     .badge.gold { border-color:#f59e0b; color:#92400e; background:linear-gradient(180deg,#fff7ed,#fff) }
     .badge.silver{ border-color:#cbd5e1; color:#334155; background:linear-gradient(180deg,#f3f4f6,#fff) }
-    .badge.bronze{ border-color:#d97706; color:#7a4e2d; background:linear-gradient(180deg,#fde68a,#fff) }
+    .badge.bronze{ border-color:#d97706; color:#7a4e2e; background:linear-gradient(180deg,#fde68a,#fff) }
 
     /* 📢 예고 박스 (Mint tone) */
     .upcoming{
@@ -180,6 +174,7 @@
       max-height:220px;
       display:flex; align-items:center; justify-content:center;
     }
+    /* 워터마크 */
     .up-img::after{
       content:"누에엥";
       position:absolute; inset:0;
@@ -242,53 +237,47 @@
     :root{
       --gold-bg1:#fff4c4; --gold-bd:#f2b21d; --gold-ink:#8b5e00;
       --silver-bg1:#f4f6f8; --silver-bd:#cbd5e1; --silver-ink:#334155;
-      --bronze-bg1:#f8efe6; --bronze-bd:#e2b08d; --bronze-ink:#7a4e2d; --bronze-dot:#d9a66c;
+      --bronze-bg1:#f8efe6; --bronze-bd:#e2b08d; --bronze-ink:#7a4e2e; --bronze-dot:#d9a66c;
     }
     .pill-tier.gold   { background:linear-gradient(180deg,var(--gold-bg1),#fff);   border-color:var(--gold-bd);   color:var(--gold-ink); }
     .pill-tier.silver { background:linear-gradient(180deg,var(--silver-bg1),#fff); border-color:var(--silver-bd); color:#334155; }
-    .pill-tier.bronze { background:linear-gradient(180deg,var(--bronze-bg1),#fff); border-color:var(--bronze-bd); color:#7a4e2d; }
+    .pill-tier.bronze { background:linear-gradient(180deg,var(--bronze-bg1),#fff); border-color:var(--bronze-bd); color:#7a4e2e; }
 
-    /* ===== 모바일 최적화 (히어로 박스 타이트하게) ===== */
+    /* ===== 모바일 최적화 ===== */
     @media (max-width: 720px){
       .wrap{ padding:18px; }
 
-      /* 상단 네비 */
+      /* 상단 네비 → 햄버거 */
       .nav-actions{ display:none; }
       .hamburger{ display:inline-flex; }
       .nav-inner{ padding:8px 12px; gap:10px; }
       .btn{ padding:8px 10px; font-size:14px; }
 
-      /* 히어로 박스 비율 압축 */
+      /* 히어로 박스 */
       .hero{ margin:12px auto 8px; border-radius:16px; }
-      .hero-grid{ padding:12px 12px; gap:10px; }
-      .hero h1{ font-size:clamp(19px,5.2vw,26px); margin-bottom:2px; line-height:1.18; }
+      .hero-grid{ padding:16px 14px; gap:12px; }
+      .hero h1{ font-size:clamp(20px,5.2vw,26px); margin-bottom:2px; line-height:1.18; }
       .hero h1 .sub{ font-size:clamp(14px,3.8vw,17px); margin-top:3px; }
-      .hero p.lead{
-        font-size:13px; line-height:1.45; margin:6px 0 6px;
-        display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+      .hero p.lead{ font-size:13px; line-height:1.5; margin:8px 0 10px; }
+
+      /* 👉 요청: 배지 2개를 두 줄로(각 줄 1개) */
+      .pill-row{
+        display:grid;
+        grid-template-columns: 1fr;
+        row-gap:6px;
       }
-      .cta-row{ margin-top:6px; gap:8px; }
-
-      /* 배지(진행중/완료) 더 슬림 */
-      .pill-row{ flex-wrap:nowrap; overflow:auto; -webkit-overflow-scrolling:touch; gap:6px; }
-      .pill-row .pill{ white-space:nowrap; font-size:11px; padding:4px 8px; border-radius:999px; }
-
-      /* 안내 패널 접힘 기본 */
-      .panel.notice{ padding:10px 12px; }
-      .panel-toggle{ display:inline-flex; }
-      .panel-body{ display:none; }       /* 모바일에선 기본 숨김 */
-      .panel-title{ font-size:14px; }
-      .panel-head .ico{ width:16px; height:16px; }
-      .panel-list{ gap:6px; }
-      .panel-list li{ grid-template-columns:16px 1fr; gap:6px; }
-      .panel-list .check{ width:16px; height:16px; }
-      .panel-foot{ font-size:12px; margin-top:6px; }
+      .pill-row .pill{
+        width:100%;
+        justify-content:center;
+        font-size:12px;
+        padding:5px 10px;
+      }
 
       /* 후원 등급: 한 줄(넘치면 스크롤) */
       .sponsor-legend{ flex-wrap:nowrap; overflow:auto; -webkit-overflow-scrolling:touch; }
       .sponsor-legend .pill-tier{ white-space:nowrap; font-size:11px; padding:6px 8px; }
 
-      /* 예고 섹션: 단일 컬럼 + 이미지 박스 더 작게 */
+      /* 예고 섹션: 단일 컬럼 + 이미지 박스 조금 작게 */
       .upcoming-grid{
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -298,12 +287,6 @@
       }
       .up-img{ max-height:160px; }
       .up-img::after{ font-size:clamp(18px, 9vw, 44px); }
-    }
-
-    /* 데스크탑에선 패널 항상 펼침 */
-    @media (min-width: 721px){
-      .panel-toggle{ display:none !important; }
-      .panel-body{ display:block !important; }
     }
   </style>
 </head>
@@ -342,6 +325,7 @@
   <main id="home" class="wrap hero">
     <div class="hero-grid">
       <section>
+        <!-- 👉 두 줄로 표시되는 배지 -->
         <div class="pill-row">
           <div class="pill live">제 3회 진행중 2025/09/11 ~</div>
           <div class="pill muted">제 2회 완료 · 2025/08/11 ~ 2025/08/25</div>
@@ -362,7 +346,7 @@
         </div>
       </section>
 
-      <!-- 안내 패널 (모바일 접힘) -->
+      <!-- 안내 패널 -->
       <aside class="panel notice" aria-labelledby="notice-title">
         <div class="panel-head">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
@@ -370,42 +354,33 @@
           </svg>
           <h3 id="notice-title" class="panel-title">이벤트 안내</h3>
         </div>
-
-        <!-- 모바일 전용 토글 버튼 -->
-        <button id="noticeToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="noticeBody">
-          핵심 안내 펼치기
-        </button>
-
-        <!-- 본문: 모바일 기본 숨김, 데스크탑 항상 보임 -->
-        <div id="noticeBody" class="panel-body">
-          <div class="panel-desc">핵심만 확인하고 바로 참여하실 수 있도록 요약했습니다.</div>
-          <div class="panel-divider" aria-hidden="true"></div>
-          <ul class="panel-list">
-            <li>
-              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <div><strong>참가 방법</strong>: 설문 링크로 접수</div>
-            </li>
-            <li>
-              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <div><strong>점수 규칙</strong>: 정답 수를 기준으로 순위를 산정한다. 동점자의 경우 중복 등수를 부여합니다.</div>
-            </li>
-            <li>
-              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <div><strong>데이터 공개</strong>: 대회 종료 후 <u>익명 통계</u></div>
-            </li>
-          </ul>
-          <div class="panel-foot" aria-label="운영 원칙">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-              <path d="M4 12l4 4 12-12" stroke-linecap="round"/>
+        <div class="panel-desc">핵심만 확인하고 바로 참여하실 수 있도록 요약했습니다.</div>
+        <div class="panel-divider" aria-hidden="true"></div>
+        <ul class="panel-list">
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>안전한 공개 범위로 운영합니다.</span>
-          </div>
+            <div><strong>참가 방법</strong>: 설문 링크로 접수</div>
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><strong>점수 규칙</strong>: 정답 수를 기준으로 순위를 산정한다. 동점자의 경우 중복 등수를 부여합니다.</div>
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><strong>데이터 공개</strong>: 대회 종료 후 <u>익명 통계</u></div>
+          </li>
+        </ul>
+        <div class="panel-foot" aria-label="운영 원칙">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M4 12l4 4 12-12" stroke-linecap="round"/>
+          </svg>
+          <span>안전한 공개 범위로 운영합니다.</span>
         </div>
       </aside>
     </div>
@@ -423,7 +398,6 @@
           </svg>
           <h3 id="sponsor-title">후원해주신 분들</h3>
         </div>
-        <!-- 후원 등급: 모바일에서 한 줄 -->
         <div class="sponsor-legend" aria-label="후원 등급 안내">
           <span class="pill-tier gold">🥇 10만원 이상</span>
           <span class="pill-tier silver">🥈 5만원 이상</span>
@@ -587,18 +561,6 @@
 
     // 모바일 메뉴에서 항목 클릭 시 자동 닫기
     drawer.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> closeDrawer()));
-
-    /* 이벤트 안내: 모바일 접힘 토글 */
-    const noticeToggle = document.getElementById('noticeToggle');
-    const noticeBody = document.getElementById('noticeBody');
-    if (noticeToggle && noticeBody){
-      noticeToggle.addEventListener('click', ()=>{
-        const exp = noticeToggle.getAttribute('aria-expanded') === 'true';
-        noticeToggle.setAttribute('aria-expanded', String(!exp));
-        noticeToggle.textContent = exp ? '핵심 안내 펼치기' : '핵심 안내 접기';
-        noticeBody.style.display = exp ? 'none' : 'block';
-      });
-    }
 
     /* 후원자 데이터 */
     const SPONSORS = [
