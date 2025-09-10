@@ -96,13 +96,13 @@
     }
     .badge .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
     .badge.gold { border-color:#f59e0b; color:#92400e; background:linear-gradient(180deg,#fff7ed,#fff) }
-    .badge.gold .dot{ background:#f59e0b }
     .badge.silver{ border-color:#cbd5e1; color:#334155; background:linear-gradient(180deg,#f3f4f6,#fff) }
-    .badge.silver .dot{ background:#94a3b8 }
     .badge.bronze{ border-color:#d97706; color:#7c2d12; background:linear-gradient(180deg,#fde68a,#fff) }
+    .badge.gold .dot{ background:#f59e0b }
+    .badge.silver .dot{ background:#94a3b8 }
     .badge.bronze .dot{ background:#f59e0b }
 
-    /* SECTIONS / CARDS / FAQ (기존 그대로) */
+    /* SECTIONS / CARDS / FAQ */
     .section{margin:40px 0;text-align:center}
     .section h2{font-size:24px;margin:0 0 6px}
     .section p.sub{color:var(--sub);margin:0 0 18px}
@@ -114,12 +114,8 @@
     .card .body p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .meta{display:flex;gap:10px;color:var(--sub);font-size:13px;justify-content:center;flex-wrap:wrap}
     .kicker{color:var(--pri-2);font-weight:800;font-size:12px;letter-spacing:.6px;text-transform:uppercase}
-    .card.muted{background:#f9fafb;border-color:#e5e7eb;}
-    .card.muted .cover{background:linear-gradient(135deg,rgba(156,163,175,.25),rgba(209,213,219,.25))}
-    .card.muted .kicker,.card.muted h3,.card.muted p{color:#6b7280}
-    .card.muted .btn{border-color:#d1d5db}
-    .card.muted .btn.primary{background:#9ca3af;color:#111827}
-    .card.muted .btn.primary.disabled,.card.muted .btn.primary[aria-disabled="true"]{opacity:.85}
+    .hint{margin-top:6px; font-size:12px; color:var(--sub);}
+
     .faq details{margin:10px 0;border:0}
     .faq summary{
       list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -170,7 +166,7 @@
         <a class="btn" href="#sponsors">후원자</a>
         <a class="btn" href="#archive">아카이브</a>
         <a class="btn" href="2nd_leaderboard.html">제 2회 리더보드</a>
-        <a class="btn primary" href="#apply" id="btn-apply">제 3회 준비중</a>
+        <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html" id="btn-apply">제 3회 참여하기</a>
       </nav>
     </div>
   </header>
@@ -180,7 +176,7 @@
     <div class="hero-grid">
       <section>
         <div class="pill live">제 2회 완료 · 2025/08/11 ~ 2025/08/25</div>
-        <div class="pill upcoming">제 3회 준비 중 · 예상 9월 초중순 시작 예정</div>
+        <div class="pill live">제 3회 진행중 2025/09/11 ~</div>
 
         <h1>🐛누에의 비밀을 맞혀보세요
           <span class="sub">이벤트 참가 & 아카이브</span>
@@ -192,7 +188,7 @@
         </p>
 
         <div class="cta-row">
-          <a class="btn primary" href="#apply" id="btn-apply-hero">제 3회 준비중</a>
+          <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html" id="btn-apply-hero">제 3회 참여하기</a>
           <a class="btn" href="#faq">FAQ</a>
         </div>
       </section>
@@ -295,18 +291,20 @@
           </div>
         </article>
 
-        <article class="card muted">
+        <!-- ✅ 제 3회 카드: 참여확인 버튼 제거 + 안내문 추가 -->
+        <article class="card">
           <div class="cover" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
           </div>
           <div class="body">
             <div class="kicker">제 3회 (2025.09)</div>
-            <h3 style="margin:6px 0 6px">이벤트 준비중</h3>
+            <h3 style="margin:6px 0 6px">제 3회 진행중</h3>
             <p style="margin:0 0 10px;color:var(--sub)">이벤트 참가 · 일정/규정 필독</p>
             <div class="meta">
-              <a class="btn primary disabled" href="#apply" aria-disabled="true" tabindex="-1">준비중</a>
-              <a class="btn" href="#faq">FAQ</a>
+              <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html">참여하기</a>
+              <a class="btn disabled" href="#" aria-disabled="true" tabindex="-1" title="준비중입니다">리더보드 (준비중)</a>
             </div>
+            <div class="hint">참여 확인은 <strong>참가 제출지</strong> 페이지에서 가능합니다.</div>
           </div>
         </article>
       </div>
@@ -327,11 +325,11 @@
         </details>
         <details>
           <summary>사진·영상은 어디에서 볼 수 있나요?</summary>
-          <div>각 회차 아카이브 페이지 하단의 "기념사진" 섀션에 정리합니다.</div>
+          <div>각 회차 아카이브 페이지 하단의 "기념사진" 섹션에 정리합니다.</div>
         </details>
         <details>
           <summary>참가 설문을 여러 번 제출해도 되나요?</summary>
-          <div>이벤트 참가 중복은 허용하지 않습니다. 데이터베이스에 중복 기록시 마지막 참여기록만 반영됩니다.</div>
+          <div>이벤트 참가 중복은 허용하지 않습니다. 데이터베이스에 중복 기록 시 마지막 참여기록만 반영됩니다.</div>
         </details>
       </div>
     </section>
@@ -343,30 +341,30 @@
 
   <!-- 스크립트 -->
   <script>
-    // 네비 "제 3회 준비중" 버튼 안내
-    const btnApplyNav = document.getElementById('btn-apply');
-    if (btnApplyNav) btnApplyNav.addEventListener('click', (e)=>{e.preventDefault(); alert('준비중입니다!');});
-    const btnApplyHero = document.getElementById('btn-apply-hero');
-    if (btnApplyHero) btnApplyHero.addEventListener('click', (e)=>{e.preventDefault(); alert('준비중입니다!');});
+    /* 준비중(비활성) 링크만 막는 범용 핸들러 */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[aria-disabled="true"], a.disabled');
+      if (a) {
+        e.preventDefault();
+        alert('준비중입니다!');
+      }
+    });
 
     /* 후원자 데이터 (금액은 등급 계산만에 사용, 화면에는 표시하지 않음) */
     const SPONSORS = [
       { name: '우리집 한지혜', amount: 100000 },           // 금
-      { name: '중앙대학교 연구실 김지산', amount: 100000 },  // 은
+      { name: '중앙대학교 연구실 김지산', amount: 100000 },  // 금
       { name: '중앙대학교 연구실 정선', amount: 50000 },    // 은
-      { name: '중앙대학교 연구실 윤홍률', amount: 50000 },    // 은
+      { name: '중앙대학교 연구실 윤홍률', amount: 50000 },  // 은
       { name: '중앙대학교 연구실 조세현', amount: 20000 },  // 동
       { name: '경희대학교 연구실 김영하', amount: 2000 },
     ];
-
     function tierOf(amt){
       if (amt >= 100000) return 'gold';
       if (amt >= 50000)  return 'silver';
       if (amt >= 10000)  return 'bronze';
       return 'default';
     }
-
-    /* 렌더: 이름만 표시 */
     const sponsorListEl = document.getElementById('sponsorList');
     function renderSponsors(list){
       sponsorListEl.innerHTML = '';
@@ -377,7 +375,6 @@
         sponsorListEl.appendChild(li);
         return;
       }
-      // 금액 내림차순 정렬(시각 우선순위 유지), 하지만 텍스트는 이름만
       const sorted = list.slice().sort((a,b)=> (b.amount||0) - (a.amount||0));
       sorted.forEach(({name, amount})=>{
         const tier = tierOf(amount||0);
