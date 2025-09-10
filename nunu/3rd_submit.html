@@ -179,6 +179,13 @@
     .prize-box strong{ display:block; text-align:center; margin-bottom:6px }
     .prize-list{ list-style:none; padding:0; margin:0; text-align:center; color:#111827 }
     .prize-list li{ margin:4px 0 }
+      /* 리더보드 준비중 모달 */
+    .modal-overlay{ position:fixed; inset:0; background:rgba(17,24,39,.45); backdrop-filter:saturate(180%) blur(4px); display:none; align-items:center; justify-content:center; z-index:100 }
+    .modal-overlay.open{ display:flex }
+    .modal{ background:var(--paper); border:1px solid var(--muted); border-radius:16px; box-shadow:var(--shadow); width:min(420px, calc(100% - 40px)); padding:18px; text-align:center }
+    .modal h3{ margin:6px 0 6px; font-size:18px }
+    .modal p{ margin:0; color:var(--sub) }
+    .modal-actions{ margin-top:12px; display:flex; gap:8px; justify-content:center }
   </style>
 </head>
 <body>
@@ -251,16 +258,16 @@
       <div class="inner">
         <h2 style="margin:0 0 10px">문항 타입 & 점수 규칙</h2>
         <div class="legend-box">
-          <div class="legend-row">
-            <span class="pill normal">일반(13) · 정답 +1 / 오답 0</span>
-            <span class="pill gold">황금(2) · 정답 +3 / 오답 0</span>
-            <span class="pill mimic">미믹(위장)(3) · 정답 +2 / 오답 −2</span>
-            <span class="pill trap">함정(2) · 정답 −3 / 오답 0</span>
-          </div>
-
           <h3 style="margin:12px 0 6px; font-size:16px">공개·채점 운영 규칙</h3>
           <ol class="rules">
-            <li><b>고치마다 점수가 다릅니다.</b> (각 문항의 <em>타입 배지/점수 칩</em> 확인)</li>
+            <li><b>고치마다 점수가 다릅니다.</b> (각 문항의 <em>타입 배지/점수 칩</em> 확인)
+              <div class="legend-row" style="margin-top:6px">
+                <span class="pill normal">일반(13) · 정답 +1 / 오답 0</span>
+                <span class="pill gold">황금(2) · 정답 +3 / 오답 0</span>
+                <span class="pill mimic">미믹(위장)(3) · 정답 +2 / 오답 −2</span>
+                <span class="pill trap">함정(2) · 정답 −3 / 오답 0</span>
+              </div>
+            </li>
             <li><b>일반고치</b>는 <u>누에 나방이 되는 즉시</u> 정답과 함께 공개됩니다.</li>
             <li><b>특수고치(황금/미믹·위장/함정)</b>가 <b>일반고치보다 먼저</b> 나왔을 경우
               <u>“누에나방 출현”만 공지</u>되고 정답은 비공개됩니다. 이후 <b>일반고치가 나온 뒤</b> 해당 특수고치 정답을 공개하고 점수를 반영합니다.</li>
@@ -316,6 +323,17 @@
       </div>
     </form>
   </main>
+  <!-- 리더보드 준비중 모달 -->
+  <div id="lb-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lb-title">
+      <div style="font-size:32px; line-height:1">✨</div>
+      <h3 id="lb-title">리더보드 준비 중</h3>
+      <p>잠시만 기다려 주십시오. 공개되면 이곳에서 확인할 수 있습니다.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="lb-close">닫기</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     /* ====== 설정: 웹앱 URL ====== */
@@ -643,9 +661,9 @@
         try{
           const exists = await checkPhoneDuplicate(digits);
           if(exists){
-            st.innerHTML = '<span class="notice notice-ok">&nbsp;&nbsp;이미 참여 기록이 있습니다. 나중에 리더보드에서 확인하십시오.</span>';
+            st.innerHTML = '<span class="notice notice-ok">이미 참여 기록이 있습니다. <a href="3rd_leaderboard.html">리더보드</a>에서 확인하십시오.</span>';
           }else{
-            st.innerHTML = '<span class="notice">&nbsp;&nbsp;아직 제출 기록이 없습니다. 지금 참여해 주십시오!</span>';
+            st.innerHTML = '<span class="notice">&nbsp;아직 제출 기록이 없습니다. 지금 참여해 주십시오!</span>';
           }
         }catch(err){
           st.innerHTML = '<span class="notice notice-err">확인 중 오류가 발생했습니다.</span>';
@@ -734,6 +752,18 @@
         btn.disabled = false; btn.textContent = '제출';
       }
     });
+    // 리더보드 모달 동작
+    (function(){
+      const link = document.querySelector('a[href="3rd_leaderboard.html"]');
+      const modal = document.getElementById('lb-modal');
+      const closeBtn = document.getElementById('lb-close');
+      const open = ()=>{ if(modal){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); } };
+      const close = ()=>{ if(modal){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); } };
+      if(link){ link.addEventListener('click', (e)=>{ e.preventDefault(); open(); }); }
+      if(closeBtn){ closeBtn.addEventListener('click', close); }
+      modal?.addEventListener('click', (e)=>{ if(e.target === modal) close(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && modal?.classList.contains('open')) close(); });
+    })();
   </script>
 </body>
 </html>
