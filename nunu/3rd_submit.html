@@ -557,9 +557,54 @@
     function showStatusOk(msg){ $('#status').innerHTML = `<span class="notice notice-ok">${msg}</span>`; }
 
     // 중복 확인
-    async function checkPhoneDuplicate(phoneDigits){
-      // 중복제출 차단에 쓰는 것과 동일한 방식: phone(숫자만)으로 조회
-      const url = `${ENDPOINT}?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}&t=${Date.now()}`;
+    async function checkPhoneDuplicate(phoneInput){
+      // 번호 정규화
+      const digits = onlyDigits(phoneInput).slice(0,11);
+      const hyphen = format344(digits);
+      const editionEl = document.getElementById('edition');
+      const edition = editionEl ? (editionEl.value || '').trim() : '';
+      const t = Date.now().toString(); // 캐시 무효화
+
+      // 다양한 서버 스펙 대응: phone / phone_norm, 하이픈 유무, edition 유무
+      const base = [
+        { action:'checkPhone', phone: digits, t },
+        { action:'checkPhone', phone: hyphen, t },
+        { action:'checkPhone', phone_norm: digits, t },
+      ];
+      const candidates = edition ? [
+        ...base,
+        { action:'checkPhone', phone: digits, edition, t },
+        { action:'checkPhone', phone: hyphen, edition, t },
+        { action:'checkPhone', phone_norm: digits, edition, t },
+      ] : base;
+
+      const existsByData = (data)=>{
+        if (!data) return false;
+        if (typeof data.exists !== 'undefined'){
+          const v = String(data.exists).toLowerCase();
+          if (v === 'true' || v === '1' || v === 'yes' || v === 'y') return true;
+          if (v === 'false' || v === '0' || v === 'no' || v === 'n') return false;
+        }
+        if (typeof data.count !== 'undefined'){
+          const n = Number(data.count); if (!Number.isNaN(n) && n > 0) return true;
+        }
+        if (data && data.error === 'duplicate_phone') return true;
+        if (Array.isArray(data) && data.length > 0) return true;
+        if (Array.isArray(data?.rows) && data.rows.length > 0) return true;
+        return false;
+      };
+
+      for (const p of candidates){
+        try{
+          const qs = new URLSearchParams(p).toString();
+          const res = await fetch(`${ENDPOINT}?${qs}`, { method:'GET', cache:'no-store' });
+          if (!res.ok) continue;
+          const data = await res.json().catch(()=>null);
+          if (existsByData(data)) return true;
+        }catch(_){ /* 다음 방식 시도 */ }
+      }
+      return false;
+    }?action=checkPhone&phone=${encodeURIComponent(phoneDigits)}&t=${Date.now()}`;
       const res = await fetch(url, { method:'GET', cache:'no-store' });
       if(!res.ok) throw new Error('dup-check http error');
       const data = await res.json().catch(()=>null);
