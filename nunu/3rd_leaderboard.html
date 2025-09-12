@@ -13,7 +13,7 @@
       /* category colors */
       --gold:#f59e0b;     /* 황금 */
       --mimic:#8b5cf6;    /* 미믹 */
-      --bomb:#b91c1c;     /* 폭탄(빨강) */
+      --bomb:#b91c1c;     /* 함정(=폭탄) */
       --normal:#9ca3af;   /* 일반 */
 
       /* neutral chip (비공개 상태) */
@@ -79,7 +79,7 @@
     /* 20칸 그리드 */
     .answers{display:grid;grid-template-columns:repeat(20, minmax(18px,1fr));gap:3px;align-items:center;width:100%}
 
-    /* 칩 (비공개 '?' 고정) */
+    /* 칩 ('?' 고정) */
     .chip{
       position:relative;display:inline-flex;align-items:center;justify-content:center;
       height:18px;border-radius:5px;border:1px solid var(--chip-bd);background:var(--chip-bg);
@@ -87,7 +87,7 @@
     }
     .chip .t{font-size:11.5px;line-height:1}
 
-    /* 칩 모서리 카테고리 색 */
+    /* 칩 모서리 색 */
     .chip::after{
       content:"";position:absolute;top:-2px;left:-2px;width:0;height:0;
       border-bottom:10px solid transparent;border-left:10px solid var(--normal);
@@ -143,7 +143,7 @@
         <h1>🐛제 3회 리더보드</h1>
         <p class="lead">지금은 비공개 모드라 칩 텍스트는 <b>?</b> 한 글자로만 표시돼요. (호버 시 문제 이미지/정보 표시)</p>
         <ul class="guides">
-          <li>표기 규칙: <b>암, 수</b> (내부는 <code>A→F</code>, <code>S→M</code>으로 변환)</li>
+          <li>표기 규칙: <b>암, 수</b> (내부는 <code>A→F</code>, <code>S→M</code> 변환)</li>
           <li>정답키(<code>ANSWER_KEY_FM</code>) 입력 시 점수/순위 자동 계산</li>
         </ul>
       </div>
@@ -159,7 +159,7 @@
         <div class="legend" aria-label="카테고리 범례">
           <span class="item"><span class="chip" data-cat="gold"><span class="t">?</span></span><span class="label">황금고치</span></span>
           <span class="item"><span class="chip" data-cat="mimic"><span class="t">?</span></span><span class="label">미믹고치</span></span>
-          <span class="item"><span class="chip" data-cat="bomb"><span class="t">?</span></span><span class="label" data-type="bomb">폭탄고치</span></span>
+          <span class="item"><span class="chip" data-cat="bomb"><span class="t">?</span></span><span class="label" data-type="bomb">함정고치</span></span>
           <span class="item"><span class="chip" data-cat="normal"><span class="t">?</span></span><span class="label">일반고치</span></span>
         </div>
         <div class="legend-note">※ CAT_MAP을 변경하여 문제별 카테고리를 조정할 수 있어요.</div>
@@ -169,7 +169,7 @@
     </section>
   </div>
 
-  <!-- 커스텀 호버 카드: [라벨+텍스트] 위, 이미지 아래 -->
+  <!-- 커스텀 호버 카드: [라벨+문제명] 위, 이미지 아래 -->
   <div id="hovercard" class="hovercard" role="dialog" aria-hidden="true">
     <div class="meta"><span class="pill">—</span><span class="text">—</span></div>
     <div class="imgwrap"><img alt=""></div>
@@ -177,23 +177,43 @@
 
   <script>
     /* ========================
-       0) 설정: 정답키 & 카테고리
+       0) 설정: 정답키 & 카테고리 & 기본 이미지
     ======================== */
 
-    // ✅ 선택: 정답키(길이 20, 'F' 또는 'M'만).
-    // 비워두면 점수는 '—', TSV 입력 순서로 표시됩니다.
+    // 정답키(길이 20, 'F' 또는 'M'만). 비우면 점수/순위 미표시.
     const ANSWER_KEY_FM = "";
 
-    // ✅ 카테고리 매핑 (문항번호 → '황금'|'미믹'|'폭탄'|'일반')
+    // 요청한 카테고리 매핑
     const CAT_MAP = {
-      4:'황금', 13:'황금',
-      6:'미믹', 12:'미믹', 18:'미믹',
-      3:'폭탄', 17:'폭탄'
-      // 나머지는 자동으로 '일반'
+      3:'미믹', 10:'미믹', 13:'미믹',
+      5:'황금', 17:'황금',
+      8:'함정', 20:'함정'
+      // 나머지는 '일반'
+    };
+
+    // 모든 문제에 동일하게 사용할 기본 이미지 주소
+    const DEFAULT_IMAGE_URL = "https://e7.pngegg.com/pngimages/699/153/png-clipart-emoji-thought-blushing-emoji-face-smiley.png";
+
+    // 점수 규칙(카테고리별)
+    const SCORE_RULES = {
+      '일반': { correct:+1, wrong: 0 },
+      '황금': { correct:+3, wrong: 0 },
+      '미믹': { correct:+2, wrong:-2 },
+      '함정': { correct:-3, wrong: 0 }, // 함정(=폭탄)
     };
 
     /* ===== 공통 유틸 ===== */
-    const catToData = (cat) => cat==='황금' ? 'gold' : cat==='미믹' ? 'mimic' : cat==='폭탄' ? 'bomb' : 'normal';
+    const normCat = (cat) => {
+      // 동의어 흡수
+      if (cat==='폭탄' || cat==='함정') return '함정';
+      if (cat==='골드') return '황금';
+      if (cat==='위장') return '미믹';
+      return (cat==='황금'||cat==='미믹'||cat==='일반') ? cat : '일반';
+    };
+    const catToData = (cat) => {
+      const c = normCat(cat);
+      return c==='황금' ? 'gold' : c==='미믹' ? 'mimic' : c==='함정' ? 'bomb' : 'normal';
+    };
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
     function denseRankAndSort(rows){
       const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
@@ -204,7 +224,7 @@
     }
     const toFM = (ch) => (ch==='A'?'F':ch==='S'?'M':ch==='F'?'F':ch==='M'?'M':'?'); // A/S/F/M 모두 수용
 
-    // ✅ 문제명이 이미 "08. ..."처럼 번호를 포함하면 번호를 중복해서 붙이지 않도록 처리
+    // 문제명이 이미 "08. ..."처럼 번호를 포함하면 중복 방지
     function formatDisplayName(qno, rawName){
       const name = String(rawName || '').trim();
       return (/^\d{1,2}\.\s*/.test(name)) ? name : `${qno}. ${name}`;
@@ -218,13 +238,14 @@
       const header = lines[0].split('\t');
       const idx = Object.fromEntries(header.map((k,i)=>[k,i]));
 
-      // 문제 이름/이미지 — 첫 데이터행에서 취득(모든 행 공통 가정)
+      // 문제 이름 — 첫 데이터행에서 취득(모든 행 공통 가정)
       const first = lines[1].split('\t');
-      const qNames = [], qImgs = [];
+      const qNames = [];
       for(let i=1;i<=20;i++){
         qNames.push((first[idx[`q${i}name`]]||'').trim() || `Q${i}`);
-        qImgs.push((first[idx[`q${i}imageUrl`]]||'').trim() || '');
       }
+      // 이미지: 요청대로 전부 동일 기본 이미지 사용
+      const qImgs = Array.from({length:20}, ()=> DEFAULT_IMAGE_URL);
 
       const keyArr = (ANSWER_KEY_FM||"").trim().split("");
       const hasKey = keyArr.length===20 && keyArr.every(c=>c==='F'||c==='M');
@@ -244,8 +265,15 @@
         if(hasKey){
           score = 0;
           for(let i=0;i<20;i++){
-            const a = ansArr[i], k = keyArr[i];
-            if((a==='F' || a==='M') && a===k) score++;
+            const a = ansArr[i];
+            const k = keyArr[i];
+            const cat = normCat(CAT_MAP[i+1] || '일반');
+            const rule = SCORE_RULES[cat] || SCORE_RULES['일반'];
+            const answered = (a==='F'||a==='M');
+            const correct = answered && a===k;
+            const wrong = !answered || (answered && a!==k);
+            if (correct) score += rule.correct;
+            else if (wrong) score += rule.wrong;
           }
         }
         return { nickname, timestamp, ans: ansArr.join(''), score };
@@ -259,7 +287,7 @@
       const parsed = parseTSV(tsv);
 
       // 카테고리 배열 준비
-      const CATEGORY = Array.from({length:20}, (_,i)=> CAT_MAP[i+1] || '일반');
+      const CATEGORY = Array.from({length:20}, (_,i)=> normCat(CAT_MAP[i+1] || '일반'));
 
       // 정렬/랭크
       const data = parsed.hasKey ? denseRankAndSort(parsed.rows) : parsed.rows;
@@ -312,7 +340,7 @@
         for(let i=0;i<20;i++){
           const chip = document.createElement('span');
           chip.className='chip';
-          chip.dataset.cat = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
+          chip.dataset.cat = catToData(CATEGORY[i]); // gold/mimic/bomb/normal(함정)
           chip.dataset.qindex = i;                   // 0~19
           chip.dataset.qname = parsed.headers[i];
           chip.dataset.qcat = CATEGORY[i];
@@ -349,28 +377,29 @@
       const img = card.querySelector('img');
       const pill = card.querySelector('.pill');
       const text = card.querySelector('.text');
+      const imgwrap = card.querySelector('.imgwrap');
 
       function showCard(x, y, chip){
         const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
         const rawName = chip.dataset.qname || '';
         const dispName = formatDisplayName(qno, rawName); // 중복 번호 방지
-        const cat = chip.dataset.qcat;
-        const catKey = chip.dataset.cat; // gold/mimic/bomb/normal
+        const catStr = chip.dataset.qcat;                 // 일반/황금/미믹/함정
+        const catKey = chip.dataset.cat;                  // normal/gold/mimic/bomb
         const url = chip.dataset.qimg;
 
         // 내용 갱신
-        pill.textContent = (cat==='황금'?'황금고치':cat==='미믹'?'미믹고치':cat==='폭탄'?'폭탄고치':'일반고치');
+        pill.textContent = (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
         pill.className = `pill ${catKey}`;
         text.textContent = dispName;
 
         if(url){
           img.src = url;
           img.alt = dispName;
-          card.querySelector('.imgwrap').style.display = 'block';
+          imgwrap.style.display = 'block';
         }else{
           img.removeAttribute('src');
           img.alt = '';
-          card.querySelector('.imgwrap').style.display = 'none';
+          imgwrap.style.display = 'none';
         }
 
         // 위치 (뷰포트 밖으로 나가지 않게)
@@ -378,13 +407,11 @@
         const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-        // 일단 보이게 한 뒤 실제 크기를 측정해서 위치 보정
         card.style.left = (x + pad) + 'px';
         card.style.top  = (y + pad) + 'px';
         card.classList.add('show');
         card.setAttribute('aria-hidden','false');
 
-        // 다음 프레임에 보정
         requestAnimationFrame(()=>{
           const rect = card.getBoundingClientRect();
           let left = rect.left, top = rect.top;
@@ -414,10 +441,7 @@
        - nunu3_responses.tsv 를 같은 폴더에 두세요.
     ======================== */
     fetch('nunu3_responses.tsv', {cache:'no-store'})
-      .then(r => {
-        if(!r.ok) throw new Error('TSV 로드 실패');
-        return r.text();
-      })
+      .then(r => { if(!r.ok) throw new Error('TSV 로드 실패'); return r.text(); })
       .then(text => renderFromTSV(text))
       .catch(err => {
         console.error(err);
