@@ -172,170 +172,190 @@
     </section>
   </div>
 
-  <script>
-    /* ========================
-       0) 설정: 정답키(F/M)와 카테고리 매핑
-    ======================== */
+<script>
+  /* ========================
+     0) 설정: 정답키(F/M)와 카테고리 매핑
+  ======================== */
 
-    // ✅ 여기 20문항의 정답을 'F' 또는 'M'으로 입력하면 점수가 자동 계산됩니다.
-    // 예시) "FFMMF... (길이 20)"  — 아직 모르면 빈 문자열("")로 두세요.
-    const ANSWER_KEY_FM = "";  // <- 여기에 공식 정답키를 넣어줘 (예: "FFMMFFFFMMMMFFFFMMMM")
+  // ✅ 20문항 정답 'F'/'M' 넣으면 점수 자동 계산
+  const ANSWER_KEY_FM = "";  // 예: "FFMMFFFFMMMMFFFFMMMM"
 
-    // 카테고리 매핑 (번호 1~20 → '황금'|'미믹'|'폭탄'|'일반')
-    // 비워두면 전부 '일반'
-    const CAT_MAP = {
-      // 예시)
-      // 4:'황금', 13:'황금',
-      // 6:'미믹', 12:'미믹', 18:'미믹',
-      // 3:'폭탄', 17:'폭탄'
-    };
+  // 선택 사항: 번호 1~20 → '황금'|'미믹'|'폭탄'|'일반'
+  const CAT_MAP = {
+    // 4:'황금', 13:'황금',
+    // 6:'미믹', 12:'미믹', 18:'미믹',
+    // 3:'폭탄', 17:'폭탄'
+  };
 
-    /* ===== 공통 유틸 ===== */
-    const catToData = (cat) => cat==='황금' ? 'gold' : cat==='미믹' ? 'mimic' : cat==='폭탄' ? 'bomb' : 'normal';
-    function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
-    function denseRank(rows){
-      const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
-      const uniq=[]; arr.forEach(r=>{ if(typeof r.score==='number' && !uniq.includes(r.score)) uniq.push(r.score); });
-      const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
-      arr.forEach(r=> r._rank = typeof r.score==='number' ? m.get(r.score) : null);
-      return arr;
+  /* ===== 공통 유틸 ===== */
+  const catToData = (cat) => cat==='황금' ? 'gold' : cat==='미믹' ? 'mimic' : cat==='폭탄' ? 'bomb' : 'normal';
+  function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
+  function denseRank(rows){
+    const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
+    const uniq=[]; arr.forEach(r=>{ if(typeof r.score==='number' && !uniq.includes(r.score)) uniq.push(r.score); });
+    const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
+    arr.forEach(r=> r._rank = typeof r.score==='number' ? m.get(r.score) : null);
+    return arr;
+  }
+  const toFM = (ch) => (ch==='A'?'F':ch==='S'?'M':ch==='F'?'F':ch==='M'?'M':'?'); // A/S/F/M 모두 수용
+
+  // 🔎 카테고리 문자열 정규화(컬럼/이름 어디서 와도 OK)
+  function normalizeCat(v){
+    const s = (v||"").toString().trim().toLowerCase();
+    if(!s) return null;
+    if(s.includes('황금') || s.includes('gold')) return '황금';
+    if(s.includes('미믹') || s.includes('mimic')) return '미믹';
+    if(s.includes('폭탄') || s.includes('bomb') || s.includes('red')) return '폭탄';
+    if(s.includes('일반') || s.includes('normal') || s.includes('기본') || s.includes('default')) return '일반';
+    return null;
+  }
+
+  /* ===== TSV 파서 & 점수 ===== */
+  function parseTSV(tsv){
+    const lines = tsv.split(/\r?\n/).filter(Boolean);
+    if(lines.length<2) return {headers:[], rows:[], hasKey:false, categories:[]};
+
+    const header = lines[0].split('\t');
+    const idx = Object.fromEntries(header.map((k,i)=>[k,i]));
+
+    // 문제 이름(툴팁용) — 첫 데이터행에서 가져옴(전 행 동일 가정)
+    const firstData = lines[1].split('\t');
+    const qNames = [];
+    for(let i=1;i<=20;i++){
+      const key = `q${i}name`;
+      qNames.push(firstData[idx[key]]?.trim() || `Q${i}`);
     }
-    const toFM = (ch) => (ch==='A'?'F':ch==='S'?'M':ch==='F'?'F':ch==='M'?'M':'?'); // A/S/F/M 모두 수용
 
-    /* ===== TSV 파서 & 점수 ===== */
-    function parseTSV(tsv){
-      const lines = tsv.split(/\r?\n/).filter(Boolean);
-      if(lines.length<2) return {headers:[], rows:[]};
+    // ✅ 카테고리 자동 결정: 컬럼 → 이름 → CAT_MAP → 기본 '일반'
+    const categories = [];
+    for(let i=1;i<=20;i++){
+      let raw = null;
+      for(const k of [`q${i}category`,`q${i}cat`,`q${i}type`,`q${i}tag`]){
+        const col = idx[k];
+        if(col !== undefined){
+          const val = firstData[col]?.trim();
+          if(val){ raw = val; break; }
+        }
+      }
+      const byCol  = normalizeCat(raw);
+      const byName = normalizeCat(qNames[i-1]);
+      const byMap  = CAT_MAP[i] || '일반';
+      categories.push(byCol || byName || byMap);
+    }
 
-      const header = lines[0].split('\t');
-      const idx = Object.fromEntries(header.map((k,i)=>[k,i]));
+    const keyArr = (ANSWER_KEY_FM||"").trim().split("");
+    const hasKey = keyArr.length===20 && keyArr.every(c=>c==='F'||c==='M');
 
-      // 문제 이름(툴팁용)
-      const firstData = lines[1].split('\t');
-      const qNames = [];
-      for(let i=1;i<=20;i++){
-        const key = `q${i}name`;
-        qNames.push(firstData[idx[key]]?.trim() || `Q${i}`);
+    const rows = lines.slice(1).map((line, lineNo)=>{
+      const c = line.split('\t');
+      const nickname = (c[idx['nickname']]||'').trim() || (c[idx['name']]||'').trim() || `참가자${lineNo}`;
+      const timestamp = (c[idx['timestamp']]||'').trim();
+      const ansFM = Array.from({length:20}, (_,i)=>{
+        const gk = `q${i+1}gender`;
+        const v = (c[idx[gk]]||'').trim();
+        return toFM(v||'?');
+      });
+
+      let score = null;
+      if(hasKey){
+        score = 0;
+        for(let i=0;i<20;i++){
+          const a = ansFM[i], k = keyArr[i];
+          if((a==='F'||a==='M') && a===k) score += 1;
+        }
       }
 
-      const keyArr = (ANSWER_KEY_FM||"").trim().split("");
-      const hasKey = keyArr.length===20 && keyArr.every(c=>c==='F'||c==='M');
+      return { nickname, timestamp, ans: ansFM.join(''), score };
+    });
 
-      const rows = lines.slice(1).map((line, lineNo)=>{
-        const c = line.split('\t');
-        const nickname = (c[idx['nickname']]||'').trim() || (c[idx['name']]||'').trim() || `참가자${lineNo}`;
-        const timestamp = (c[idx['timestamp']]||'').trim();
-        const ansFM = Array.from({length:20}, (_,i)=>{
-          const gk = `q${i+1}gender`;
-          const v = (c[idx[gk]]||'').trim();
-          return toFM(v||'?'); // 내부 저장만 FM
-        });
+    return { headers:qNames, rows, hasKey, categories };
+  }
 
-        let score = null;
-        if(hasKey){
-          score = 0;
-          for(let i=0;i<20;i++){
-            const a = ansFM[i];
-            const k = keyArr[i];
-            if(a==='F' || a==='M'){
-              if(a===k) score += 1;
-            }
-          }
-        }
+  /* ===== 렌더 ===== */
+  function renderFromTSV(tsv){
+    const parsed = parseTSV(tsv);
 
-        return { nickname, timestamp, ans: ansFM.join(''), score };
-      });
+    const CATEGORY = parsed.categories; // ← 자동 감지된 카테고리 사용
 
-      return { headers:qNames, rows, hasKey };
-    }
+    // 점수 유무에 따라 정렬/순위
+    const data = parsed.hasKey ? denseRank(parsed.rows) : parsed.rows;
 
-    /* ===== 렌더 ===== */
-    function renderFromTSV(tsv){
-      const parsed = parseTSV(tsv);
+    const tbl = document.createElement('table');
 
-      // 카테고리 배열 준비
-      const CATEGORY = Array.from({length:20}, (_,i)=> CAT_MAP[i+1] || '일반');
+    // THEAD
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th class="rank-col">순위</th>
+        <th class="nick-col">닉네임</th>
+        <th class="score-col">점수</th>
+        <th>제출지</th>
+      </tr>`;
+    tbl.appendChild(thead);
 
-      // 점수 유무에 따라 정렬/순위
-      const data = parsed.hasKey ? denseRank(parsed.rows) : parsed.rows; // 점수 없으면 입력 순서 유지
+    // TBODY
+    const tbody = document.createElement('tbody');
 
-      const tbl = document.createElement('table');
+    data.forEach((row)=>{
+      const tr = document.createElement('tr');
 
-      // THEAD
-      const thead = document.createElement('thead');
-      thead.innerHTML = `
-        <tr>
-          <th class="rank-col">순위</th>
-          <th class="nick-col">닉네임</th>
-          <th class="score-col">점수</th>
-          <th>제출지</th>
-        </tr>`;
-      tbl.appendChild(thead);
+      const tdRank = document.createElement('td');
+      tdRank.className='rank';
+      tdRank.textContent = (typeof row._rank==='number') ? medalRank(row._rank) : '—';
 
-      // TBODY
-      const tbody = document.createElement('tbody');
+      const tdNick = document.createElement('td');
+      tdNick.className='nick';
+      tdNick.textContent = row.nickname || '-';
 
-      data.forEach((row)=>{
-        const tr = document.createElement('tr');
+      const tdScore= document.createElement('td');
+      tdScore.className='score';
+      tdScore.textContent = (typeof row.score==='number') ? `${row.score}점` : '—';
 
-        const tdRank = document.createElement('td');
-        tdRank.className='rank';
-        tdRank.textContent = (typeof row._rank==='number') ? medalRank(row._rank) : '—';
+      const tdAns = document.createElement('td');
+      const wrap = document.createElement('div');
+      wrap.className='answers';
 
-        const tdNick = document.createElement('td');
-        tdNick.className='nick';
-        tdNick.textContent = row.nickname || '-';
+      for(let i=0;i<20;i++){
+        const chip = document.createElement('span');
+        chip.className='chip';
+        chip.setAttribute('data-cat', catToData(CATEGORY[i]));
+        chip.title = `${String(i+1).padStart(2,'0')}. ${parsed.headers[i]} · ${CATEGORY[i]}`;
+        const t = document.createElement('span');
+        t.className='t';
+        t.textContent='?'; // 비공개 모드 텍스트
+        chip.appendChild(t);
+        wrap.appendChild(chip);
+      }
 
-        const tdScore= document.createElement('td');
-        tdScore.className='score';
-        tdScore.textContent = (typeof row.score==='number') ? `${row.score}점` : '—';
+      tdAns.appendChild(wrap);
+      tr.appendChild(tdRank);
+      tr.appendChild(tdNick);
+      tr.appendChild(tdScore);
+      tr.appendChild(tdAns);
+      tbody.appendChild(tr);
+    });
 
-        const tdAns = document.createElement('td');
-        const wrap = document.createElement('div');
-        wrap.className='answers';
+    tbl.appendChild(tbody);
 
-        for(let i=0;i<20;i++){
-          const chip = document.createElement('span');
-          chip.className='chip';                 // 항상 회색 (비공개)
-          chip.setAttribute('data-cat', catToData(CATEGORY[i]));
-          chip.title = `${String(i+1).padStart(2,'0')}. ${parsed.headers[i]} · ${CATEGORY[i]}`;
-          const t = document.createElement('span');
-          t.className='t';
-          t.textContent='?';                     // 비공개 모드: 칩 텍스트는 항상 ?
-          chip.appendChild(t);
-          wrap.appendChild(chip);
-        }
+    const host = document.getElementById('tableWrap');
+    host.innerHTML='';
+    host.appendChild(tbl);
+  }
 
-        tdAns.appendChild(wrap);
-        tr.appendChild(tdRank);
-        tr.appendChild(tdNick);
-        tr.appendChild(tdScore);
-        tr.appendChild(tdAns);
-        tbody.appendChild(tr);
-      });
-
-      tbl.appendChild(tbody);
-
+  /* ========================
+     TSV 로드 (동일 폴더의 파일)
+  ======================== */
+  fetch('nunu3_responses.tsv', {cache:'no-store'})
+    .then(r => {
+      if(!r.ok) throw new Error('TSV 로드 실패');
+      return r.text();
+    })
+    .then(text => renderFromTSV(text))
+    .catch(err => {
+      console.error(err);
       const host = document.getElementById('tableWrap');
-      host.innerHTML='';
-      host.appendChild(tbl);
-    }
-
-    /* ========================
-       TSV 로드 (동일 폴더의 파일)
-       - nunu3_responses.tsv 를 같은 폴더에 두세요.
-    ======================== */
-    fetch('nunu3_responses.tsv', {cache:'no-store'})
-      .then(r => {
-        if(!r.ok) throw new Error('TSV 로드 실패');
-        return r.text();
-      })
-      .then(text => renderFromTSV(text))
-      .catch(err => {
-        console.error(err);
-        const host = document.getElementById('tableWrap');
-        host.innerHTML = '<div style="padding:14px;color:#b91c1c">TSV를 불러오지 못했습니다. HTML과 같은 폴더에 <b>nunu3_responses.tsv</b>를 넣어주세요.</div>';
-      });
-  </script>
+      host.innerHTML = '<div style="padding:14px;color:#b91c1c">TSV를 불러오지 못했습니다. HTML과 같은 폴더에 <b>nunu3_responses.tsv</b>를 넣어주세요.</div>';
+    });
+</script>
 </body>
 </html>
