@@ -10,21 +10,18 @@
       --radius:14px; --shadow:0 10px 30px rgba(17,24,39,.08);
       --box-w:980px;
 
-      /* category colors */
-      --gold:#f59e0b;     /* 황금 */
-      --mimic:#8b5cf6;    /* 미믹 */
-      --bomb:#b91c1c;     /* 함정(=폭탄) */
-      --normal:#9ca3af;   /* 일반 */
+      --gold:#f59e0b;     --mimic:#8b5cf6;    --bomb:#b91c1c;    --normal:#9ca3af;
 
-      /* neutral chip (비공개 상태) */
-      --chip-bg:#f3f4f6;  --chip-bd:#e5e7eb; --chip-tx:#374151;
+      --chip-bg:#f3f4f6;  --chip-bd:#e5e7eb;  --chip-tx:#374151;
+
+      --ok:#2563eb;       /* 파랑(정답) */
+      --bad:#dc2626;      /* 빨강(오답) */
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
       font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
     .wrap{max-width:1120px;margin:0 auto;padding:20px 24px}
 
-    /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);
       background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
@@ -36,29 +33,25 @@
     .btn.primary{background:#4b5563;color:#ffffff;border:0}
     .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
 
-    /* HERO */
     .hero{margin:14px auto 10px;border:1px solid var(--muted);border-radius:var(--radius);
       background:var(--paper);box-shadow:var(--shadow);max-width:var(--box-w)}
     .hero-inner{padding:16px 18px}
-    .hero h1{margin:0;font-size:clamp(20px,3vw,28px);letter-spacing:-.2px;line-height:1.18}
+    .hero h1{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.18}
     .lead{color:var(--sub);margin:8px 0 6px}
     .guides{color:#4b5563;margin:6px 0 0;padding-left:18px;list-style:disc}
     .guides li{margin:4px 0}
 
-    /* 카드 */
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);
-      box-shadow:var(--shadow);overflow:hidden;max-width:var(--box-w);margin-left:auto;margin-right:auto}
+      box-shadow:var(--shadow);overflow:hidden;max-width:var(--box-w);margin:0 auto}
     .card .inner{padding:16px 18px}
     h2{margin:0 0 10px;font-size:20px}
 
-    /* 범례 */
     .legend{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:8px 0 10px;color:#374151}
     .legend .item{display:inline-flex;align-items:center;gap:8px}
     .legend .label{font-size:14px;white-space:nowrap}
     .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:700}
     .legend-note{font-size:13px;color:#6b7280;margin-top:4px}
 
-    /* 표 */
     .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff}
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
     thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);
@@ -74,18 +67,14 @@
     .nick{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .score{font-weight:800;white-space:nowrap}
 
-    /* 20칸 그리드 */
     .answers{display:grid;grid-template-columns:repeat(20, minmax(18px,1fr));gap:3px;align-items:center;width:100%}
 
-    /* 칩 ('?' 고정) */
     .chip{
       position:relative;display:inline-flex;align-items:center;justify-content:center;
       height:18px;border-radius:5px;border:1px solid var(--chip-bd);background:var(--chip-bg);
       color:var(--chip-tx);font-weight:800;letter-spacing:.2px;padding:0;width:100%;
     }
     .chip .t{font-size:11.5px;line-height:1}
-
-    /* 칩 모서리 색 */
     .chip::after{
       content:"";position:absolute;top:-2px;left:-2px;width:0;height:0;
       border-bottom:10px solid transparent;border-left:10px solid var(--normal);
@@ -95,7 +84,10 @@
     .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* 범례 칩 크게 */
+    /* 오픈 시 정/오답 색 */
+    .chip.open.correct .t{color:var(--ok)}
+    .chip.open.wrong   .t{color:var(--bad)}
+
     .legend .chip{height:28px;min-width:28px;width:auto;padding:0 10px;border-radius:8px}
     .legend .chip .t{font-size:14px;line-height:1}
     .legend .chip::after{top:-3px;left:-3px;border-bottom:12px solid transparent;border-left:12px solid var(--normal)}
@@ -104,7 +96,6 @@
     .legend .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .legend .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* 커스텀 호버 카드 */
     .hovercard{
       position:fixed; z-index:1000; pointer-events:none; opacity:0; transform:translateY(6px);
       transition:opacity .12s ease, transform .12s ease;
@@ -113,33 +104,23 @@
     }
     .hovercard.show{opacity:1; transform:translateY(0)}
     .hovercard .meta{padding:10px 12px; font-size:13px; color:#334155; display:flex; align-items:center; gap:8px}
-    .hovercard .pill{
-      display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; color:#fff
-    }
+    .hovercard .pill{display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; color:#fff}
     .pill.gold{background:var(--gold)} .pill.mimic{background:var(--mimic)}
     .pill.bomb{background:var(--bomb)} .pill.normal{background:var(--normal)}
 
-    .hovercard .imgwrap{
-      display:flex; justify-content:center; align-items:center;
-      width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0;
-    }
+    .hovercard .imgwrap{display:flex; justify-content:center; align-items:center; width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0;}
     .hovercard .imgwrap img{display:block; width:25%; height:auto; object-fit:contain;}
 
-    /* ✅ 툴팁 제목(문제명) 한 줄 고정 + 말줄임 */
+    /* 툴팁 제목 한 줄 고정 */
     .hovercard .text{
-      display:inline-block;
-      max-width:180px;         /* 카드 폭(최대 280px) 대비 텍스트 영역 제한 */
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      display:inline-block; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
   </style>
 </head>
 <body>
-  <!-- NAV -->
   <header class="nav">
     <div class="nav-inner wrap">
-      <a class="brand" href="#" aria-label="누에 대회 홈"><strong>🐛누에 고치 성별 맞추기 대회</strong></a>
+      <a class="brand" href="#"><strong>🐛누에 고치 성별 맞추기 대회</strong></a>
       <nav class="nav-actions">
         <a class="btn" href="https://www.hanri.net/nunu/index.html">HOME</a>
         <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html">제 3회 참여하기</a>
@@ -147,7 +128,6 @@
     </div>
   </header>
 
-  <!-- HERO -->
   <main class="wrap">
     <div class="hero">
       <div class="hero-inner">
@@ -169,7 +149,6 @@
       <div class="inner">
         <h2>리더보드</h2>
 
-        <!-- 카테고리 범례 -->
         <div class="legend" aria-label="카테고리 범례">
           <span class="item"><span class="chip" data-cat="gold"><span class="t">?</span></span><span class="label">황금고치</span></span>
           <span class="item"><span class="chip" data-cat="mimic"><span class="t">?</span></span><span class="label">미믹고치</span></span>
@@ -183,54 +162,17 @@
     </section>
   </div>
 
-  <!-- 커스텀 호버 카드: [라벨+문제명] 위, 이미지 아래 -->
   <div id="hovercard" class="hovercard" role="dialog" aria-hidden="true">
     <div class="meta"><span class="pill">—</span><span class="text" title="—">—</span></div>
     <div class="imgwrap"><img alt=""></div>
   </div>
 
   <script>
-    /* ========================
-       0) 설정: 정답키 & 카테고리 & 기본 이미지
-    ======================== */
+    /* ==== 서버 API URL (Apps Script 웹앱의 /exec) ==== */
+    const API_URL = 'https://script.google.com/macros/s/AKfycbytIFgu9X0EguOwF3eDeHRkizLgIXmukP42mLTVEHTXmTH5iTHi-V27ivChRAaA8eO07A/exec';
 
-    // 정답키(길이 20, 'F' 또는 'M'만). 비우면 점수/순위 미표시.
-    // ⚠️ 보안을 위해 실제 운영에서는 브라우저에 보내지 마세요(서버에서만 사용).
-    const ANSWER_KEY_FM = "";
-
-    // 요청한 카테고리 매핑 (특수고치는 점수 미반영)
-    const CAT_MAP = {
-      3:'미믹', 10:'미믹', 13:'미믹',
-      5:'황금', 17:'황금',
-      8:'함정', 20:'함정'
-      // 나머지는 '일반'
-    };
-
-    // (요청) 5번/20번 임시 답(F) 강제 입력 — 표시(칩)는 항상 '?'라서 외형엔 영향 X
-    const FORCED_ANS = { 5:'F', 20:'F' };
-
-    // 모든 문제에 동일하게 사용할 기본 이미지 주소(원하면 문제별로 바꿔도 됨)
-    const DEFAULT_IMAGE_URL = "https://e7.pngegg.com/pngimages/699/153/png-clipart-emoji-thought-blushing-emoji-face-smiley.png";
-
-    // 점수 규칙 — 특수고치는 점수 미반영, 일반만 +1/0
-    const SCORE_RULES = {
-      '일반': { correct:+1, wrong: 0 },
-      '황금': { correct: 0, wrong: 0 },
-      '미믹': { correct: 0, wrong: 0 },
-      '함정': { correct: 0, wrong: 0 },
-    };
-
-    /* ===== 공통 유틸 ===== */
-    const normCat = (cat) => {
-      if (cat==='폭탄' || cat==='함정') return '함정';
-      if (cat==='골드') return '황금';
-      if (cat==='위장') return '미믹';
-      return (cat==='황금'||cat==='미믹'||cat==='일반'||cat==='함정') ? cat : '일반';
-    };
-    const catToData = (cat) => {
-      const c = normCat(cat);
-      return c==='황금' ? 'gold' : c==='미믹' ? 'mimic' : c==='함정' ? 'bomb' : 'normal';
-    };
+    /* 카테고리 보조 */
+    const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
     function denseRankAndSort(rows){
       const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
@@ -239,89 +181,67 @@
       arr.forEach(r=> r._rank = typeof r.score==='number' ? m.get(r.score) : null);
       return arr;
     }
-    const toFM = (ch) => {
-      if (ch==='A') return 'F';
-      if (ch==='S') return 'M';
-      if (ch==='F' || ch==='M') return ch;
-      if (ch==='D') return '?'; // 요청: 모름(D) → 비공개('?') 처리
-      return '?';
-    };
-
-    // 문제명이 이미 "08. ..."처럼 번호를 포함하면 중복 방지
     function formatDisplayName(qno, rawName){
       const name = String(rawName || '').trim();
       return (/^\d{1,2}\.\s*/.test(name)) ? name : `${qno}. ${name}`;
     }
 
-    /* ===== TSV 파서 & 점수 ===== */
-    function parseTSV(tsv){
-      const lines = tsv.split(/\r?\n/).filter(Boolean);
-      if(lines.length<2) return {headers:[], images:[], rows:[], hasKey:false};
+    /* 호버카드 */
+    function attachHovercard(){
+      const card = document.getElementById('hovercard');
+      const img = card.querySelector('img');
+      const pill = card.querySelector('.pill');
+      const text = card.querySelector('.text');
+      const imgwrap = card.querySelector('.imgwrap');
 
-      const header = lines[0].split('\t');
-      const idx = Object.fromEntries(header.map((k,i)=>[k,i]));
+      function showCard(x, y, chip){
+        const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
+        const rawName = chip.dataset.qname || '';
+        const dispName = formatDisplayName(qno, rawName);
+        const catStr = chip.dataset.qcat;
+        const catKey = chip.dataset.cat;
+        const url = chip.dataset.qimg;
 
-      // 문제 이름 — 첫 데이터행에서 취득(모든 행 공통 가정)
-      const first = lines[1].split('\t');
-      const qNames = [];
-      for(let i=1;i<=20;i++){
-        qNames.push((first[idx[`q${i}name`]]||'').trim() || `Q${i}`);
-      }
+        pill.textContent = (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
+        pill.className = `pill ${catKey}`;
+        text.textContent = dispName;
+        text.title = dispName;
 
-      // 이미지: 요청대로 전부 동일 기본 이미지 사용(필요시 문제별 URL로 바꾸세요)
-      const qImgs = Array.from({length:20}, ()=> DEFAULT_IMAGE_URL);
+        if(url){ img.src = url; img.alt = dispName; imgwrap.style.display='flex'; }
+        else { img.removeAttribute('src'); img.alt=''; imgwrap.style.display='none'; }
 
-      const keyArr = (ANSWER_KEY_FM||"").trim().split("");
-      const hasKey = keyArr.length===20 && keyArr.every(c=>c==='F'||c==='M');
+        const pad=14, vw=Math.max(document.documentElement.clientWidth, window.innerWidth||0), vh=Math.max(document.documentElement.clientHeight, window.innerHeight||0);
+        card.style.left = (x + pad) + 'px'; card.style.top = (y + pad) + 'px';
+        card.classList.add('show'); card.setAttribute('aria-hidden','false');
 
-      const rows = lines.slice(1).map((line, lineNo)=>{
-        const c = line.split('\t');
-        const nickname = (c[idx['nickname']]||'').trim() || (c[idx['name']]||'').trim() || `참가자${lineNo+1}`;
-        const timestamp = (c[idx['timestamp']]||'').trim();
-
-        const ansArr = Array.from({length:20}, (_,i)=>{
-          const gk = `q${i+1}gender`;
-          let v = (c[idx[gk]]||'').trim();
-          v = toFM(v || '?');
-          // 5/20번 강제 답 덮어쓰기
-          const forced = FORCED_ANS[i+1];
-          return forced ? forced : v;
+        requestAnimationFrame(()=>{
+          const rect = card.getBoundingClientRect();
+          let left = rect.left, top = rect.top;
+          if(rect.right > vw - 8) left = x - rect.width - pad;
+          if(rect.bottom > vh - 8) top = y - rect.height - pad;
+          card.style.left = Math.max(8, left) + 'px';
+          card.style.top  = Math.max(8, top)  + 'px';
         });
+      }
+      function hideCard(){ card.classList.remove('show'); card.setAttribute('aria-hidden','true'); }
 
-        let score = null;
-        if(hasKey){
-          score = 0;
-          for(let i=0;i<20;i++){
-            const a = ansArr[i];
-            const k = keyArr[i];
-            const cat = normCat(CAT_MAP[i+1] || '일반');
-            const rule = SCORE_RULES[cat] || SCORE_RULES['일반'];
-            const answered = (a==='F'||a==='M');
-            const correct = answered && a===k;
-            const wrong = !answered || (answered && a!==k);
-            if (correct) score += rule.correct;
-            else if (wrong) score += rule.wrong;
-          }
-        }
-        return { nickname, timestamp, ans: ansArr.join(''), score };
+      const tableWrap = document.getElementById('tableWrap');
+      tableWrap.addEventListener('mousemove', (e)=>{
+        const target = e.target.closest('.chip');
+        if(target){ showCard(e.clientX, e.clientY, target); }
+        else{ hideCard(); }
       });
-
-      return { headers:qNames, images:qImgs, rows, hasKey };
+      tableWrap.addEventListener('mouseleave', hideCard);
     }
 
-    /* ===== 렌더 ===== */
-    function renderFromTSV(tsv){
-      const parsed = parseTSV(tsv);
-
-      // 카테고리 배열 준비
-      const CATEGORY = Array.from({length:20}, (_,i)=> normCat(CAT_MAP[i+1] || '일반'));
-
-      // 정렬/랭크
-      const data = parsed.hasKey ? denseRankAndSort(parsed.rows) : parsed.rows;
+    /* 렌더 */
+    function renderBoard(payload){
+      const { open, qnames, category, rows } = payload;
+      const CATEGORY = category.map(c=>c); // ['일반','황금',...]
+      const data = rows ? denseRankAndSort(rows) : [];
 
       const tbl = document.createElement('table');
 
-      // THEAD
       const thead = document.createElement('thead');
       thead.innerHTML = `
         <tr>
@@ -333,48 +253,41 @@
         </tr>`;
       tbl.appendChild(thead);
 
-      // TBODY
       const tbody = document.createElement('tbody');
 
       data.forEach((row, rowIndex)=>{
         const tr = document.createElement('tr');
 
-        // 번호(정렬 결과 기준)
-        const tdNo = document.createElement('td');
-        tdNo.className = 'rowno';
-        tdNo.textContent = (rowIndex+1)+'.';
+        const tdNo = document.createElement('td'); tdNo.className='rowno'; tdNo.textContent=(rowIndex+1)+'.';
+        const tdRank = document.createElement('td'); tdRank.className='rank'; tdRank.textContent=(typeof row._rank==='number')?medalRank(row._rank):'—';
+        const tdNick = document.createElement('td'); tdNick.className='nick'; tdNick.textContent=row.nickname || '-';
+        const tdScore= document.createElement('td'); tdScore.className='score'; tdScore.textContent=(typeof row.score==='number')?`${row.score}점`:'—';
 
-        // 순위
-        const tdRank = document.createElement('td');
-        tdRank.className='rank';
-        tdRank.textContent = (typeof row._rank==='number') ? medalRank(row._rank) : '—';
-
-        // 닉네임
-        const tdNick = document.createElement('td');
-        tdNick.className='nick';
-        tdNick.textContent = row.nickname || '-';
-
-        // 점수
-        const tdScore= document.createElement('td');
-        tdScore.className='score';
-        tdScore.textContent = (typeof row.score==='number') ? `${row.score}점` : '—';
-
-        // 제출지 (칩 20개)
         const tdAns = document.createElement('td');
-        const wrap = document.createElement('div');
-        wrap.className='answers';
+        const wrap = document.createElement('div'); wrap.className='answers';
 
-        for(let i=0;i<20;i++){
+        for(let i=0;i<qnames.length;i++){
           const chip = document.createElement('span');
-          chip.className='chip';
-          chip.dataset.cat = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
-          chip.dataset.qindex = i;                   // 0~19
-          chip.dataset.qname = parsed.headers[i];
-          chip.dataset.qcat = CATEGORY[i];
-          chip.dataset.qimg = parsed.images[i] || '';
-          const t = document.createElement('span');
-          t.className='t';
-          t.textContent='?'; // ✅ 항상 '?' (비공개 모드)
+          chip.className = 'chip';
+          chip.dataset.cat   = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
+          chip.dataset.qindex= i;
+          chip.dataset.qname = qnames[i] || `Q${i+1}`;
+          chip.dataset.qcat  = CATEGORY[i];
+          chip.dataset.qimg  = ''; // 필요 시 이미지 URL 주입
+
+          const t = document.createElement('span'); t.className='t';
+
+          // 닫힘: 항상 '?'
+          // 오픈: 일반고치만 F/M 노출 + 색 (corr: 1 정답, 0 오답, null 미표시)
+          let label='?';
+          if (open && CATEGORY[i] === '일반' && row.answers) {
+            const ch = row.answers[i];
+            if (ch === 'F' || ch === 'M') label = ch;
+            if (row.corr && row.corr[i] != null) {
+              chip.classList.add('open', row.corr[i] === 1 ? 'correct' : 'wrong');
+            }
+          }
+          t.textContent = label;
           chip.appendChild(t);
           wrap.appendChild(chip);
         }
@@ -389,109 +302,32 @@
       });
 
       tbl.appendChild(tbody);
-
       const host = document.getElementById('tableWrap');
-      host.innerHTML='';
-      host.appendChild(tbl);
-
-      // 호버 카드 이벤트(위임)
+      host.innerHTML=''; host.appendChild(tbl);
       attachHovercard();
     }
 
-    /* ===== 커스텀 호버 카드 ===== */
-    function attachHovercard(){
-      const card = document.getElementById('hovercard');
-      const img = card.querySelector('img');
-      const pill = card.querySelector('.pill');
-      const text = card.querySelector('.text');
-      const imgwrap = card.querySelector('.imgwrap');
-
-      function showCard(x, y, chip){
-        const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
-        const rawName = chip.dataset.qname || '';
-        const dispName = formatDisplayName(qno, rawName); // 번호+이름
-        const catStr = chip.dataset.qcat;                 // 일반/황금/미믹/함정
-        const catKey = chip.dataset.cat;                  // normal/gold/mimic/bomb
-        const url = chip.dataset.qimg;
-
-        // 내용 갱신
-        pill.textContent = (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
-        pill.className = `pill ${catKey}`;
-        text.textContent = dispName;
-        text.title = dispName; // ✅ 길어 잘릴 때 기본 브라우저 툴팁으로 전체 보기
-
-        if(url){
-          img.src = url;
-          img.alt = dispName;
-          imgwrap.style.display = 'flex';
-        }else{
-          img.removeAttribute('src');
-          img.alt = '';
-          imgwrap.style.display = 'none';
-        }
-
-        // 위치 계산
-        const pad = 14;
-        const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-        const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-        card.style.left = (x + pad) + 'px';
-        card.style.top  = (y + pad) + 'px';
-        card.classList.add('show');
-        card.setAttribute('aria-hidden','false');
-
-        requestAnimationFrame(()=>{
-          const rect = card.getBoundingClientRect();
-          let left = rect.left, top = rect.top;
-          if(rect.right > vw - 8) left = x - rect.width - pad;
-          if(rect.bottom > vh - 8) top = y - rect.height - pad;
-          card.style.left = Math.max(8, left) + 'px';
-          card.style.top  = Math.max(8, top)  + 'px';
-        });
-      }
-
-      function hideCard(){
-        card.classList.remove('show');
-        card.setAttribute('aria-hidden','true');
-      }
-
-      const tableWrap = document.getElementById('tableWrap');
-      tableWrap.addEventListener('mousemove', (e)=>{
-        const target = e.target.closest('.chip');
-        if(target){ showCard(e.clientX, e.clientY, target); }
-        else{ hideCard(); }
-      });
-      tableWrap.addEventListener('mouseleave', hideCard);
-    }
-
-    /* ========================
-       TSV 로드 (같은 폴더의 파일)
-       - 운영 보안: 원본 제출 TSV/정답은 클라이언트로 보내지 마세요!
-       - 지금 데모는 정적 TSV를 읽지만, 실제는 서버에서 '점수만' 계산해 전달하세요.
-    ======================== */
-    fetch('nunu3_responses.tsv', {cache:'no-store'})
-      .then(r => { if(!r.ok) throw new Error('TSV 로드 실패'); return r.text(); })
-      .then(text => renderFromTSV(text))
+    /* 데이터 로드 */
+    fetch(API_URL, { cache:'no-store' })
+      .then(r => r.json())
+      .then(json => {
+        if(!json.ok) throw new Error(json.error || '서버 오류');
+        renderBoard(json);
+      })
       .catch(err => {
         console.error(err);
         const host = document.getElementById('tableWrap');
         host.innerHTML =
-          '<div style="padding:14px;color:#b91c1c">TSV를 불러오지 못했습니다. '+
-          '이 HTML과 같은 폴더에 <b>nunu3_responses.tsv</b>를 넣어주세요.</div>';
+          '<div style="padding:14px;color:#b91c1c">데이터를 불러오지 못했습니다. '+
+          '웹앱 URL(API_URL)과 접근 권한을 확인하세요.</div>';
       });
 
-    /* ========================
-       기본 보안(우클릭/단축키 차단) — 완전 차단은 불가, 억제용
-    ======================== */
-    document.addEventListener('contextmenu', (e)=> e.preventDefault());
-    document.addEventListener('dragstart', (e)=> e.preventDefault());
+    /* 억제용 보안(완전 차단 불가) */
+    document.addEventListener('contextmenu', e=>e.preventDefault());
+    document.addEventListener('dragstart', e=>e.preventDefault());
     document.addEventListener('keydown', (e)=>{
       const k = e.key.toUpperCase();
-      if (
-        e.keyCode===123 || // F12
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(k)) || // DevTools
-        (e.ctrlKey && ['U','S','P'].includes(k)) // 소스보기/저장/인쇄
-      ){
+      if (e.keyCode===123 || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(k)) || (e.ctrlKey && ['U','S','P'].includes(k))){
         e.preventDefault(); e.stopPropagation();
       }
     }, true);
