@@ -10,12 +10,14 @@
       --radius:14px; --shadow:0 10px 30px rgba(17,24,39,.08);
       --box-w:980px;
 
-      --gold:#f59e0b;     --mimic:#8b5cf6;    --bomb:#b91c1c;    --normal:#9ca3af;
+      --gold:#f59e0b; --mimic:#8b5cf6; --bomb:#b91c1c; --normal:#9ca3af;
 
-      --chip-bg:#f3f4f6;  --chip-bd:#e5e7eb;  --chip-tx:#374151;
+      --chip-bg:#f3f4f6; --chip-bd:#e5e7eb; --chip-tx:#374151;
 
-      --ok:#2563eb;       /* 파랑(정답) */
-      --bad:#dc2626;      /* 빨강(오답) */
+      --ok:#2563eb;  /* 파랑(정답) */
+      --bad:#dc2626; /* 빨강(오답) */
+      --accent:#111827;
+      --highlight:#fef3c7;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
@@ -37,9 +39,16 @@
       background:var(--paper);box-shadow:var(--shadow);max-width:var(--box-w)}
     .hero-inner{padding:16px 18px}
     .hero h1{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.18}
+
     .lead{color:var(--sub);margin:8px 0 6px}
-    .guides{color:#4b5563;margin:6px 0 0;padding-left:18px;list-style:disc}
-    .guides li{margin:4px 0}
+    .guides{color:#374151;margin:10px 0 0;padding-left:18px;list-style:disc}
+    .guides li{margin:6px 0}
+    /* 강조/컬러링 */
+    .tt{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f3f4f6;padding:1px 6px;border-radius:6px}
+    .em{font-weight:800;color:var(--accent)}
+    .blue{color:var(--ok);font-weight:800}
+    .red{color:var(--bad);font-weight:800}
+    .note{background:var(--highlight);padding:0 6px;border-radius:6px}
 
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);
       box-shadow:var(--shadow);overflow:hidden;max-width:var(--box-w);margin:0 auto}
@@ -50,7 +59,6 @@
     .legend .item{display:inline-flex;align-items:center;gap:8px}
     .legend .label{font-size:14px;white-space:nowrap}
     .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:700}
-    .legend-note{font-size:13px;color:#6b7280;margin-top:4px}
 
     .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff}
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
@@ -132,13 +140,15 @@
     <div class="hero">
       <div class="hero-inner">
         <h1>🐛제 3회 리더보드</h1>
-        <p class="lead">지금은 비공개 모드라 제출된 문항은 전부 <b>?</b> 한 글자로만 표시가 됩니다.</p>
+        <p class="lead">
+          지금은 <span class="em">비공개 모드</span>라 제출된 문항은 전부 <span class="tt">?</span> 한 글자로만 표시가 됩니다.
+        </p>
         <ul class="guides">
-          <li>일반고치가 우화되는 순간 참여를 마무리하고 모든 제출지가 오픈됩니다.</li>
-          <li>제출지에는 암/수로 표기가 되며, 파랑(정답) · 빨강(오답)으로 구분합니다.</li>
-          <li>제출지에 마우스를 올리면 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
-          <li>1·2·3위만 🥇/🥈/🥉 이모지, 그 외는 n등 으로 표시 됩니다.</li>
-          <li>동점자는 동일 순위이며, 다음 순위는 연속으로 이어집니다</li>
+          <li><span class="em">일반고치</span>가 우화되는 순간 참여를 마무리하고 모든 제출지가 <span class="em">오픈</span>됩니다.</li>
+          <li>제출지에는 <span class="em">암/수</span>로 표기가 되며, <span class="blue">파랑(정답)</span> · <span class="red">빨강(오답)</span>으로 구분합니다.</li>
+          <li>제출지에 <span class="em">마우스를 올리면</span> 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
+          <li><span class="em">1·2·3위</span>만 🥇/🥈/🥉 이모지, 그 외는 <span class="note">n등</span> 으로 표시 됩니다.</li>
+          <li>동점자는 <span class="em">동일 순위</span>이며, 다음 순위는 <span class="em">연속</span>으로 이어집니다.</li>
         </ul>
       </div>
     </div>
@@ -155,7 +165,6 @@
           <span class="item"><span class="chip" data-cat="bomb"><span class="t">?</span></span><span class="label" data-type="bomb">함정고치</span></span>
           <span class="item"><span class="chip" data-cat="normal"><span class="t">?</span></span><span class="label">일반고치</span></span>
         </div>
-        <div class="legend-note">※ CAT_MAP을 변경하여 문제별 카테고리를 조정할 수 있어요.</div>
 
         <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">데이터 로딩 중…</div></div>
       </div>
@@ -169,9 +178,17 @@
 
   <script>
     /* ==== 서버 API URL (Apps Script 웹앱의 /exec) ==== */
-    const API_URL = 'https://script.google.com/macros/s/AKfycbytIFgu9X0EguOwF3eDeHRkizLgIXmukP42mLTVEHTXmTH5iTHi-V27ivChRAaA8eO07A/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzMVS94F7gTyYIlG34bl9cwPzomj5fjQUiL0wUYyO5EA8xz-6gftHRR4Ap-culFTkjXxg/exec';
 
-    /* 카테고리 보조 */
+    /* ===== 임시 토글 =====
+       - 프라이버시 모드: 칩은 항상 '?'
+       - 점수/순위 숨김: 항상 '-' 표시
+       필요 시 false로 바꾸면 즉시 공개/표시 가능
+    */
+    const FORCE_PRIVACY_MODE = true;
+    const FORCE_HIDE_RANK_SCORE = true;
+
+    /* 보조 */
     const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
     function denseRankAndSort(rows){
@@ -236,8 +253,8 @@
 
     /* 렌더 */
     function renderBoard(payload){
-      const { open, qnames, category, rows } = payload;
-      const CATEGORY = category.map(c=>c); // ['일반','황금',...]
+      const { open, qnames, qimgs, category, rows } = payload;
+      const CATEGORY = category.map(c=>c);
       const data = rows ? denseRankAndSort(rows) : [];
 
       const tbl = document.createElement('table');
@@ -259,9 +276,13 @@
         const tr = document.createElement('tr');
 
         const tdNo = document.createElement('td'); tdNo.className='rowno'; tdNo.textContent=(rowIndex+1)+'.';
-        const tdRank = document.createElement('td'); tdRank.className='rank'; tdRank.textContent=(typeof row._rank==='number')?medalRank(row._rank):'—';
+        const tdRank = document.createElement('td'); tdRank.className='rank';
+        tdRank.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row._rank==='number')?medalRank(row._rank):'—');
+
         const tdNick = document.createElement('td'); tdNick.className='nick'; tdNick.textContent=row.nickname || '-';
-        const tdScore= document.createElement('td'); tdScore.className='score'; tdScore.textContent=(typeof row.score==='number')?`${row.score}점`:'—';
+
+        const tdScore= document.createElement('td'); tdScore.className='score';
+        tdScore.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row.score==='number')?`${row.score}점`:'—');
 
         const tdAns = document.createElement('td');
         const wrap = document.createElement('div'); wrap.className='answers';
@@ -273,14 +294,14 @@
           chip.dataset.qindex= i;
           chip.dataset.qname = qnames[i] || `Q${i+1}`;
           chip.dataset.qcat  = CATEGORY[i];
-          chip.dataset.qimg  = ''; // 필요 시 이미지 URL 주입
+          chip.dataset.qimg  = (qimgs && qimgs[i]) ? qimgs[i] : '';
 
           const t = document.createElement('span'); t.className='t';
 
-          // 닫힘: 항상 '?'
-          // 오픈: 일반고치만 F/M 노출 + 색 (corr: 1 정답, 0 오답, null 미표시)
+          // 프라이버시 모드: 항상 '?'
+          // 공개 모드(미래): 일반고치만 F/M 노출 + 정/오답 색
           let label='?';
-          if (open && CATEGORY[i] === '일반' && row.answers) {
+          if (!FORCE_PRIVACY_MODE && open && CATEGORY[i] === '일반' && row.answers) {
             const ch = row.answers[i];
             if (ch === 'F' || ch === 'M') label = ch;
             if (row.corr && row.corr[i] != null) {
