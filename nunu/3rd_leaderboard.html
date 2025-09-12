@@ -120,8 +120,15 @@
     }
     .pill.gold{background:var(--gold)} .pill.mimic{background:var(--mimic)}
     .pill.bomb{background:var(--bomb)} .pill.normal{background:var(--normal)}
-    .hovercard .imgwrap{display:block; width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb}
-    .hovercard .imgwrap img{display:block; width:100%; height:auto; object-fit:cover}
+
+    .hovercard .imgwrap{
+      display:flex; justify-content:center; align-items:center;
+      width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0;
+    }
+    /* ✅ 이미지 1/4 크기 */
+    .hovercard .imgwrap img{
+      display:block; width:25%; height:auto; object-fit:contain;
+    }
   </style>
 </head>
 <body>
@@ -204,11 +211,10 @@
 
     /* ===== 공통 유틸 ===== */
     const normCat = (cat) => {
-      // 동의어 흡수
       if (cat==='폭탄' || cat==='함정') return '함정';
       if (cat==='골드') return '황금';
       if (cat==='위장') return '미믹';
-      return (cat==='황금'||cat==='미믹'||cat==='일반') ? cat : '일반';
+      return (cat==='황금'||cat==='미믹'||cat==='일반'||cat==='함정') ? cat : '일반';
     };
     const catToData = (cat) => {
       const c = normCat(cat);
@@ -340,7 +346,7 @@
         for(let i=0;i<20;i++){
           const chip = document.createElement('span');
           chip.className='chip';
-          chip.dataset.cat = catToData(CATEGORY[i]); // gold/mimic/bomb/normal(함정)
+          chip.dataset.cat = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
           chip.dataset.qindex = i;                   // 0~19
           chip.dataset.qname = parsed.headers[i];
           chip.dataset.qcat = CATEGORY[i];
@@ -395,14 +401,14 @@
         if(url){
           img.src = url;
           img.alt = dispName;
-          imgwrap.style.display = 'block';
+          imgwrap.style.display = 'flex';
         }else{
           img.removeAttribute('src');
           img.alt = '';
           imgwrap.style.display = 'none';
         }
 
-        // 위치 (뷰포트 밖으로 나가지 않게)
+        // 위치 계산
         const pad = 14;
         const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -450,6 +456,26 @@
           '<div style="padding:14px;color:#b91c1c">TSV를 불러오지 못했습니다. '+
           '이 HTML과 같은 폴더에 <b>nunu3_responses.tsv</b>를 넣어주세요.</div>';
       });
+
+    /* ========================
+       기본 보안(우클릭/단축키 차단) — 완전 차단은 불가, 억제용
+    ======================== */
+    // 우클릭(컨텍스트 메뉴) 차단
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+    // 드래그/이미지 끌어가기 차단
+    document.addEventListener('dragstart', (e)=> e.preventDefault());
+    // 개발자도구/소스보기/저장 등의 단축키 억제
+    document.addEventListener('keydown', (e)=>{
+      const k = e.key.toUpperCase();
+      if (
+        e.keyCode===123 || // F12
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(k)) || // DevTools
+        (e.ctrlKey && ['U','S','P'].includes(k)) // 소스보기/저장/인쇄
+      ){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
   </script>
 </body>
 </html>
