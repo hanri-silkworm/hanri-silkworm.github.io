@@ -54,9 +54,7 @@
     /* 범례 */
     .legend{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:8px 0 10px;color:#374151}
     .legend .item{display:inline-flex;align-items:center;gap:8px}
-    .legend .label{
-      font-size:14px; writing-mode:horizontal-tb; text-orientation:mixed; white-space:nowrap;
-    }
+    .legend .label{font-size:14px;white-space:nowrap}
     .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:700}
     .legend-note{font-size:13px;color:#6b7280;margin-top:4px}
 
@@ -79,7 +77,7 @@
     /* 20칸 그리드 */
     .answers{display:grid;grid-template-columns:repeat(20, minmax(18px,1fr));gap:3px;align-items:center;width:100%}
 
-    /* 칩 ('?' 기본) */
+    /* 칩 ('?' 고정) */
     .chip{
       position:relative;display:inline-flex;align-items:center;justify-content:center;
       height:18px;border-radius:5px;border:1px solid var(--chip-bd);background:var(--chip-bg);
@@ -125,8 +123,15 @@
       display:flex; justify-content:center; align-items:center;
       width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0;
     }
-    .hovercard .imgwrap img{
-      display:block; width:25%; height:auto; object-fit:contain;
+    .hovercard .imgwrap img{display:block; width:25%; height:auto; object-fit:contain;}
+
+    /* ✅ 툴팁 제목(문제명) 한 줄 고정 + 말줄임 */
+    .hovercard .text{
+      display:inline-block;
+      max-width:180px;         /* 카드 폭(최대 280px) 대비 텍스트 영역 제한 */
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
   </style>
 </head>
@@ -147,10 +152,10 @@
     <div class="hero">
       <div class="hero-inner">
         <h1>🐛제 3회 리더보드</h1>
+        <p class="lead">지금은 비공개 모드라 제출된 문항은 전부 <b>?</b> 한 글자로만 표시가 됩니다.</p>
         <ul class="guides">
-          <li>지금은 비공개 모드라 제출된 문항은 전부 <b>?</b> 한 글자로만 표시가 됩니다.</li>
           <li>일반고치가 우화되는 순간 참여를 마무리하고 모든 제출지가 오픈됩니다.</li>
-          <li>제출지에는 <b>암/수</b>로 표기가 되며,  <b style="color:#1e3a8a">파랑(정답)</b> · <b style="color:#b91c1c">빨강(오답)</b>으로 구분합니다.</li>
+          <li>제출지에는 암/수로 표기가 되며, 파랑(정답) · 빨강(오답)으로 구분합니다.</li>
           <li>제출지에 마우스를 올리면 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
           <li>1·2·3위만 🥇/🥈/🥉 이모지, 그 외는 n등 으로 표시 됩니다.</li>
           <li>동점자는 동일 순위이며, 다음 순위는 연속으로 이어집니다</li>
@@ -178,24 +183,22 @@
     </section>
   </div>
 
-  <!-- 커스텀 호버 카드 -->
+  <!-- 커스텀 호버 카드: [라벨+문제명] 위, 이미지 아래 -->
   <div id="hovercard" class="hovercard" role="dialog" aria-hidden="true">
-    <div class="meta"><span class="pill">—</span><span class="text">—</span></div>
+    <div class="meta"><span class="pill">—</span><span class="text" title="—">—</span></div>
     <div class="imgwrap"><img alt=""></div>
   </div>
 
   <script>
     /* ========================
-       0) 설정: 정답키 & 카테고리 & 기본 이미지 / 공개 규칙
+       0) 설정: 정답키 & 카테고리 & 기본 이미지
     ======================== */
 
-    // 채점키(20칸). 일반 고치 자리에만 F/M을 넣으면 됨(맞으면 +1). 특수 고치 칸은 어떤 문자가 와도 무시.
+    // 정답키(길이 20, 'F' 또는 'M'만). 비우면 점수/순위 미표시.
+    // ⚠️ 보안을 위해 실제 운영에서는 브라우저에 보내지 마세요(서버에서만 사용).
     const ANSWER_KEY_FM = "";
 
-    // (미공개 메모) 요청사항: 5, 20번은 특수고치이며 F로 기록만(표시/채점엔 미사용)
-    const HIDDEN_ANSWER_MEMO = { 5:'F', 20:'F' };
-
-    // 카테고리 매핑
+    // 요청한 카테고리 매핑 (특수고치는 점수 미반영)
     const CAT_MAP = {
       3:'미믹', 10:'미믹', 13:'미믹',
       5:'황금', 17:'황금',
@@ -203,18 +206,21 @@
       // 나머지는 '일반'
     };
 
-    // 기본 이미지
+    // (요청) 5번/20번 임시 답(F) 강제 입력 — 표시(칩)는 항상 '?'라서 외형엔 영향 X
+    const FORCED_ANS = { 5:'F', 20:'F' };
+
+    // 모든 문제에 동일하게 사용할 기본 이미지 주소(원하면 문제별로 바꿔도 됨)
     const DEFAULT_IMAGE_URL = "https://e7.pngegg.com/pngimages/699/153/png-clipart-emoji-thought-blushing-emoji-face-smiley.png";
 
-    // 🔒 지금은 제출지 전부 ? 로 고정
-    const REVEAL = {
-      normals: false,  // 일반도 숨김
-      specials: false, // 특수도 숨김
-      whitelist: []
+    // 점수 규칙 — 특수고치는 점수 미반영, 일반만 +1/0
+    const SCORE_RULES = {
+      '일반': { correct:+1, wrong: 0 },
+      '황금': { correct: 0, wrong: 0 },
+      '미믹': { correct: 0, wrong: 0 },
+      '함정': { correct: 0, wrong: 0 },
     };
-    const SPECIAL_REVEAL_AT = null; // 예: '2025-12-01T09:00:00+09:00'
 
-    /* ===== 유틸 ===== */
+    /* ===== 공통 유틸 ===== */
     const normCat = (cat) => {
       if (cat==='폭탄' || cat==='함정') return '함정';
       if (cat==='골드') return '황금';
@@ -225,14 +231,6 @@
       const c = normCat(cat);
       return c==='황금' ? 'gold' : c==='미믹' ? 'mimic' : c==='함정' ? 'bomb' : 'normal';
     };
-    const isSpecial = (cat) => ['황금','미믹','함정'].includes(normCat(cat));
-    const specialsOpenNow = () => {
-      if (REVEAL.specials) return true;
-      if (!SPECIAL_REVEAL_AT) return false;
-      const t = Date.parse(SPECIAL_REVEAL_AT);
-      return Number.isFinite(t) && Date.now() >= t;
-    };
-
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
     function denseRankAndSort(rows){
       const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
@@ -241,13 +239,12 @@
       arr.forEach(r=> r._rank = typeof r.score==='number' ? m.get(r.score) : null);
       return arr;
     }
-
-    // TSV → 'F' | 'M' | '?'
     const toFM = (ch) => {
-      const v = String(ch || '').trim().toUpperCase();
-      if (['A','F','여','FEMALE'].includes(v)) return 'F';
-      if (['S','M','남','MALE'].includes(v))   return 'M';
-      return '?'; // D, ?, 빈값 포함
+      if (ch==='A') return 'F';
+      if (ch==='S') return 'M';
+      if (ch==='F' || ch==='M') return ch;
+      if (ch==='D') return '?'; // 요청: 모름(D) → 비공개('?') 처리
+      return '?';
     };
 
     // 문제명이 이미 "08. ..."처럼 번호를 포함하면 중복 방지
@@ -256,19 +253,10 @@
       return (/^\d{1,2}\.\s*/.test(name)) ? name : `${qno}. ${name}`;
     }
 
-    // 채점키 파싱(길이 20, 각 칸 'F'/'M'이면 유효, 아니면 null)
-    function parseKey(str){
-      const arr = Array.from({length:20}, (_,i)=>{
-        const c = (str && str[i]) ? str[i].toUpperCase() : '';
-        return (c==='F' || c==='M') ? c : null;
-      });
-      return arr;
-    }
-
     /* ===== TSV 파서 & 점수 ===== */
     function parseTSV(tsv){
       const lines = tsv.split(/\r?\n/).filter(Boolean);
-      if(lines.length<2) return {headers:[], images:[], rows:[], hasAnyScore:false};
+      if(lines.length<2) return {headers:[], images:[], rows:[], hasKey:false};
 
       const header = lines[0].split('\t');
       const idx = Object.fromEntries(header.map((k,i)=>[k,i]));
@@ -279,15 +267,12 @@
       for(let i=1;i<=20;i++){
         qNames.push((first[idx[`q${i}name`]]||'').trim() || `Q${i}`);
       }
-      // 이미지: 요청대로 전부 동일 기본 이미지 사용
+
+      // 이미지: 요청대로 전부 동일 기본 이미지 사용(필요시 문제별 URL로 바꾸세요)
       const qImgs = Array.from({length:20}, ()=> DEFAULT_IMAGE_URL);
 
-      // 카테고리 배열
-      const CATEGORY = Array.from({length:20}, (_,i)=> normCat(CAT_MAP[i+1] || '일반'));
-
-      // 채점키(일반만 사용)
-      const keyArr = parseKey(ANSWER_KEY_FM);
-      const hasAnyNormalKey = keyArr.some((k, i)=> k && CATEGORY[i]==='일반');
+      const keyArr = (ANSWER_KEY_FM||"").trim().split("");
+      const hasKey = keyArr.length===20 && keyArr.every(c=>c==='F'||c==='M');
 
       const rows = lines.slice(1).map((line, lineNo)=>{
         const c = line.split('\t');
@@ -296,38 +281,43 @@
 
         const ansArr = Array.from({length:20}, (_,i)=>{
           const gk = `q${i+1}gender`;
-          const v = (c[idx[gk]]||'').trim();
-          return toFM(v||'?');
+          let v = (c[idx[gk]]||'').trim();
+          v = toFM(v || '?');
+          // 5/20번 강제 답 덮어쓰기
+          const forced = FORCED_ANS[i+1];
+          return forced ? forced : v;
         });
 
         let score = null;
-        if(hasAnyNormalKey){
-          let s = 0;
+        if(hasKey){
+          score = 0;
           for(let i=0;i<20;i++){
-            const cat = CATEGORY[i];
-            const k = keyArr[i];              // 'F'|'M'|null
-            if (cat !== '일반') continue;      // 특수고치는 점수 미반영
-            if (!k) continue;                  // 키 없는 칸은 스킵
-            const a = ansArr[i];               // 'F'|'M'|'?'
-            if (a === k) s += 1;               // 일반: 맞으면 +1, 그 외 0
+            const a = ansArr[i];
+            const k = keyArr[i];
+            const cat = normCat(CAT_MAP[i+1] || '일반');
+            const rule = SCORE_RULES[cat] || SCORE_RULES['일반'];
+            const answered = (a==='F'||a==='M');
+            const correct = answered && a===k;
+            const wrong = !answered || (answered && a!==k);
+            if (correct) score += rule.correct;
+            else if (wrong) score += rule.wrong;
           }
-          score = s;
         }
         return { nickname, timestamp, ans: ansArr.join(''), score };
       });
 
-      return { headers:qNames, images:qImgs, rows, hasAnyScore:hasAnyNormalKey };
+      return { headers:qNames, images:qImgs, rows, hasKey };
     }
 
     /* ===== 렌더 ===== */
     function renderFromTSV(tsv){
       const parsed = parseTSV(tsv);
 
-      // 카테고리 배열
+      // 카테고리 배열 준비
       const CATEGORY = Array.from({length:20}, (_,i)=> normCat(CAT_MAP[i+1] || '일반'));
 
       // 정렬/랭크
-      const data = parsed.hasAnyScore ? denseRankAndSort(parsed.rows) : parsed.rows;
+      const data = parsed.hasKey ? denseRankAndSort(parsed.rows) : parsed.rows;
 
       const tbl = document.createElement('table');
 
@@ -374,33 +364,17 @@
         const wrap = document.createElement('div');
         wrap.className='answers';
 
-        for (let i=0;i<20;i++){
+        for(let i=0;i<20;i++){
           const chip = document.createElement('span');
           chip.className='chip';
-
-          const catStr = CATEGORY[i];             // '일반' | '황금' | '미믹' | '함정'
-          const special = isSpecial(catStr);
-          const userCh  = (row.ans[i] || '?');    // 'F' | 'M' | '?'
-
-          // 공개 규칙: 지금은 무조건 '?' (normals=false, specials=false)
-          let visibleCh = '?';
-          if (REVEAL.whitelist?.includes(i+1)) {
-            visibleCh = userCh; // 필요 시 특정 문항만 공개
-          } else if (special) {
-            visibleCh = specialsOpenNow() ? userCh : '?';
-          } else {
-            visibleCh = REVEAL.normals ? userCh : '?';
-          }
-
-          chip.dataset.cat   = catToData(catStr); // gold/mimic/bomb/normal
-          chip.dataset.qindex= i;                 // 0~19
+          chip.dataset.cat = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
+          chip.dataset.qindex = i;                   // 0~19
           chip.dataset.qname = parsed.headers[i];
-          chip.dataset.qcat  = catStr;
-          chip.dataset.qimg  = parsed.images[i] || '';
-
+          chip.dataset.qcat = CATEGORY[i];
+          chip.dataset.qimg = parsed.images[i] || '';
           const t = document.createElement('span');
           t.className='t';
-          t.textContent = (visibleCh==='F' || visibleCh==='M') ? visibleCh : '?';
+          t.textContent='?'; // ✅ 항상 '?' (비공개 모드)
           chip.appendChild(t);
           wrap.appendChild(chip);
         }
@@ -435,16 +409,16 @@
       function showCard(x, y, chip){
         const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
         const rawName = chip.dataset.qname || '';
-        const dispName = formatDisplayName(qno, rawName); // 번호 중복 방지
+        const dispName = formatDisplayName(qno, rawName); // 번호+이름
         const catStr = chip.dataset.qcat;                 // 일반/황금/미믹/함정
         const catKey = chip.dataset.cat;                  // normal/gold/mimic/bomb
         const url = chip.dataset.qimg;
 
         // 내용 갱신
-        const catTitle = (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
-        pill.textContent = catTitle;
+        pill.textContent = (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
         pill.className = `pill ${catKey}`;
         text.textContent = dispName;
+        text.title = dispName; // ✅ 길어 잘릴 때 기본 브라우저 툴팁으로 전체 보기
 
         if(url){
           img.src = url;
@@ -492,7 +466,8 @@
 
     /* ========================
        TSV 로드 (같은 폴더의 파일)
-       - nunu3_responses.tsv 를 같은 폴더에 두세요.
+       - 운영 보안: 원본 제출 TSV/정답은 클라이언트로 보내지 마세요!
+       - 지금 데모는 정적 TSV를 읽지만, 실제는 서버에서 '점수만' 계산해 전달하세요.
     ======================== */
     fetch('nunu3_responses.tsv', {cache:'no-store'})
       .then(r => { if(!r.ok) throw new Error('TSV 로드 실패'); return r.text(); })
@@ -517,8 +492,7 @@
         (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(k)) || // DevTools
         (e.ctrlKey && ['U','S','P'].includes(k)) // 소스보기/저장/인쇄
       ){
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
       }
     }, true);
   </script>
