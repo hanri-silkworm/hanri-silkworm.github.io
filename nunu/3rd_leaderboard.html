@@ -145,11 +145,11 @@
     <div class="hero">
       <div class="hero-inner">
         <h1>🐛제 3회 리더보드</h1>
-        <p class="lead">지금은 비공개 모드라 제출된 문항은 전부 <b>?</b> 한 글자로만 표시돼요.</p>
+        <p class="lead">현재는 비공개 모드 — 제출지는 전부 <b>?</b>로만 보여요. (점수는 일반 고치만 반영)</p>
         <ul class="guides">
-          <li>표기: F=암컷, M=수컷, D=모름(칩엔 <b>?</b>)</li>
-          <li>특수 고치(황금/미믹/함정)는 항상 <b>?</b>로 숨김(나중에 공개 가능)</li>
-          <li><b>점수는 일반 고치만 반영</b> (맞으면 +1, 그 외 0)</li>
+          <li>기입: F=암컷, M=수컷, D=모름(칩엔 <b>?</b>로 표시)</li>
+          <li>특수 고치(황금/미믹/함정)는 점수 미반영, 표시도 <b>?</b></li>
+          <li>일반 고치만 채점(+1), 점수는 표시됨</li>
         </ul>
       </div>
     </div>
@@ -185,8 +185,7 @@
        0) 설정: 정답키 & 카테고리 & 기본 이미지 / 공개 규칙
     ======================== */
 
-    // 채점키(20칸). 일반 고치 자리에만 F/M을 넣으면 됨. 나머지는 ?, -, 공백 등 아무거나 무시됨.
-    // 예시) "F?M-  ? ? ? ? ? ? ? ? ? ? ? ? ? ?" ← 길이만 20 맞추면 됨
+    // 채점키(20칸). 일반 고치 자리에만 F/M을 넣으면 됨(맞으면 +1). 특수 고치 칸은 어떤 문자가 와도 무시.
     const ANSWER_KEY_FM = "";
 
     // (미공개 메모) 요청사항: 5, 20번은 특수고치이며 F로 기록만(표시/채점엔 미사용)
@@ -203,11 +202,11 @@
     // 기본 이미지
     const DEFAULT_IMAGE_URL = "https://e7.pngegg.com/pngimages/699/153/png-clipart-emoji-thought-blushing-emoji-face-smiley.png";
 
-    // 공개/비공개 토글
+    // 🔒 지금은 제출지 전부 ? 로 고정
     const REVEAL = {
-      normals: true,   // 일반고치 제출은 즉시 F/M 표시
-      specials: false, // 특수고치 제출은 항상 ? (나중에 공개 가능)
-      whitelist: []    // 예: [5,8,10] → 해당 문제만 강제 공개
+      normals: false,  // ← 여기만 false로 두면 일반도 숨김
+      specials: false,
+      whitelist: []    // 예: [7,12]만 공개하고 싶을 때 사용
     };
     const SPECIAL_REVEAL_AT = null; // 예: '2025-12-01T09:00:00+09:00' 지정 시 자동 공개
 
@@ -306,7 +305,7 @@
             if (cat !== '일반') continue;      // 특수고치는 점수 미반영
             if (!k) continue;                 // 키 없는 칸은 스킵
             const a = ansArr[i];              // 'F'|'M'|'?'
-            if (a === k) s += 1;              // 일반: 맞으면 +1, 나머지 0
+            if (a === k) s += 1;              // 일반: 맞으면 +1, 그 외 0
           }
           score = s;
         }
@@ -379,10 +378,10 @@
           const special = isSpecial(catStr);
           const userCh  = (row.ans[i] || '?');    // 'F' | 'M' | '?'
 
-          // 공개 규칙 적용
+          // 공개 규칙: 지금은 무조건 '?' (normals=false, specials=false)
           let visibleCh = '?';
           if (REVEAL.whitelist?.includes(i+1)) {
-            visibleCh = userCh;
+            visibleCh = userCh; // 필요 시 특정 문항만 공개
           } else if (special) {
             visibleCh = specialsOpenNow() ? userCh : '?';
           } else {
