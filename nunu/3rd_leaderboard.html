@@ -114,14 +114,14 @@
       overflow:hidden; min-width:220px; max-width:280px;
     }
     .hovercard.show{opacity:1; transform:translateY(0)}
-    .hovercard .imgwrap{display:block; width:100%; background:#f3f4f6}
-    .hovercard .imgwrap img{display:block; width:100%; height:auto; object-fit:cover}
     .hovercard .meta{padding:10px 12px; font-size:13px; color:#334155; display:flex; align-items:center; gap:8px}
     .hovercard .pill{
       display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; color:#fff
     }
     .pill.gold{background:var(--gold)} .pill.mimic{background:var(--mimic)}
     .pill.bomb{background:var(--bomb)} .pill.normal{background:var(--normal)}
+    .hovercard .imgwrap{display:block; width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb}
+    .hovercard .imgwrap img{display:block; width:100%; height:auto; object-fit:cover}
   </style>
 </head>
 <body>
@@ -164,15 +164,15 @@
         </div>
         <div class="legend-note">※ CAT_MAP을 변경하여 문제별 카테고리를 조정할 수 있어요.</div>
 
-        <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">TSV 로딩 중…</div></div>
+        <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">데이터 로딩 중…</div></div>
       </div>
     </section>
   </div>
 
-  <!-- 커스텀 호버 카드 -->
+  <!-- 커스텀 호버 카드: [라벨+텍스트] 위, 이미지 아래 -->
   <div id="hovercard" class="hovercard" role="dialog" aria-hidden="true">
-    <div class="imgwrap"><img alt=""></div>
     <div class="meta"><span class="pill">—</span><span class="text">—</span></div>
+    <div class="imgwrap"><img alt=""></div>
   </div>
 
   <script>
@@ -185,7 +185,6 @@
     const ANSWER_KEY_FM = "";
 
     // ✅ 카테고리 매핑 (문항번호 → '황금'|'미믹'|'폭탄'|'일반')
-    //   실제 3회 기준 예시. 필요한 숫자만 바꿔 쓰면 됩니다.
     const CAT_MAP = {
       4:'황금', 13:'황금',
       6:'미믹', 12:'미믹', 18:'미믹',
@@ -197,7 +196,6 @@
     const catToData = (cat) => cat==='황금' ? 'gold' : cat==='미믹' ? 'mimic' : cat==='폭탄' ? 'bomb' : 'normal';
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
     function denseRankAndSort(rows){
-      // 점수 내림차순 정렬 + dense rank
       const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
       const uniq=[]; arr.forEach(r=>{ if(typeof r.score==='number' && !uniq.includes(r.score)) uniq.push(r.score); });
       const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
@@ -205,6 +203,12 @@
       return arr;
     }
     const toFM = (ch) => (ch==='A'?'F':ch==='S'?'M':ch==='F'?'F':ch==='M'?'M':'?'); // A/S/F/M 모두 수용
+
+    // ✅ 문제명이 이미 "08. ..."처럼 번호를 포함하면 번호를 중복해서 붙이지 않도록 처리
+    function formatDisplayName(qno, rawName){
+      const name = String(rawName || '').trim();
+      return (/^\d{1,2}\.\s*/.test(name)) ? name : `${qno}. ${name}`;
+    }
 
     /* ===== TSV 파서 & 점수 ===== */
     function parseTSV(tsv){
@@ -335,7 +339,7 @@
       host.innerHTML='';
       host.appendChild(tbl);
 
-      // 호버 카드 이벤트(위임) — 기본 title 사용 안 함(중복 방지)
+      // 호버 카드 이벤트(위임)
       attachHovercard();
     }
 
@@ -347,31 +351,48 @@
       const text = card.querySelector('.text');
 
       function showCard(x, y, chip){
-        const name = chip.dataset.qname;
+        const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
+        const rawName = chip.dataset.qname || '';
+        const dispName = formatDisplayName(qno, rawName); // 중복 번호 방지
         const cat = chip.dataset.qcat;
         const catKey = chip.dataset.cat; // gold/mimic/bomb/normal
-        const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
         const url = chip.dataset.qimg;
 
         // 내용 갱신
-        img.src = url || '';
-        img.alt = name ? `${qno}. ${name}` : '문제 이미지';
         pill.textContent = (cat==='황금'?'황금고치':cat==='미믹'?'미믹고치':cat==='폭탄'?'폭탄고치':'일반고치');
         pill.className = `pill ${catKey}`;
-        text.textContent = `${qno}. ${name}`;
+        text.textContent = dispName;
+
+        if(url){
+          img.src = url;
+          img.alt = dispName;
+          card.querySelector('.imgwrap').style.display = 'block';
+        }else{
+          img.removeAttribute('src');
+          img.alt = '';
+          card.querySelector('.imgwrap').style.display = 'none';
+        }
 
         // 위치 (뷰포트 밖으로 나가지 않게)
-        const pad = 14, cw = 260, ch = 240;
-        let left = x + pad, top = y + pad;
+        const pad = 14;
         const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        if(left + cw > vw - 8) left = x - cw - pad;
-        if(top + ch > vh - 8) top = y - ch - pad;
 
-        card.style.left = left + 'px';
-        card.style.top  = top + 'px';
+        // 일단 보이게 한 뒤 실제 크기를 측정해서 위치 보정
+        card.style.left = (x + pad) + 'px';
+        card.style.top  = (y + pad) + 'px';
         card.classList.add('show');
         card.setAttribute('aria-hidden','false');
+
+        // 다음 프레임에 보정
+        requestAnimationFrame(()=>{
+          const rect = card.getBoundingClientRect();
+          let left = rect.left, top = rect.top;
+          if(rect.right > vw - 8) left = x - rect.width - pad;
+          if(rect.bottom > vh - 8) top = y - rect.height - pad;
+          card.style.left = Math.max(8, left) + 'px';
+          card.style.top  = Math.max(8, top)  + 'px';
+        });
       }
 
       function hideCard(){
