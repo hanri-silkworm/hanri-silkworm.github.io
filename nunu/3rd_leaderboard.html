@@ -54,7 +54,9 @@
     /* 범례 */
     .legend{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:8px 0 10px;color:#374151}
     .legend .item{display:inline-flex;align-items:center;gap:8px}
-    .legend .label{font-size:14px;white-space:nowrap}
+    .legend .label{
+      font-size:14px; writing-mode:horizontal-tb; text-orientation:mixed; white-space:nowrap;
+    }
     .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:700}
     .legend-note{font-size:13px;color:#6b7280;margin-top:4px}
 
@@ -145,11 +147,13 @@
     <div class="hero">
       <div class="hero-inner">
         <h1>🐛제 3회 리더보드</h1>
-        <p class="lead">현재는 비공개 모드 — 제출지는 전부 <b>?</b>로만 보여요. (점수는 일반 고치만 반영)</p>
         <ul class="guides">
-          <li>기입: F=암컷, M=수컷, D=모름(칩엔 <b>?</b>로 표시)</li>
-          <li>특수 고치(황금/미믹/함정)는 점수 미반영, 표시도 <b>?</b></li>
-          <li>일반 고치만 채점(+1), 점수는 표시됨</li>
+          <li>지금은 비공개 모드라 제출된 문항은 전부 <b>?</b> 한 글자로만 표시가 됩니다.</li>
+          <li>일반고치가 우화되는 순간 참여를 마무리하고 모든 제출지가 오픈됩니다.</li>
+          <li>제출지에는 <b>암/수</b>로 표기가 되며,  <b style="color:#1e3a8a">파랑(정답)</b> · <b style="color:#b91c1c">빨강(오답)</b>으로 구분합니다.</li>
+          <li>제출지에 마우스를 올리면 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
+          <li>1·2·3위만 🥇/🥈/🥉 이모지, 그 외는 n등 으로 표시 됩니다.</li>
+          <li>동점자는 동일 순위이며, 다음 순위는 연속으로 이어집니다</li>
         </ul>
       </div>
     </div>
@@ -204,11 +208,11 @@
 
     // 🔒 지금은 제출지 전부 ? 로 고정
     const REVEAL = {
-      normals: false,  // ← 여기만 false로 두면 일반도 숨김
-      specials: false,
-      whitelist: []    // 예: [7,12]만 공개하고 싶을 때 사용
+      normals: false,  // 일반도 숨김
+      specials: false, // 특수도 숨김
+      whitelist: []
     };
-    const SPECIAL_REVEAL_AT = null; // 예: '2025-12-01T09:00:00+09:00' 지정 시 자동 공개
+    const SPECIAL_REVEAL_AT = null; // 예: '2025-12-01T09:00:00+09:00'
 
     /* ===== 유틸 ===== */
     const normCat = (cat) => {
@@ -238,7 +242,7 @@
       return arr;
     }
 
-    // TSV 값 → 'F' | 'M' | '?'
+    // TSV → 'F' | 'M' | '?'
     const toFM = (ch) => {
       const v = String(ch || '').trim().toUpperCase();
       if (['A','F','여','FEMALE'].includes(v)) return 'F';
@@ -303,9 +307,9 @@
             const cat = CATEGORY[i];
             const k = keyArr[i];              // 'F'|'M'|null
             if (cat !== '일반') continue;      // 특수고치는 점수 미반영
-            if (!k) continue;                 // 키 없는 칸은 스킵
-            const a = ansArr[i];              // 'F'|'M'|'?'
-            if (a === k) s += 1;              // 일반: 맞으면 +1, 그 외 0
+            if (!k) continue;                  // 키 없는 칸은 스킵
+            const a = ansArr[i];               // 'F'|'M'|'?'
+            if (a === k) s += 1;               // 일반: 맞으면 +1, 그 외 0
           }
           score = s;
         }
