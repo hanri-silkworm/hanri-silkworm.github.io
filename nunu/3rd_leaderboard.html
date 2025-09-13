@@ -153,7 +153,7 @@
     }
     @media (max-width:560px){
       .rowno-col, td.rowno{ display:none }                 /* # 숨김 */
-      thead th:nth-child(5), tbody td:nth-child(5){ display:none } /* 제출지 숨김 */
+      thead th:nth-child(5), tbody td:nth-child(5){ display:none } /* 제출지 숨김(모바일) */
       .wrap{ padding:12px }
       .hero h1{ font-size:22px }
       .guides{ margin-top:8px }
@@ -192,6 +192,10 @@
           <li>제출지에 <span class="em">마우스를 올리면</span> 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
           <li><span class="em">1·2·3위</span>만 🥇/🥈/🥉 이모지, 그 외는 <span class="note">n등</span> 으로 표시 됩니다.</li>
           <li>동점자는 <span class="em">동일 순위</span>이며, 다음 순위는 <span class="em">연속</span>으로 이어집니다.</li>
+          <li class="note">
+            📱 <b>모바일</b>에서는 <b>순위·점수만</b> 확인할 수 있어요. 💻 <b>PC/태블릿</b>에서는 각 제출지의 <b>답(F/M)</b>과
+            칩에 마우스를 올리면 <b>누에 나방 사진</b>도 볼 수 있습니다.
+          </li>
         </ul>
       </div>
     </div>
@@ -226,16 +230,14 @@
 
     /* ===== 임시 토글 =====
        - 프라이버시 모드: 칩은 항상 '?'
-       - 점수/순위 숨김: 항상 '-' 표시 (데스크톱/태블릿에서만 적용)
-       ※ 모바일(<=560px)에선 순위/점수는 항상 보이도록 강제 노출
+       - 점수/순위 숨김: 항상 '-' 표시
+       ※ 요청대로 현재는 "완전 비공개" 상태로 둘 다 true
     */
-    const FORCE_PRIVACY_MODE = false;   // 지금은 공개(일반고치만 노출) 테스트 상태
-    const FORCE_HIDE_RANK_SCORE = true; // 데스크톱/태블릿에서만 숨김
+    const FORCE_PRIVACY_MODE = true;
+    const FORCE_HIDE_RANK_SCORE = true;
 
-    /* 모바일 간소화: 560px 이하 */
+    /* 모바일 단순화 플래그(칩 생성을 생략하여 가볍게) */
     const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
-    /* 최종 숨김 여부(모바일은 무조건 표시) */
-    const HIDE_RANK_SCORE = FORCE_HIDE_RANK_SCORE && !IS_MOBILE_SIMPLE;
 
     /* 보조 */
     const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
@@ -326,16 +328,16 @@
 
         const tdNo = document.createElement('td'); tdNo.className='rowno'; tdNo.textContent=(rowIndex+1)+'.';
         const tdRank = document.createElement('td'); tdRank.className='rank';
-        tdRank.textContent = HIDE_RANK_SCORE ? '-' : ((typeof row._rank==='number')?medalRank(row._rank):'—');
+        tdRank.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row._rank==='number')?medalRank(row._rank):'—');
 
         const tdNick = document.createElement('td'); tdNick.className='nick'; tdNick.textContent=row.nickname || '-';
 
         const tdScore= document.createElement('td'); tdScore.className='score';
-        tdScore.textContent = HIDE_RANK_SCORE ? '-' : ((typeof row.score==='number')?`${row.score}점`:'—');
+        tdScore.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row.score==='number')?`${row.score}점`:'—');
 
         const tdAns = document.createElement('td');
 
-        /* 모바일에선 칩 생성 자체를 생략(순위·닉네임·점수만) */
+        /* 모바일에선 칩 자체를 생성하지 않음(순위·닉네임·점수만) */
         if (!IS_MOBILE_SIMPLE) {
           const wrap = document.createElement('div'); wrap.className='answers';
 
@@ -350,9 +352,10 @@
 
             const t = document.createElement('span'); t.className='t';
 
-            // 프라이버시 모드: 항상 '?'
-            // 공개 모드: 일반고치만 F/M 노출 + 정/오답 색/배경
-            let label='?';
+            // 현재는 비공개 모드(무조건 '?')
+            let label = '?';
+
+            // (공개 시) 일반고치만 F/M 노출 + 정오답 색/배경 표시 로직
             if (!FORCE_PRIVACY_MODE && open && CATEGORY[i] === '일반' && row.answers) {
               const ch = row.answers[i];
               if (ch === 'F' || ch === 'M') label = ch;
@@ -360,6 +363,7 @@
                 chip.classList.add('open', row.corr[i] === 1 ? 'correct' : 'wrong');
               }
             }
+
             t.textContent = label;
             chip.appendChild(t);
             wrap.appendChild(chip);
