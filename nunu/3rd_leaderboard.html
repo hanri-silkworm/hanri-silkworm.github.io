@@ -14,16 +14,23 @@
 
       --chip-bg:#f3f4f6; --chip-bd:#e5e7eb; --chip-tx:#374151;
 
-      --ok:#2563eb;  /* 파랑(정답) */
-      --bad:#dc2626; /* 빨강(오답) */
+      --ok:#2563eb;  /* 파랑(정답 글자색) */
+      --bad:#dc2626; /* 빨강(오답 글자색) */
+      --ok-bg:#dbeafe;   /* 파랑-100 (정답 배경) */
+      --ok-bd:#93c5fd;   /* 파랑-300 (정답 테두리) */
+      --bad-bg:#fee2e2;  /* 빨강-100 (오답 배경) */
+      --bad-bd:#fca5a5;  /* 빨강-300 (오답 테두리) */
+
       --accent:#111827;
       --highlight:#fef3c7;
     }
+
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
       font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
     .wrap{max-width:1120px;margin:0 auto;padding:20px 24px}
 
+    /* NAV */
     header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);
       background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
@@ -35,6 +42,7 @@
     .btn.primary{background:#4b5563;color:#ffffff;border:0}
     .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
 
+    /* HERO */
     .hero{margin:14px auto 10px;border:1px solid var(--muted);border-radius:var(--radius);
       background:var(--paper);box-shadow:var(--shadow);max-width:var(--box-w)}
     .hero-inner{padding:16px 18px}
@@ -50,6 +58,7 @@
     .red{color:var(--bad);font-weight:800}
     .note{background:var(--highlight);padding:0 6px;border-radius:6px}
 
+    /* 카드/테이블 */
     .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);
       box-shadow:var(--shadow);overflow:hidden;max-width:var(--box-w);margin:0 auto}
     .card .inner{padding:16px 18px}
@@ -60,7 +69,7 @@
     .legend .label{font-size:14px;white-space:nowrap}
     .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:700}
 
-    .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff}
+    .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
     thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--muted);
       text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
@@ -75,27 +84,29 @@
     .nick{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .score{font-weight:800;white-space:nowrap}
 
+    /* 칩 */
     .answers{display:grid;grid-template-columns:repeat(20, minmax(18px,1fr));gap:3px;align-items:center;width:100%}
-
     .chip{
       position:relative;display:inline-flex;align-items:center;justify-content:center;
       height:18px;border-radius:5px;border:1px solid var(--chip-bd);background:var(--chip-bg);
       color:var(--chip-tx);font-weight:800;letter-spacing:.2px;padding:0;width:100%;
     }
     .chip .t{font-size:11.5px;line-height:1}
-    .chip::after{
-      content:"";position:absolute;top:-2px;left:-2px;width:0;height:0;
-      border-bottom:10px solid transparent;border-left:10px solid var(--normal);
-    }
+    .chip::after{content:"";position:absolute;top:-2px;left:-2px;width:0;height:0;border-bottom:10px solid transparent;border-left:10px solid var(--normal)}
     .chip[data-cat="gold"]::after{  border-left-color:var(--gold)}
     .chip[data-cat="mimic"]::after{ border-left-color:var(--mimic)}
     .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* 오픈 시 정/오답 색 */
-    .chip.open.correct .t{color:var(--ok)}
-    .chip.open.wrong   .t{color:var(--bad)}
+    /* 공개 시 정/오답 강조(글자 + 배경/테두리) */
+    .chip.open.correct{ background:var(--ok-bg); border-color:var(--ok-bd); box-shadow:0 0 0 2px rgba(37,99,235,.18) inset }
+    .chip.open.wrong{   background:var(--bad-bg); border-color:var(--bad-bd); box-shadow:0 0 0 2px rgba(220,38,38,.18) inset }
+    .chip.open.correct .t{ color:var(--ok); font-weight:900 }
+    .chip.open.wrong   .t{ color:var(--bad); font-weight:900 }
+    .chip.open.correct:hover{ box-shadow:0 0 0 2px rgba(37,99,235,.28) inset }
+    .chip.open.wrong:hover{   box-shadow:0 0 0 2px rgba(220,38,38,.28) inset }
 
+    /* 범례 칩 크게 */
     .legend .chip{height:28px;min-width:28px;width:auto;padding:0 10px;border-radius:8px}
     .legend .chip .t{font-size:14px;line-height:1}
     .legend .chip::after{top:-3px;left:-3px;border-bottom:12px solid transparent;border-left:12px solid var(--normal)}
@@ -104,6 +115,7 @@
     .legend .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .legend .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
+    /* 호버카드 */
     .hovercard{
       position:fixed; z-index:1000; pointer-events:none; opacity:0; transform:translateY(6px);
       transition:opacity .12s ease, transform .12s ease;
@@ -115,142 +127,47 @@
     .hovercard .pill{display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; color:#fff}
     .pill.gold{background:var(--gold)} .pill.mimic{background:var(--mimic)}
     .pill.bomb{background:var(--bomb)} .pill.normal{background:var(--normal)}
+    .hovercard .imgwrap{display:flex; justify-content:center; align-items:center; width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0}
+    .hovercard .imgwrap img{display:block; width:25%; height:auto; object-fit:contain}
+    .hovercard .text{display:inline-block; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
-    .hovercard .imgwrap{display:flex; justify-content:center; align-items:center; width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0;}
-    .hovercard .imgwrap img{display:block; width:25%; height:auto; object-fit:contain;}
+    /* ── NAV: 모바일에서도 한 줄 유지 ───────────────── */
+    header.nav .nav-inner{ flex-wrap:nowrap }
+    .brand{ min-width:0 }
+    .brand strong{ font-size:clamp(14px, 3.6vw, 18px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    .nav-actions{ flex-shrink:0; gap:8px }
+    .btn{ white-space:nowrap }
 
-    /* 툴팁 제목 한 줄 고정 */
-    .hovercard .text{
-      display:inline-block; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    @media (max-width:560px){
+      .nav-inner{ padding:8px 10px; gap:8px }
+      .btn{ padding:6px 10px; font-size:13px }
     }
-    /* ▶ 명확한 배경/테두리 색 변수 */
-:root{
-  --ok-bg:#dbeafe;   /* 파랑-100 */
-  --ok-bd:#93c5fd;   /* 파랑-300 */
-  --bad-bg:#fee2e2;  /* 빨강-100 */
-  --bad-bd:#fca5a5;  /* 빨강-300 */
-}
 
-/* ▶ 공개 상태에서 정답/오답 칩을 더 또렷하게 */
-.chip.open.correct{
-  background:var(--ok-bg);
-  border-color:var(--ok-bd);
-  box-shadow:0 0 0 2px rgba(37,99,235,.18) inset; /* 은은한 내부 하이라이트 */
-}
-.chip.open.wrong{
-  background:var(--bad-bg);
-  border-color:var(--bad-bd);
-  box-shadow:0 0 0 2px rgba(220,38,38,.18) inset;
-}
-
-/* (기존 글자색도 유지) */
-.chip.open.correct .t{ color:var(--ok); font-weight:900; }
-.chip.open.wrong   .t{ color:var(--bad); font-weight:900; }
-
-/* 선택: 마우스 올렸을 때 살짝 더 강조하고 싶다면 */
-.chip.open.correct:hover{ box-shadow:0 0 0 2px rgba(37,99,235,.28) inset; }
-.chip.open.wrong:hover{   box-shadow:0 0 0 2px rgba(220,38,38,.28) inset; }
-
-    /* 표 영역이 좁을 때 가로 스크롤 허용 */
-.table-wrap{
-  overflow-x:auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* 칩(정오답) 배경/테두리 더 또렷하게 — 이미 있다면 유지 */
-:root{
-  --ok-bg:#dbeafe;   /* 파랑-100 */
-  --ok-bd:#93c5fd;   /* 파랑-300 */
-  --bad-bg:#fee2e2;  /* 빨강-100 */
-  --bad-bd:#fca5a5;  /* 빨강-300 */
-}
-.chip.open.correct{
-  background:var(--ok-bg);
-  border-color:var(--ok-bd);
-  box-shadow:0 0 0 2px rgba(37,99,235,.18) inset;
-}
-.chip.open.wrong{
-  background:var(--bad-bg);
-  border-color:var(--bad-bd);
-  box-shadow:0 0 0 2px rgba(220,38,38,.18) inset;
-}
-
-/* ─────────────────────────────────────────────
-   반응형(모바일) 레이아웃
-   - 칩 20칸 → 태블릿 10칸×2줄, 폰 5칸×4줄
-   - 여백/폰트/컬럼폭도 함께 축소
-────────────────────────────────────────────── */
-
-/* 태블릿 이하 */
-@media (max-width: 1024px){
-  .wrap{ padding:16px 16px; }
-  .answers{ grid-template-columns: repeat(10, minmax(18px,1fr)); gap:4px; }
-  thead th, tbody td{ padding:8px 10px; }
-  .rank-col{ width:100px; }
-  .nick-col{ width:170px; }
-  .score-col{ width:64px; }
-  .chip{ height:20px; }
-  .chip .t{ font-size:12px; }
-}
-
-/* 작은 폰(<=560px) */
-@media (max-width: 560px){
-  /* 맨 왼쪽 #(행번호) 컬럼 숨김 */
-  .rowno-col, td.rowno{ display:none; }
-
-  .wrap{ padding:12px 12px; }
-  .hero h1{ font-size:22px; }
-  .guides{ margin-top:8px; }
-  .answers{ grid-template-columns: repeat(5, minmax(22px,1fr)); gap:5px; }
-  thead th, tbody td{ padding:8px; }
-  .rank-col{ width:90px; }
-  .nick-col{ width:150px; }
-  .score-col{ width:58px; }
-  .chip{ height:22px; border-radius:6px; }
-  .chip .t{ font-size:12.5px; }
-}
-
-/* 아주 작은 폰(<=380px) — 칩 더 크게 4칸×5줄 */
-@media (max-width: 380px){
-  .answers{ grid-template-columns: repeat(4, minmax(24px,1fr)); gap:6px; }
-  .nick-col{ width:130px; }
-}
-/* ── NAV: 모바일에서도 한 줄 유지 ───────────────── */
-header.nav .nav-inner{ flex-wrap:nowrap; }
-.brand{ min-width:0; }
-.brand strong{
-  font-size:clamp(14px, 3.6vw, 18px);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.nav-actions{ flex-shrink:0; gap:8px; }
-.btn{ white-space:nowrap; }
-
-@media (max-width:560px){
-  .nav-inner{ padding:8px 10px; gap:8px; }
-  .btn{ padding:6px 10px; font-size:13px; }
-}
-
-/* ── 모바일: 점수만 보이기(닉네임 + 점수 유지) ──────
-   1열(#), 2열(순위), 5열(제출지) 숨김  */
-@media (max-width:560px){
-  .rowno-col, td.rowno{ display:none; }
-  thead th:nth-child(2), tbody td:nth-child(2){ display:none; } /* 순위 */
-  thead th:nth-child(5), tbody td:nth-child(5){ display:none; } /* 제출지 */
-
-  /* 테이블 간격/정렬 보정 */
-  .nick-col{ width:auto; }
-  .score-col{ width:84px; }
-  td.score{ text-align:right; }
-}
-
-/* 아주 작은 폰에서 버튼·여백 더 촘촘히 */
-@media (max-width:380px){
-  .btn{ padding:5px 8px; font-size:12.5px; }
-}
-
+    /* ── 반응형: 칩 그리드 압축 ───────────────────── */
+    @media (max-width:1024px){
+      .wrap{ padding:16px }
+      .answers{ grid-template-columns: repeat(10, minmax(18px,1fr)); gap:4px }
+      thead th, tbody td{ padding:8px 10px }
+      .rank-col{ width:100px } .nick-col{ width:170px } .score-col{ width:64px }
+      .chip{ height:20px } .chip .t{ font-size:12px }
+    }
+    @media (max-width:560px){
+      .rowno-col, td.rowno{ display:none }                 /* # 숨김 */
+      thead th:nth-child(5), tbody td:nth-child(5){ display:none } /* 제출지 숨김 */
+      .wrap{ padding:12px }
+      .hero h1{ font-size:22px }
+      .guides{ margin-top:8px }
+      thead th, tbody td{ padding:8px }
+      .rank-col{ width:82px } .nick-col{ width:auto } .score-col{ width:84px }
+      td.rank{ white-space:nowrap } td.score{ text-align:right }
+    }
+    @media (max-width:380px){
+      .btn{ padding:5px 8px; font-size:12.5px }
+    }
   </style>
 </head>
 <body>
+  <!-- NAV -->
   <header class="nav">
     <div class="nav-inner wrap">
       <a class="brand" href="#"><strong>🐛누에 고치 성별 맞추기 대회</strong></a>
@@ -261,6 +178,7 @@ header.nav .nav-inner{ flex-wrap:nowrap; }
     </div>
   </header>
 
+  <!-- HERO -->
   <main class="wrap">
     <div class="hero">
       <div class="hero-inner">
@@ -296,6 +214,7 @@ header.nav .nav-inner{ flex-wrap:nowrap; }
     </section>
   </div>
 
+  <!-- Hovercard -->
   <div id="hovercard" class="hovercard" role="dialog" aria-hidden="true">
     <div class="meta"><span class="pill">—</span><span class="text" title="—">—</span></div>
     <div class="imgwrap"><img alt=""></div>
@@ -307,11 +226,16 @@ header.nav .nav-inner{ flex-wrap:nowrap; }
 
     /* ===== 임시 토글 =====
        - 프라이버시 모드: 칩은 항상 '?'
-       - 점수/순위 숨김: 항상 '-' 표시
-       필요 시 false로 바꾸면 즉시 공개/표시 가능
+       - 점수/순위 숨김: 항상 '-' 표시 (데스크톱/태블릿에서만 적용)
+       ※ 모바일(<=560px)에선 순위/점수는 항상 보이도록 강제 노출
     */
-    const FORCE_PRIVACY_MODE = false;
-    const FORCE_HIDE_RANK_SCORE = true;
+    const FORCE_PRIVACY_MODE = false;   // 지금은 공개(일반고치만 노출) 테스트 상태
+    const FORCE_HIDE_RANK_SCORE = true; // 데스크톱/태블릿에서만 숨김
+
+    /* 모바일 간소화: 560px 이하 */
+    const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
+    /* 최종 숨김 여부(모바일은 무조건 표시) */
+    const HIDE_RANK_SCORE = FORCE_HIDE_RANK_SCORE && !IS_MOBILE_SIMPLE;
 
     /* 보조 */
     const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
@@ -402,43 +326,47 @@ header.nav .nav-inner{ flex-wrap:nowrap; }
 
         const tdNo = document.createElement('td'); tdNo.className='rowno'; tdNo.textContent=(rowIndex+1)+'.';
         const tdRank = document.createElement('td'); tdRank.className='rank';
-        tdRank.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row._rank==='number')?medalRank(row._rank):'—');
+        tdRank.textContent = HIDE_RANK_SCORE ? '-' : ((typeof row._rank==='number')?medalRank(row._rank):'—');
 
         const tdNick = document.createElement('td'); tdNick.className='nick'; tdNick.textContent=row.nickname || '-';
 
         const tdScore= document.createElement('td'); tdScore.className='score';
-        tdScore.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row.score==='number')?`${row.score}점`:'—');
+        tdScore.textContent = HIDE_RANK_SCORE ? '-' : ((typeof row.score==='number')?`${row.score}점`:'—');
 
         const tdAns = document.createElement('td');
-        const wrap = document.createElement('div'); wrap.className='answers';
 
-        for(let i=0;i<qnames.length;i++){
-          const chip = document.createElement('span');
-          chip.className = 'chip';
-          chip.dataset.cat   = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
-          chip.dataset.qindex= i;
-          chip.dataset.qname = qnames[i] || `Q${i+1}`;
-          chip.dataset.qcat  = CATEGORY[i];
-          chip.dataset.qimg  = (qimgs && qimgs[i]) ? qimgs[i] : '';
+        /* 모바일에선 칩 생성 자체를 생략(순위·닉네임·점수만) */
+        if (!IS_MOBILE_SIMPLE) {
+          const wrap = document.createElement('div'); wrap.className='answers';
 
-          const t = document.createElement('span'); t.className='t';
+          for(let i=0;i<qnames.length;i++){
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.dataset.cat   = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
+            chip.dataset.qindex= i;
+            chip.dataset.qname = qnames[i] || `Q${i+1}`;
+            chip.dataset.qcat  = CATEGORY[i];
+            chip.dataset.qimg  = (qimgs && qimgs[i]) ? qimgs[i] : '';
 
-          // 프라이버시 모드: 항상 '?'
-          // 공개 모드(미래): 일반고치만 F/M 노출 + 정/오답 색
-          let label='?';
-          if (!FORCE_PRIVACY_MODE && open && CATEGORY[i] === '일반' && row.answers) {
-            const ch = row.answers[i];
-            if (ch === 'F' || ch === 'M') label = ch;
-            if (row.corr && row.corr[i] != null) {
-              chip.classList.add('open', row.corr[i] === 1 ? 'correct' : 'wrong');
+            const t = document.createElement('span'); t.className='t';
+
+            // 프라이버시 모드: 항상 '?'
+            // 공개 모드: 일반고치만 F/M 노출 + 정/오답 색/배경
+            let label='?';
+            if (!FORCE_PRIVACY_MODE && open && CATEGORY[i] === '일반' && row.answers) {
+              const ch = row.answers[i];
+              if (ch === 'F' || ch === 'M') label = ch;
+              if (row.corr && row.corr[i] != null) {
+                chip.classList.add('open', row.corr[i] === 1 ? 'correct' : 'wrong');
+              }
             }
+            t.textContent = label;
+            chip.appendChild(t);
+            wrap.appendChild(chip);
           }
-          t.textContent = label;
-          chip.appendChild(t);
-          wrap.appendChild(chip);
+          tdAns.appendChild(wrap);
         }
 
-        tdAns.appendChild(wrap);
         tr.appendChild(tdNo);
         tr.appendChild(tdRank);
         tr.appendChild(tdNick);
@@ -464,8 +392,7 @@ header.nav .nav-inner{ flex-wrap:nowrap; }
         console.error(err);
         const host = document.getElementById('tableWrap');
         host.innerHTML =
-          '<div style="padding:14px;color:#b91c1c">데이터를 불러오지 못했습니다. '+
-          '웹앱 URL(API_URL)과 접근 권한을 확인하세요.</div>';
+          '<div style="padding:14px;color:#b91c1c">데이터를 불러오지 못했습니다. 웹앱 URL(API_URL)과 접근 권한을 확인하세요.</div>';
       });
 
     /* 억제용 보안(완전 차단 불가) */
