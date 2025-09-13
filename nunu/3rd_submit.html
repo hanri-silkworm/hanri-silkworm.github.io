@@ -448,7 +448,7 @@
       if(disabled){ fs.dataset.disabled = '1'; }
 
       const pillHTML = disabled
-        ? `<div class="pill disabled" aria-label="비활성 문항">제출 비활성(준비중)</div>`
+        ? `<div class="pill disabled" aria-label="비활성 문항">제출 비활성(확인 불가)</div>`
         : `<div class="pill ${t}" aria-label="점수 규칙">${ruleText(t)}</div>`;
 
       const requiredStar = disabled ? '' : `<span class="req" style="color:#ef4444">*</span>`;
@@ -466,7 +466,7 @@
           <div>
             <div class="name">${it.name}</div>
             ${pillHTML}
-            <div class="subnote">${disabled ? '이 문항은 준비중이라 제출할 수 없습니다.' : '이미지를 참고하여 성별을 선택하십시오.'}</div>
+            <div class="subnote">${disabled ? '이 문항의 고치는 성별을 확인 할 수 없습니다..' : '이미지를 참고하여 성별을 선택하십시오.'}</div>
           </div>
           <div>
             <label>성별 선택 ${requiredStar}</label>
