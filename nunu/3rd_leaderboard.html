@@ -151,6 +151,71 @@
 .chip.open.correct:hover{ box-shadow:0 0 0 2px rgba(37,99,235,.28) inset; }
 .chip.open.wrong:hover{   box-shadow:0 0 0 2px rgba(220,38,38,.28) inset; }
 
+    /* 표 영역이 좁을 때 가로 스크롤 허용 */
+.table-wrap{
+  overflow-x:auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 칩(정오답) 배경/테두리 더 또렷하게 — 이미 있다면 유지 */
+:root{
+  --ok-bg:#dbeafe;   /* 파랑-100 */
+  --ok-bd:#93c5fd;   /* 파랑-300 */
+  --bad-bg:#fee2e2;  /* 빨강-100 */
+  --bad-bd:#fca5a5;  /* 빨강-300 */
+}
+.chip.open.correct{
+  background:var(--ok-bg);
+  border-color:var(--ok-bd);
+  box-shadow:0 0 0 2px rgba(37,99,235,.18) inset;
+}
+.chip.open.wrong{
+  background:var(--bad-bg);
+  border-color:var(--bad-bd);
+  box-shadow:0 0 0 2px rgba(220,38,38,.18) inset;
+}
+
+/* ─────────────────────────────────────────────
+   반응형(모바일) 레이아웃
+   - 칩 20칸 → 태블릿 10칸×2줄, 폰 5칸×4줄
+   - 여백/폰트/컬럼폭도 함께 축소
+────────────────────────────────────────────── */
+
+/* 태블릿 이하 */
+@media (max-width: 1024px){
+  .wrap{ padding:16px 16px; }
+  .answers{ grid-template-columns: repeat(10, minmax(18px,1fr)); gap:4px; }
+  thead th, tbody td{ padding:8px 10px; }
+  .rank-col{ width:100px; }
+  .nick-col{ width:170px; }
+  .score-col{ width:64px; }
+  .chip{ height:20px; }
+  .chip .t{ font-size:12px; }
+}
+
+/* 작은 폰(<=560px) */
+@media (max-width: 560px){
+  /* 맨 왼쪽 #(행번호) 컬럼 숨김 */
+  .rowno-col, td.rowno{ display:none; }
+
+  .wrap{ padding:12px 12px; }
+  .hero h1{ font-size:22px; }
+  .guides{ margin-top:8px; }
+  .answers{ grid-template-columns: repeat(5, minmax(22px,1fr)); gap:5px; }
+  thead th, tbody td{ padding:8px; }
+  .rank-col{ width:90px; }
+  .nick-col{ width:150px; }
+  .score-col{ width:58px; }
+  .chip{ height:22px; border-radius:6px; }
+  .chip .t{ font-size:12.5px; }
+}
+
+/* 아주 작은 폰(<=380px) — 칩 더 크게 4칸×5줄 */
+@media (max-width: 380px){
+  .answers{ grid-template-columns: repeat(4, minmax(24px,1fr)); gap:6px; }
+  .nick-col{ width:130px; }
+}
+
   </style>
 </head>
 <body>
