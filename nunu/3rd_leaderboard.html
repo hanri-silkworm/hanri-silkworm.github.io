@@ -65,8 +65,11 @@
 
     .legend{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:8px 0 10px;color:#374151}
     .legend .item{display:inline-flex;align-items:center;gap:8px}
-    .legend .label{font-size:14px;white-space:nowrap}
-    .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:700}
+    .legend .label{font-size:14px;white-space:nowrap;font-weight:800} /* 전체 볼드 */
+    .legend .label[data-type="gold"]{color:var(--gold)}   /* 황금 = 노란색 */
+    .legend .label[data-type="mimic"]{color:var(--mimic)} /* 미믹 = 보라색 */
+    .legend .label[data-type="bomb"]{color:var(--bomb);font-weight:800} /* 함정도 볼드 유지 */
+    .legend-note{ margin-top:6px; font-size:12px; color:var(--sub); }
 
     .table-wrap{border:1px solid var(--muted);border-radius:12px;background:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
@@ -210,12 +213,28 @@
       <div class="inner">
         <h2>리더보드</h2>
 
+        <!-- 범례: 라벨 볼드 + 색상 지정 -->
         <div class="legend" aria-label="카테고리 범례">
-          <span class="item"><span class="chip" data-cat="gold"><span class="t">?</span></span><span class="label">황금고치</span></span>
-          <span class="item"><span class="chip" data-cat="mimic"><span class="t">?</span></span><span class="label">미믹고치</span></span>
-          <span class="item"><span class="chip" data-cat="bomb"><span class="t">?</span></span><span class="label" data-type="bomb">함정고치</span></span>
-          <span class="item"><span class="chip" data-cat="normal"><span class="t">?</span></span><span class="label">일반고치</span></span>
+          <span class="item">
+            <span class="chip" data-cat="gold"><span class="t">?</span></span>
+            <span class="label" data-type="gold">황금고치</span>
+          </span>
+          <span class="item">
+            <span class="chip" data-cat="mimic"><span class="t">?</span></span>
+            <span class="label" data-type="mimic">미믹고치</span>
+          </span>
+          <span class="item">
+            <span class="chip" data-cat="bomb"><span class="t">?</span></span>
+            <span class="label" data-type="bomb">함정고치</span>
+          </span>
+          <span class="item">
+            <span class="chip" data-cat="normal"><span class="t">?</span></span>
+            <span class="label" data-type="normal">일반고치</span>
+          </span>
         </div>
+        <p class="legend-note">
+          ※ 17번 고치는 성별 확인이 불가하여 <b>제외</b>되었고, 추첨을 통해 <b>16번 고치가 황금고치</b>로 변경되었습니다.
+        </p>
 
         <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">데이터 로딩 중…</div></div>
       </div>
