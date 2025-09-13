@@ -101,6 +101,8 @@
     .pill.gold{color:var(--gold); border-color:#fcd34d; background:#fffdf4}
     .pill.mimic{color:var(--mimic); border-color:#ddd6fe; background:#faf7ff}
     .pill.trap{color:var(--trap); border-color:#fecaca; background:#fff5f5}
+    /* 비활성 칩 */
+    .pill.disabled{color:#6b7280; border-color:#e5e7eb; background:#f9fafb}
 
     /* 상태 안내문구 */
     #status{min-height:24px; text-align:center; margin-top:6px}
@@ -160,7 +162,7 @@
       .btn.kakao{ width:auto }
       .photo{ width:100%; height:clamp(180px,58vw,260px); }
     }
-      /* 모바일 네비: 버튼 1줄 유지 */
+    /* 모바일 네비: 버튼 1줄 유지 */
     @media (max-width:480px){
       .nav-inner{ gap:8px; padding:10px 12px; }
       .nav-inner > .brand{ flex:1 1 auto; min-width:0; max-width:55%; }
@@ -168,24 +170,30 @@
       header.nav .nav-inner > div{ display:flex; gap:8px; flex-wrap:nowrap; }
       header.nav .btn{ font-size:14px; padding:8px 10px; white-space:nowrap; }
     }
-      /* 참여 확인(퀵 체크) */
+    /* 참여 확인(퀵 체크) */
     .quick{margin:10px 0 0; padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#f8fafc; text-align:center; display:flex; justify-content:center}
     .quick-row{display:inline-flex; gap:8px; align-items:center; justify-content:center; flex-wrap:nowrap}
     .quick input[type="tel"]{ width:clamp(220px, 50vw, 280px); max-width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted) }
     #quick-status{ min-height:22px; text-align:center; margin-top:8px }
     @media (max-width:480px){ .quick-row{ flex-wrap:wrap } .quick .btn{ width:auto } }
-      /* 상품 안내 박스 */
+
+    /* 상품 안내 박스 */
     .prize-box{ margin:10px 0 0; padding:12px; border:1px dashed #d1d5db; border-radius:12px; background:#fafafa }
     .prize-box strong{ display:block; text-align:center; margin-bottom:6px }
     .prize-list{ list-style:none; padding:0; margin:0; text-align:center; color:#111827 }
     .prize-list li{ margin:4px 0 }
-      /* 리더보드 준비중 모달 */
+
+    /* 리더보드 준비중 모달 */
     .modal-overlay{ position:fixed; inset:0; background:rgba(17,24,39,.45); backdrop-filter:saturate(180%) blur(4px); display:none; align-items:center; justify-content:center; z-index:100 }
     .modal-overlay.open{ display:flex }
     .modal{ background:var(--paper); border:1px solid var(--muted); border-radius:16px; box-shadow:var(--shadow); width:min(420px, calc(100% - 40px)); padding:18px; text-align:center }
     .modal h3{ margin:6px 0 6px; font-size:18px }
-    .modal p{ margin:0; color:var(--sub) }
+    .modal p{ margin:0; color:#6b7280 }
     .modal-actions{ margin-top:12px; display:flex; gap:8px; justify-content:center }
+
+    /* 비활성 문항 스타일 */
+    fieldset.is-disabled{opacity:.72}
+    fieldset.is-disabled .qgrid{pointer-events:none}
   </style>
 </head>
 <body>
@@ -342,10 +350,14 @@
     /* 이미지 기본 경로 */
     const IMG_BASE = 'https://www.hanri.net/nunu/3rd_photo/';
 
-    /* 타입 매핑: gold[5,17], trap[20,8], mimic[10,3,13], 나머지 normal */
-    const GOLD = new Set([5,17]);
-    const TRAP = new Set([20,8]);
+    /* 타입 매핑: gold[5,11], trap[20,8], mimic[10,3,13], 나머지 normal */
+    const GOLD  = new Set([5,11]);       // ⬅️ 11번을 황금으로 변경
+    const TRAP  = new Set([20,8]);
     const MIMIC = new Set([10,3,13]);
+
+    /* 비활성 문항 */
+    const DISABLED = new Set([17]);      // ⬅️ 17번 비활성
+
     function getType(idx1){
       if(GOLD.has(idx1)) return 'gold';
       if(TRAP.has(idx1)) return 'trap';
@@ -370,11 +382,11 @@
     function toFileName(idx, displayName){
       const num = pad2(idx);
       const raw = (displayName||'')
-        .replace(/^\s*\d+\s*[\.\-_\)]*\s*/,'');  // "01.", "01_", "01- " 등 제거(여러 기호 허용)
+        .replace(/^\s*\d+\s*[\.\-_\)]*\s*/,'');  // "01.", "01_", "01- " 등 제거
       const withUnderscore = raw.trim()
         .replace(/\s+/g,'_')                     // 공백→_
         .replace(/^_+|_+$/g,'');                 // 앞뒤 _ 제거
-      const encoded = encodeURIComponent(withUnderscore); // 한글/특수문자 안전
+      const encoded = encodeURIComponent(withUnderscore);
       return `${num}_${encoded}.jpg`;
     }
 
@@ -419,25 +431,33 @@
       phoneInput.value = formatted;
       phoneInput.setSelectionRange(formatted.length, formatted.length);
     });
-    phoneInput.addEventListener('blur', ()=>{
-      phoneInput.value = format344(phoneInput.value);
-    });
+    phoneInput.addEventListener('blur', ()=>{ phoneInput.value = format344(phoneInput.value); });
 
     /* 문항 렌더링 */
     const qWrap = $('#questions');
     ITEMS.forEach((it, idx)=>{
       const i = idx + 1;
       const t = getType(i);
+      const disabled = DISABLED.has(i);
       const fileName = toFileName(i, it.name);
       const imgUrl = IMG_BASE + fileName;
 
       const fs = document.createElement('fieldset');
       fs.dataset.index = i;
-      fs.className = `type-${t}`;
+      fs.className = `type-${t}` + (disabled ? ' is-disabled' : '');
+      if(disabled){ fs.dataset.disabled = '1'; }
+
+      const pillHTML = disabled
+        ? `<div class="pill disabled" aria-label="비활성 문항">제출 비활성(준비중)</div>`
+        : `<div class="pill ${t}" aria-label="점수 규칙">${ruleText(t)}</div>`;
+
+      const requiredStar = disabled ? '' : `<span class="req" style="color:#ef4444">*</span>`;
+      const helpHTML = disabled ? '' : `<div class="help-err" data-help style="display:none">이 문항의 성별을 선택하십시오.</div>`;
+
       fs.innerHTML = `
         <legend>문항 ${i}</legend>
         <div class="qgrid">
-          <div class="photo">
+          <div class="photo" aria-disabled="${disabled?'true':'false'}">
             <img src="${imgUrl}" alt="${it.name} 사진" draggable="false" oncontextmenu="return false" onerror="this.alt='이미지를 불러올 수 없습니다.'">
             <span class="flag ${t}" aria-label="${typeKorean(t)} 배지">
               <i>${t==='gold'?'✨':t==='mimic'?'😏':t==='trap'?'⚠️':'🐛'}</i>${typeKorean(t)}
@@ -445,22 +465,22 @@
           </div>
           <div>
             <div class="name">${it.name}</div>
-            <div class="pill ${t}" aria-label="점수 규칙">${ruleText(t)}</div>
-            <div class="subnote">이미지를 참고하여 성별을 선택하십시오.</div>
+            ${pillHTML}
+            <div class="subnote">${disabled ? '이 문항은 준비중이라 제출할 수 없습니다.' : '이미지를 참고하여 성별을 선택하십시오.'}</div>
           </div>
           <div>
-            <label>성별 선택 <span class="req" style="color:#ef4444">*</span></label>
+            <label>성별 선택 ${requiredStar}</label>
             <div class="radios" role="radiogroup" aria-label="${it.name} 성별 선택">
               <label class="radio" data-type="F">
-                <input type="radio" name="q${i}_gender" value="F"/>
+                <input type="radio" name="q${i}_gender" value="F" ${disabled?'disabled':''}/>
                 <span>암컷</span>
               </label>
               <label class="radio" data-type="M">
-                <input type="radio" name="q${i}_gender" value="M"/>
+                <input type="radio" name="q${i}_gender" value="M" ${disabled?'disabled':''}/>
                 <span>수컷</span>
               </label>
             </div>
-            <div class="help-err" data-help style="display:none">이 문항의 성별을 선택하십시오.</div>
+            ${helpHTML}
           </div>
         </div>
       `;
@@ -468,12 +488,8 @@
     });
 
     /* 이미지 우클릭/드래그 방지(추가 보호) */
-    document.addEventListener('contextmenu', (e)=>{
-      if(e.target && e.target.tagName==='IMG') e.preventDefault();
-    });
-    document.addEventListener('dragstart', (e)=>{
-      if(e.target && e.target.tagName==='IMG') e.preventDefault();
-    });
+    document.addEventListener('contextmenu', (e)=>{ if(e.target && e.target.tagName==='IMG') e.preventDefault(); });
+    document.addEventListener('dragstart', (e)=>{ if(e.target && e.target.tagName==='IMG') e.preventDefault(); });
 
     // 선택 토글
     function paintGroup(group){
@@ -540,6 +556,9 @@
 
       const missingQuestions = [];
       for(let i=1;i<=Q_TOTAL;i++){
+        // 비활성 문항은 검증에서 제외
+        if (DISABLED.has(i)) continue;
+
         const fs = document.querySelector(`fieldset[data-index="${i}"]`);
         const checked = document.querySelector(`input[name="q${i}_gender"]:checked`);
         const help = fs.querySelector('[data-help]');
@@ -576,18 +595,16 @@
 
     // 중복 확인
     async function checkPhoneDuplicate(phoneInput){
-      // 1) 입력 정규화: 하이픈 제거, 선행 0 제거 버전까지 모두 생성
       const raw = String(phoneInput || '');
-      const digits = onlyDigits(raw).slice(0,11);                 // 예: 01045297136
-      const digitsNoLead0 = digits.replace(/^0+/, '');            // 예: 1045297136 (시트 phone_norm과 동일 케이스)
-      const hyphen = format344(digits);                            // 예: 010-4529-7136
-      const hyphenNoLead0 = format344(digitsNoLead0);              // 예: 1-0452-97136 (서버 구현에 따라 무시될 수 있음)
+      const digits = onlyDigits(raw).slice(0,11);
+      const digitsNoLead0 = digits.replace(/^0+/, '');
+      const hyphen = format344(digits);
+      const hyphenNoLead0 = format344(digitsNoLead0);
 
       const editionEl = document.getElementById('edition');
       const edition = editionEl ? (editionEl.value || '').trim() : '';
-      const t = Date.now().toString(); // 캐시 무효화용 파라미터
+      const t = Date.now().toString();
 
-      // 2) 서버 스펙 대응: phone / phone_norm, 하이픈 유무, 선행 0 제거, edition 유무 모두 시도
       const base = [
         { action:'checkPhone', phone: digits, t },
         { action:'checkPhone', phone: hyphen, t },
@@ -642,9 +659,7 @@
         quickPhone.value = v;
         quickPhone.setSelectionRange(v.length, v.length);
       });
-      quickPhone.addEventListener('blur', ()=>{
-        quickPhone.value = format344(quickPhone.value);
-      });
+      quickPhone.addEventListener('blur', ()=>{ quickPhone.value = format344(quickPhone.value); });
     }
     const quickBtn = document.getElementById('btn-quick-check');
     if (quickBtn){
@@ -683,15 +698,17 @@
       fd.set('phone_norm', onlyDigits($('#phone').value.trim()));
       fd.set('submittedAt', new Date().toISOString());
       for(let i=1;i<=Q_TOTAL;i++){
+        const disabled = DISABLED.has(i);
         const t = getType(i);
         const name = ITEMS[i-1].name;
         const fileName = toFileName(i, name);
         const imgUrl = IMG_BASE + fileName;
-        const g = (document.querySelector(`input[name="q${i}_gender"]:checked`)||{}).value || '';
+        const g = disabled ? '' : ((document.querySelector(`input[name="q${i}_gender"]:checked`)||{}).value || '');
         fd.set(`q${i}_name`, name);
         fd.set(`q${i}_imageUrl`, imgUrl);
         fd.set(`q${i}_gender`, g);
         fd.set(`q${i}_type`, t);
+        fd.set(`q${i}_disabled`, disabled ? 'true' : 'false');
       }
       return fd;
     }
@@ -752,6 +769,7 @@
         btn.disabled = false; btn.textContent = '제출';
       }
     });
+
     // 리더보드 모달 동작
     (function(){
       const link = document.querySelector('a[href="3rd_leaderboard.html"]');
