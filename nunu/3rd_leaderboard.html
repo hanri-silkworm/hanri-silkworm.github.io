@@ -289,7 +289,7 @@
         const isDisabled = chip.dataset.disabled === '1';
         const url = isDisabled ? '' : (chip.dataset.qimg || '');
 
-        pill.textContent = isDisabled ? '비활성(제외)' :
+        pill.textContent = isDisabled ? '제외' :
                            (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
         pill.className = `pill ${isDisabled ? 'disabled' : catKey}`;
         text.textContent = dispName;
