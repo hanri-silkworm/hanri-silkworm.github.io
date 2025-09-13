@@ -51,7 +51,6 @@
     .lead{color:var(--sub);margin:8px 0 6px}
     .guides{color:#374151;margin:10px 0 0;padding-left:18px;list-style:disc}
     .guides li{margin:6px 0}
-    /* 강조/컬러링 */
     .tt{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f3f4f6;padding:1px 6px;border-radius:6px}
     .em{font-weight:800;color:var(--accent)}
     .blue{color:var(--ok);font-weight:800}
@@ -98,13 +97,17 @@
     .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* 공개 시 정/오답 강조(글자 + 배경/테두리) */
+    /* 공개 시 정/오답 강조 */
     .chip.open.correct{ background:var(--ok-bg); border-color:var(--ok-bd); box-shadow:0 0 0 2px rgba(37,99,235,.18) inset }
     .chip.open.wrong{   background:var(--bad-bg); border-color:var(--bad-bd); box-shadow:0 0 0 2px rgba(220,38,38,.18) inset }
     .chip.open.correct .t{ color:var(--ok); font-weight:900 }
     .chip.open.wrong   .t{ color:var(--bad); font-weight:900 }
     .chip.open.correct:hover{ box-shadow:0 0 0 2px rgba(37,99,235,.28) inset }
     .chip.open.wrong:hover{   box-shadow:0 0 0 2px rgba(220,38,38,.28) inset }
+
+    /* 비활성 칩(제외) */
+    .chip.disabled{ opacity:.5; background:#f8fafc; border-style:dashed }
+    .chip.disabled .t{ color:#6b7280; font-weight:800 }
 
     /* 범례 칩 크게 */
     .legend .chip{height:28px;min-width:28px;width:auto;padding:0 10px;border-radius:8px}
@@ -127,11 +130,12 @@
     .hovercard .pill{display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; color:#fff}
     .pill.gold{background:var(--gold)} .pill.mimic{background:var(--mimic)}
     .pill.bomb{background:var(--bomb)} .pill.normal{background:var(--normal)}
+    .pill.disabled{background:#9ca3af}
     .hovercard .imgwrap{display:flex; justify-content:center; align-items:center; width:100%; background:#f3f4f6; border-top:1px solid #e5e7eb; padding:8px 0}
     .hovercard .imgwrap img{display:block; width:25%; height:auto; object-fit:contain}
     .hovercard .text{display:inline-block; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
-    /* ── NAV: 모바일에서도 한 줄 유지 ───────────────── */
+    /* NAV: 모바일 한 줄 유지 */
     header.nav .nav-inner{ flex-wrap:nowrap }
     .brand{ min-width:0 }
     .brand strong{ font-size:clamp(14px, 3.6vw, 18px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
@@ -143,7 +147,7 @@
       .btn{ padding:6px 10px; font-size:13px }
     }
 
-    /* ── 반응형: 칩 그리드 압축 ───────────────────── */
+    /* 반응형: 칩 그리드 압축 */
     @media (max-width:1024px){
       .wrap{ padding:16px }
       .answers{ grid-template-columns: repeat(10, minmax(18px,1fr)); gap:4px }
@@ -152,7 +156,7 @@
       .chip{ height:20px } .chip .t{ font-size:12px }
     }
     @media (max-width:560px){
-      .rowno-col, td.rowno{ display:none }                 /* # 숨김 */
+      .rowno-col, td.rowno{ display:none }
       thead th:nth-child(5), tbody td:nth-child(5){ display:none } /* 제출지 숨김(모바일) */
       .wrap{ padding:12px }
       .hero h1{ font-size:22px }
@@ -225,30 +229,43 @@
   </div>
 
   <script>
-    /* ==== 서버 API URL (Apps Script 웹앱의 /exec) ==== */
+    /* ==== 서버 API URL ==== */
     const API_URL = 'https://script.google.com/macros/s/AKfycbzMVS94F7gTyYIlG34bl9cwPzomj5fjQUiL0wUYyO5EA8xz-6gftHRR4Ap-culFTkjXxg/exec';
 
-    /* ===== 임시 토글 =====
-       - 프라이버시 모드: 칩은 항상 '?'
-       - 점수/순위 숨김: 항상 '-' 표시
-       ※ 요청대로 현재는 "완전 비공개" 상태로 둘 다 true
-    */
-    const FORCE_PRIVACY_MODE = true;
-    const FORCE_HIDE_RANK_SCORE = true;
+    /* ==== 공개/표시 토글 ==== */
+    const FORCE_PRIVACY_MODE = true;       // 칩은 '?' 고정
+    const FORCE_HIDE_RANK_SCORE = true;    // 점수/순위 숨김
 
-    /* 모바일 단순화 플래그(칩 생성을 생략하여 가볍게) */
+    /* 모바일 단순화 */
     const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
 
-    /* 보조 */
+    /* 규칙: 카테고리·가중치·비활성 */
+    const DISABLED_1BASED = new Set([17]);   // 17번 문항 비활성(제외)
+    const GOLD_FIXED_1BASED = new Set([16]); // 16번 고치 = 황금고치(강제)
+
     const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
-    function denseRankAndSort(rows){
-      const arr = rows.slice().sort((a,b)=> (b.score??-Infinity) - (a.score??-Infinity));
-      const uniq=[]; arr.forEach(r=>{ if(typeof r.score==='number' && !uniq.includes(r.score)) uniq.push(r.score); });
+
+    function weightByCat(cat, corr){
+      // corr: 1=정답, 0=오답, null/undefined=미채점
+      if (corr==null) return 0;
+      switch(cat){
+        case '일반': return corr ? +1 : 0;
+        case '황금': return corr ? +3 : 0;
+        case '미믹': return corr ? +2 : -2;
+        case '함정': return corr ? -3 : 0;
+        default: return 0;
+      }
+    }
+
+    function denseRankAndSort(rows, scoreKey='_score_eff'){
+      const arr = rows.slice().sort((a,b)=> (b[scoreKey]??-Infinity) - (a[scoreKey]??-Infinity));
+      const uniq=[]; arr.forEach(r=>{ if(typeof r[scoreKey]==='number' && !uniq.includes(r[scoreKey])) uniq.push(r[scoreKey]); });
       const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
-      arr.forEach(r=> r._rank = typeof r.score==='number' ? m.get(r.score) : null);
+      arr.forEach(r=> r._rank = typeof r[scoreKey]==='number' ? m.get(r[scoreKey]) : null);
       return arr;
     }
+
     function formatDisplayName(qno, rawName){
       const name = String(rawName || '').trim();
       return (/^\d{1,2}\.\s*/.test(name)) ? name : `${qno}. ${name}`;
@@ -263,15 +280,18 @@
       const imgwrap = card.querySelector('.imgwrap');
 
       function showCard(x, y, chip){
-        const qno = String(Number(chip.dataset.qindex)+1).padStart(2,'0');
+        const qi0 = Number(chip.dataset.qindex); // 0-based
+        const qno = String(qi0+1).padStart(2,'0');
         const rawName = chip.dataset.qname || '';
         const dispName = formatDisplayName(qno, rawName);
         const catStr = chip.dataset.qcat;
         const catKey = chip.dataset.cat;
-        const url = chip.dataset.qimg;
+        const isDisabled = chip.dataset.disabled === '1';
+        const url = isDisabled ? '' : (chip.dataset.qimg || '');
 
-        pill.textContent = (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
-        pill.className = `pill ${catKey}`;
+        pill.textContent = isDisabled ? '비활성(제외)' :
+                           (catStr==='황금'?'황금고치':catStr==='미믹'?'미믹고치':catStr==='함정'?'함정고치':'일반고치');
+        pill.className = `pill ${isDisabled ? 'disabled' : catKey}`;
         text.textContent = dispName;
         text.title = dispName;
 
@@ -302,11 +322,37 @@
       tableWrap.addEventListener('mouseleave', hideCard);
     }
 
+    /* 점수 재계산(서버가 corr 제공 시) */
+    function recalcScore(row, CATEGORY){
+      const corr = row.corr;
+      if (!Array.isArray(corr) || corr.length !== CATEGORY.length) return null; // 재계산 불가
+      let s = 0;
+      for(let i=0;i<CATEGORY.length;i++){
+        const q1 = i+1;
+        if (DISABLED_1BASED.has(q1)) continue;                 // 17번 제외
+        const cat = CATEGORY[i];
+        s += weightByCat(cat, corr[i]);
+      }
+      return s;
+    }
+
     /* 렌더 */
     function renderBoard(payload){
-      const { open, qnames, qimgs, category, rows } = payload;
-      const CATEGORY = category.map(c=>c);
-      const data = rows ? denseRankAndSort(rows) : [];
+      const { open, qnames, qimgs } = payload;
+
+      // 서버 카테고리를 복사한 뒤, GOLD_FIXED_1BASED에 지정된 문항을 '황금'으로 강제
+      const CATEGORY = (payload.category || []).map(c=>c);
+      GOLD_FIXED_1BASED.forEach(q1=>{
+        if (q1 >= 1 && q1 <= CATEGORY.length) CATEGORY[q1-1] = '황금';
+      });
+
+      // 행 데이터 준비: 점수 재계산(가능 시)하여 _score_eff에 보관
+      const rows = (payload.rows || []).map(r=>{
+        const eff = recalcScore(r, CATEGORY);
+        return { ...r, _score_eff: (eff==null ? r.score : eff) };
+      });
+
+      const data = denseRankAndSort(rows, '_score_eff');
 
       const tbl = document.createElement('table');
 
@@ -333,30 +379,38 @@
         const tdNick = document.createElement('td'); tdNick.className='nick'; tdNick.textContent=row.nickname || '-';
 
         const tdScore= document.createElement('td'); tdScore.className='score';
-        tdScore.textContent = FORCE_HIDE_RANK_SCORE ? '-' : ((typeof row.score==='number')?`${row.score}점`:'—');
+        const scoreToShow = (typeof row._score_eff==='number') ? row._score_eff : (typeof row.score==='number' ? row.score : null);
+        tdScore.textContent = FORCE_HIDE_RANK_SCORE ? '-' : (scoreToShow==null ? '—' : `${scoreToShow}점`);
 
         const tdAns = document.createElement('td');
 
-        /* 모바일에선 칩 자체를 생성하지 않음(순위·닉네임·점수만) */
+        /* 모바일은 칩 생략 */
         if (!IS_MOBILE_SIMPLE) {
           const wrap = document.createElement('div'); wrap.className='answers';
 
           for(let i=0;i<qnames.length;i++){
+            const q1 = i+1;
+            const isDisabled = DISABLED_1BASED.has(q1);
             const chip = document.createElement('span');
-            chip.className = 'chip';
-            chip.dataset.cat   = catToData(CATEGORY[i]); // gold/mimic/bomb/normal
+            chip.className = 'chip' + (isDisabled ? ' disabled' : '');
+            chip.dataset.disabled = isDisabled ? '1' : '0';
+
+            /* 카테고리(16번 황금 강제 반영됨) */
+            const catStr = CATEGORY[i] || '일반';
+            const catKey = catToData(catStr);
+            chip.dataset.cat   = catKey;
             chip.dataset.qindex= i;
             chip.dataset.qname = qnames[i] || `Q${i+1}`;
-            chip.dataset.qcat  = CATEGORY[i];
+            chip.dataset.qcat  = catStr;
             chip.dataset.qimg  = (qimgs && qimgs[i]) ? qimgs[i] : '';
 
             const t = document.createElement('span'); t.className='t';
 
-            // 현재는 비공개 모드(무조건 '?')
-            let label = '?';
+            // 기본 라벨: 비공개 모드면 '?' / 비활성은 '—'
+            let label = isDisabled ? '—' : '?';
 
-            // (공개 시) 일반고치만 F/M 노출 + 정오답 색/배경 표시 로직
-            if (!FORCE_PRIVACY_MODE && open && CATEGORY[i] === '일반' && row.answers) {
+            // 공개 시 표시 로직(정책 유지: 일반만 F/M + 정/오답 강조)
+            if (!FORCE_PRIVACY_MODE && open && !isDisabled && catStr === '일반' && row.answers) {
               const ch = row.answers[i];
               if (ch === 'F' || ch === 'M') label = ch;
               if (row.corr && row.corr[i] != null) {
