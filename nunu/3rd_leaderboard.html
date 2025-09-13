@@ -215,6 +215,38 @@
   .answers{ grid-template-columns: repeat(4, minmax(24px,1fr)); gap:6px; }
   .nick-col{ width:130px; }
 }
+/* ── NAV: 모바일에서도 한 줄 유지 ───────────────── */
+header.nav .nav-inner{ flex-wrap:nowrap; }
+.brand{ min-width:0; }
+.brand strong{
+  font-size:clamp(14px, 3.6vw, 18px);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.nav-actions{ flex-shrink:0; gap:8px; }
+.btn{ white-space:nowrap; }
+
+@media (max-width:560px){
+  .nav-inner{ padding:8px 10px; gap:8px; }
+  .btn{ padding:6px 10px; font-size:13px; }
+}
+
+/* ── 모바일: 점수만 보이기(닉네임 + 점수 유지) ──────
+   1열(#), 2열(순위), 5열(제출지) 숨김  */
+@media (max-width:560px){
+  .rowno-col, td.rowno{ display:none; }
+  thead th:nth-child(2), tbody td:nth-child(2){ display:none; } /* 순위 */
+  thead th:nth-child(5), tbody td:nth-child(5){ display:none; } /* 제출지 */
+
+  /* 테이블 간격/정렬 보정 */
+  .nick-col{ width:auto; }
+  .score-col{ width:84px; }
+  td.score{ text-align:right; }
+}
+
+/* 아주 작은 폰에서 버튼·여백 더 촘촘히 */
+@media (max-width:380px){
+  .btn{ padding:5px 8px; font-size:12.5px; }
+}
 
   </style>
 </head>
