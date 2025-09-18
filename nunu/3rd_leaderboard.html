@@ -197,15 +197,10 @@
           지금은 <span class="em">비공개 모드</span>라 제출된 문항은 전부 <span class="tt">?</span> 한 글자로만 표시가 됩니다.
         </p>
         <ul class="guides">
-          <li><span class="em">일반고치</span>가 우화되는 순간 참여를 마무리하고 모든 제출지가 <span class="em">오픈</span>됩니다.</li>
-          <li>제출지에는 <span class="em">암/수</span>로 표기가 되며, <span class="blue">파랑(정답)</span> · <span class="red">빨강(오답)</span>으로 구분합니다.</li>
-          <li>제출지에 <span class="em">마우스를 올리면</span> 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
-          <li><span class="em">1·2·3위</span>만 🥇/🥈/🥉 이모지, 그 외는 <span class="note">n등</span> 으로 표시 됩니다.</li>
-          <li>동점자는 <span class="em">동일 순위</span>이며, 다음 순위는 <span class="em">연속</span>으로 이어집니다.</li>
-          <li class="note">
-            📱 <b>모바일</b>에서는 <b>순위·점수만</b> 확인할 수 있어요. 💻 <b>PC/태블릿</b>에서는 각 제출지의 <b>답(F/M)</b>과
-            칩에 마우스를 올리면 <b>누에 나방 사진</b>도 볼 수 있습니다.
-          </li>
+          <li><span class="em">특수고치(3·5·8·10·13·16·20)</span>는 항상 <b>?</b>로 표시되고 <b>점수 미반영</b>입니다.</li>
+          <li>그 외 고치는 답이 기록되면 바로 <b>F/M 표시</b>되고, 정답키가 있는 항목은 <b>점수/색상</b> 반영됩니다.</li>
+          <li><span class="em">1·2·3위</span>만 🥇/🥈/🥉 이모지, 동점은 같은 순위로 표기합니다.</li>
+          <li class="note">모바일에서는 순위·점수만, PC/태블릿에서는 칩과 호버 이미지를 볼 수 있습니다.</li>
         </ul>
       </div>
     </div>
@@ -236,7 +231,7 @@
           </span>
         </div>
         <p class="legend-note">
-          ※ 17번 고치는 성별 확인이 불가하여 <b>제외</b>되었고, 추첨을 통해 <b>16번 고치가 황금고치</b>로 변경되었습니다.
+          ※ 17번 고치는 성별 확인이 불가하여 <b>제외</b>되었고, 추첨으로 <b>16번 고치가 황금</b>입니다.
         </p>
 
         <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">데이터 로딩 중…</div></div>
@@ -251,72 +246,29 @@
   </div>
 
   <script>
-    /* ====== 클라이언트 제어(토글) ====== */
-    const UI = {
-      FORCE_PRIVACY_MODE: false,      // true면 무조건 칩에 '?'만 표시
-      FORCE_HIDE_RANK_SCORE: false,   // true면 순위/점수 칼럼 모두 '-'
-      SPECIALS_VISIBLE: true,         // 공개 시 특수고치(F/M)도 노출
-      SPECIALS_SCORING: true,         // 점수 계산에 특수고치 반영
-      OPEN_MODE: 'normal_any',        // 'always_open' | 'always_closed' | 'normal_any' | 'normal_all'
-    };
-
-    /* 서버 API URL */
+    /* ====== 상수/규칙 ====== */
     const API_URL = 'https://script.google.com/macros/s/AKfycbxIR59WstV5BOCrCyN-jgTQkkLKhrWX3bhuz3Pru95JidMYdC2WCxwwCQ9F-ERxhb84tA/exec';
 
-    /* 모바일 단순화 */
-    const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
+    /* 특수고치: 항상 '?' + 점수 미반영 */
+    const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
 
-    /* 규칙: 강제 제외/강제 황금 */
-    const DISABLED_1BASED = new Set([17]);   // 17번 문항 제외
-    const GOLD_FIXED_1BASED = new Set([16]); // 16번 = 황금
+    /* 제외 문항(표시/점수 모두 제외) */
+    const DISABLED_1BASED = new Set([17]);
 
-    /* 호스트 제외용 닉네임 */
+    /* 호스트 닉네임: 순위 산정 제외(점수 표기는 함) */
     const HOST_NICKS = new Set(['누에집사','호스트']);
 
-    /* 카테고리 유틸 */
+    /* 반응형 단순화 */
+    const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
+
+    /* 카테고리 보조 */
     const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
-    function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
-
-    /* 점수 가중치 */
-    function weightByCat(cat, corr){
-      if (corr==null) return 0;
-      switch(cat){
-        case '일반': return corr ? +1 : 0;
-        case '황금': return corr ? +3 : 0;
-        case '미믹': return corr ? +2 : -2;
-        case '함정': return corr ? -3 : 0;
-        default: return 0;
-      }
-    }
-
-    /* 오픈 규칙 */
-    function computeOpen(keyArr, CATEGORY){
-      if (UI.OPEN_MODE === 'always_open') return true;
-      if (UI.OPEN_MODE === 'always_closed') return false;
-      const normalIdxs = CATEGORY.map((c,i)=>({c,i})).filter(o=>o.c==='일반').map(o=>o.i);
-      const isFM = (v)=> v==='F'||v==='M';
-      const hasAnyNormalKey = normalIdxs.some(i=> isFM(keyArr[i]));
-      const allNormalKey    = normalIdxs.every(i=> isFM(keyArr[i]));
-      return (UI.OPEN_MODE === 'normal_all') ? allNormalKey : hasAnyNormalKey;
-    }
-
-    /* 정규화 */
     const isFM = v => v === 'F' || v === 'M';
-    function toFM(ch) {
-      if (!ch) return '?';
-      const c = String(ch).trim().toUpperCase();
-      if (c === 'A') return 'F';
-      if (c === 'S') return 'M';
-      if (c === 'F' || c === 'M') return c;
-      return '?';
-    }
+    function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
+    function toFM(ch){ const c=String(ch||'').trim().toUpperCase(); if(c==='A') return 'F'; if(c==='S') return 'M'; if(c==='F'||c==='M') return c; return '?'; }
+    function formatDisplayName(qno, rawName){ const name=String(rawName||'').trim(); return (/^\d{1,2}\.\s*/.test(name))?name:`${qno}. ${name}`; }
 
-    function formatDisplayName(qno, rawName){
-      const name = String(rawName || '').trim();
-      return (/^\d{1,2}\.\s*/.test(name)) ? name : `${qno}. ${name}`;
-    }
-
-    /* 호버카드 */
+    /* === Hovercard === */
     function attachHovercard(){
       const card = document.getElementById('hovercard');
       const img = card.querySelector('img');
@@ -325,7 +277,7 @@
       const imgwrap = card.querySelector('.imgwrap');
 
       function showCard(x, y, chip){
-        const qi0 = Number(chip.dataset.qindex); // 0-based
+        const qi0 = Number(chip.dataset.qindex);
         const qno = String(qi0+1).padStart(2,'0');
         const rawName = chip.dataset.qname || '';
         const dispName = formatDisplayName(qno, rawName);
@@ -340,7 +292,8 @@
         text.textContent = dispName;
         text.title = dispName;
 
-        if(url){ img.src = url; img.alt = dispName; imgwrap.style.display='flex'; }
+        // 이미지는 일반 문항만 보여줌(특수/제외는 숨김)
+        if(url && !SPECIALS_1BASED.has(qi0+1) && !isDisabled){ img.src = url; img.alt = dispName; imgwrap.style.display='flex'; }
         else { img.removeAttribute('src'); img.alt=''; imgwrap.style.display='none'; }
 
         const pad=14, vw=Math.max(document.documentElement.clientWidth, window.innerWidth||0), vh=Math.max(document.documentElement.clientHeight, window.innerHeight||0);
@@ -367,69 +320,61 @@
       tableWrap.addEventListener('mouseleave', hideCard);
     }
 
-    /* 점수/정오답 계산(전부 프론트에서) */
-    function computeScoreAndCorr(rowAnswersStr, keyArr, CATEGORY){
-      const N = CATEGORY.length;
-      const ans = Array.from({length:N}, (_,i)=> toFM(rowAnswersStr?.[i]));
+    /* === 점수/정오답 계산 ===
+       - 특수고치: 항상 '?' / 점수 미반영 / 색칠 없음
+       - 일반고치: 참가자 답이 F/M이면 즉시 표시,
+                   정답키가 F/M일 때만 +1/0 점수 및 색칠 */
+    function computeScoreAndCorr(rowAnswersStr, keyArr, totalQ){
+      const ans = Array.from({length:totalQ}, (_,i)=> toFM(rowAnswersStr?.[i]));
       let score = 0;
-      const corr = Array(N).fill(null);
+      const corr = Array(totalQ).fill(null);
 
-      for(let i=0;i<N;i++){
-        const q1=i+1;
+      for(let i=0;i<totalQ;i++){
+        const q1 = i+1;
         if (DISABLED_1BASED.has(q1)) continue;
-
-        // 강제 황금 반영
-        const cat0 = CATEGORY[i];
-        const cat  = GOLD_FIXED_1BASED.has(q1) ? '황금' : cat0;
-
-        const specials = (cat !== '일반');
+        if (SPECIALS_1BASED.has(q1)) { // 특수고치는 완전 배제
+          corr[i] = null;
+          continue;
+        }
         const a = ans[i], k = keyArr[i];
-        const isCorr = (isFM(a) && isFM(k)) ? (a===k) : null;
-
-        // 점수 집계
-        const scoringThis = specials ? !!UI.SPECIALS_SCORING : true;
-        if (scoringThis && isCorr!=null) score += weightByCat(cat, isCorr);
-
-        // 정오답 칠하기(오픈 + 특수노출 설정)
-        const open = computeOpen(keyArr, CATEGORY);
-        const visibleHere = (!specials) || (specials && UI.SPECIALS_VISIBLE);
-        corr[i] = (UI.FORCE_PRIVACY_MODE || !open || !visibleHere || isCorr==null) ? null : (isCorr?1:0);
+        if (isFM(k) && isFM(a)) {
+          const ok = (a===k);
+          corr[i] = ok ? 1 : 0;   // 색칠 허용
+          score += ok ? 1 : 0;    // 일반고치 +1/0
+        } else {
+          // 아직 키가 없거나 참가자 답이 없음 → 표시만 하고 색칠/점수는 미반영
+          corr[i] = null;
+        }
       }
       return { score, corr, ans };
     }
 
-    /* 순위 계산(호스트 제외) */
+    /* === 순위 계산(호스트 제외) === */
     function denseRankExcludingHosts(rows){
-      // rows: [{nickname, _score_eff}]
       const nonHost = rows.filter(r=> !HOST_NICKS.has((r.nickname||'').trim()));
       const sorted = nonHost.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
       const uniq=[]; sorted.forEach(r=>{ const v=r._score_eff; if(typeof v==='number' && !uniq.includes(v)) uniq.push(v); });
-      const m = new Map(uniq.map((sc,i)=>[sc,i+1])); // score -> dense rank
-      const rankMap = new Map(sorted.map(r=> [r.nickname, m.get(r._score_eff)])); // nickname -> rank
+      const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
+      const rankMap = new Map(sorted.map(r=> [r.nickname, m.get(r._score_eff)]));
       rows.forEach(r=>{
         const nick = (r.nickname||'').trim();
         r._rank = HOST_NICKS.has(nick) ? null : rankMap.get(nick) ?? null;
       });
-      // 화면 표시는 점수 기준 전체 정렬
       return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
     }
 
     function renderBoard(payload){
-      const { qnames, qimgs, category:categoryRaw, key:keyRaw, rows:rawRows } = payload;
-
-      // 카테고리 복사 + 강제 황금(16번) 프론트 반영
-      const CATEGORY = (categoryRaw || []).map(c=>c);
-
-      // key: 배열(F/M/?)
+      const { qnames, qimgs, category, key:keyRaw, rows:rawRows } = payload;
+      const totalQ = qnames.length;
       const keyArr = (keyRaw || []).map(toFM);
 
-      // 각 참가자 점수/정오답 프론트 계산
+      // 각 참가자 점수/정오답 계산
       const rows = (rawRows || []).map(r=>{
-        const { score, corr, ans } = computeScoreAndCorr(r.answers || '', keyArr, CATEGORY);
+        const { score, corr, ans } = computeScoreAndCorr(r.answers || '', keyArr, totalQ);
         return { ...r, _score_eff: score, _corr: corr, _ansArr: ans };
       });
 
-      // 순위(호스트 제외) 계산 후 점수 내림차순 정렬로 표시
+      // 순위(호스트 제외) 계산 → 점수순 재정렬
       const data = denseRankExcludingHosts(rows);
 
       // 테이블 구성
@@ -454,7 +399,7 @@
 
         const tdRank = document.createElement('td'); tdRank.className='rank';
         const rankText = (typeof row._rank==='number')? medalRank(row._rank) : '—';
-        tdRank.textContent = UI.FORCE_HIDE_RANK_SCORE ? '-' : rankText;
+        tdRank.textContent = rankText;
 
         const tdNick = document.createElement('td'); tdNick.className='nick';
         const nick = row.nickname || '-';
@@ -466,7 +411,7 @@
 
         const tdScore= document.createElement('td'); tdScore.className='score';
         const scoreToShow = (typeof row._score_eff==='number') ? row._score_eff : null;
-        tdScore.textContent = UI.FORCE_HIDE_RANK_SCORE ? '-' : (scoreToShow==null ? '—' : `${scoreToShow}점`);
+        tdScore.textContent = (scoreToShow==null ? '—' : `${scoreToShow}점`);
 
         const tdAns = document.createElement('td');
 
@@ -476,14 +421,14 @@
           for(let i=0;i<qnames.length;i++){
             const q1 = i+1;
             const isDisabled = DISABLED_1BASED.has(q1);
+            const isSpecial  = SPECIALS_1BASED.has(q1);
+
             const chip = document.createElement('span');
             chip.className = 'chip' + (isDisabled ? ' disabled' : '');
             chip.dataset.disabled = isDisabled ? '1' : '0';
 
-            const catStr0 = CATEGORY[i] || '일반';
-            const catStr  = GOLD_FIXED_1BASED.has(q1) ? '황금' : catStr0;
-            const catKey  = catToData(catStr);
-
+            const catStr = category?.[i] || '일반';
+            const catKey = catToData(catStr);
             chip.dataset.cat   = catKey;
             chip.dataset.qindex= i;
             chip.dataset.qname = qnames[i] || `Q${i+1}`;
@@ -492,17 +437,19 @@
 
             const t = document.createElement('span'); t.className='t';
 
-            // 기본 라벨: 비공개 모드면 '?' / 비활성은 '—'
+            // 기본 라벨
             let label = isDisabled ? '—' : '?';
 
-            // 공개 시 표시 로직(일반은 항상, 특수는 SPECIALS_VISIBLE일 때 F/M 표시)
-            const open = computeOpen(keyArr, CATEGORY);
-            if (!UI.FORCE_PRIVACY_MODE && open && !isDisabled) {
-              const isSpecial = (catStr!=='일반');
-              const showAnswer = (!isSpecial) || (isSpecial && UI.SPECIALS_VISIBLE);
-              if (showAnswer) {
+            if(!isDisabled){
+              if (isSpecial) {
+                // 특수고치: 항상 '?', 색칠 없음
+                label = '?';
+              } else {
+                // 일반고치: 참가자 답이 F/M이면 즉시 표시
                 const ch = row._ansArr?.[i];
-                if (ch === 'F' || ch === 'M') label = ch;
+                if (ch==='F' || ch==='M') label = ch;
+
+                // 정답키가 있을 때만 색칠
                 const cflag = row._corr?.[i];
                 if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
               }
