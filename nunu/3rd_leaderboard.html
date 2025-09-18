@@ -82,7 +82,7 @@
     .nick{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .score{font-weight:800;white-space:nowrap}
 
-    /* HOST 뱃지(등수칸 전용) */
+    /* HOST 뱃지(순위칸) */
     .host-pill{display:inline-flex;align-items:center;padding:0 8px;height:18px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:12px;font-weight:800}
 
     /* 칩 */
@@ -247,11 +247,11 @@
     /* ====== 상수/규칙 ====== */
     const API_URL = 'https://script.google.com/macros/s/AKfycbxIR59WstV5BOCrCyN-jgTQkkLKhrWX3bhuz3Pru95JidMYdC2WCxwwCQ9F-ERxhb84tA/exec';
 
-    /* 특수고치 고정 세트 (표시 '?' 고정, 색칠 없음) */
+    /* 특수고치(표시는 항상 '?') */
     const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
 
-    /* 특수고치 점수 반영 토글 — 이 한 줄만 바꾸면 ON/OFF */
-    const ENABLE_SPECIALS_SCORING = true; // ← true 로 바꾸면 특수고치 점수 반영
+    /* 특수고치 점수 반영 토글 — 한 줄로 ON/OFF */
+    const ENABLE_SPECIALS_SCORING = false; // ← true 로 바꾸면 특수고치 점수 반영
 
     /* 가중치 (원하면 변경 가능) */
     const WEIGHT = {
@@ -265,7 +265,7 @@
     /* 제외 문항(표시/점수 모두 제외) */
     const DISABLED_1BASED = new Set([17]);
 
-    /* HOST 별칭 & 판정 (등수 제외 + 등수칸 HOST 뱃지) */
+    /* HOST 별칭 & 판정 (등수 제외 + 순위칸 HOST 뱃지) */
     const HOST_ALIASES = ['누에집사 (한리)', '누에집사', '호스트'];
     const normNick = s => String(s||'').replace(/\s+/g,' ').trim();
     const isHost   = s => HOST_ALIASES.some(a => normNick(s) === normNick(a));
@@ -304,8 +304,8 @@
         text.textContent = dispName;
         text.title = dispName;
 
-        // 이미지는 일반 문항만 표시(특수/제외는 숨김)
-        if(url && !SPECIALS_1BASED.has(qi0+1) && !isDisabled){
+        // ⬇️ 이미지: 일반/특수 모두 표시(제외만 숨김)
+        if(url && !isDisabled){
           img.src = url; img.alt = dispName; imgwrap.style.display='flex';
         } else {
           img.removeAttribute('src'); img.alt=''; imgwrap.style.display='none';
@@ -351,7 +351,7 @@
           const c = row.corr[i];
 
           if (specials.has(q1)) {
-            // 특수고치: 표시는 항상 '?', 색칠 없음. 점수는 토글에 따라 반영
+            // 특수고치: 표시는 항상 '?', 색칠 없음. ⬇️ 점수는 토글에 따라 반영
             if (ENABLE_SPECIALS_SCORING) {
               if (c === 1) score += getWeight(cat, true);
               else if (c === 0) score += getWeight(cat, false);
@@ -447,16 +447,13 @@
 
       const tbody = document.createElement('tbody');
 
-      data.forEach((row, rowIndex)=>{
+      data.forEach((row)=>{
         const tr = document.createElement('tr');
 
-        // # (실제 등수 표시; HOST는 —)
+        // # (실제 등수; HOST는 —)
         const tdNo = document.createElement('td'); tdNo.className='rowno';
-        if (isHost(row.nickname)) {
-          tdNo.textContent = '—';
-        } else {
-          tdNo.textContent = (typeof row._rank==='number') ? (row._rank + '.') : '—';
-        }
+        if (isHost(row.nickname)) tdNo.textContent = '—';
+        else tdNo.textContent = (typeof row._rank==='number') ? (row._rank + '.') : '—';
 
         // 순위(호스트면 HOST 뱃지)
         const tdRank = document.createElement('td'); tdRank.className='rank';
@@ -492,7 +489,7 @@
             chip.className = 'chip' + (isDisabled ? ' disabled' : '');
             chip.dataset.disabled = isDisabled ? '1' : '0';
 
-            const catStr = isSpecial ? (category?.[i] || '황금') : (category?.[i] || '일반');
+            const catStr = category?.[i] || (isSpecial ? '황금' : '일반'); // 카테고리 문자열
             const catKey = catToData(catStr);
             chip.dataset.cat   = catKey;
             chip.dataset.qindex= i;
@@ -502,18 +499,19 @@
 
             const t = document.createElement('span'); t.className='t';
 
+            // 기본 라벨
             let label = isDisabled ? '—' : '?';
 
             if(!isDisabled){
               if (isSpecial) {
-                // 특수고치: 항상 '?', 색칠 없음
+                // 특수고치: 항상 '?' 유지, 색칠 없음
                 label = '?';
               } else {
                 // 일반고치: 답 기록되면 즉시 F/M 표시
                 const ch = row._ansArr?.[i];
                 if (ch==='F' || ch==='M') label = ch;
 
-                // 정/오답 색칠 (corr가 있거나 key로 산출된 경우만)
+                // 정/오답 색칠 (corr가 있을 때만)
                 const cflag = row._corr?.[i];
                 if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
               }
