@@ -14,15 +14,11 @@
 
       --chip-bg:#f3f4f6; --chip-bd:#e5e7eb; --chip-tx:#374151;
 
-      --ok:#2563eb;
-      --bad:#dc2626;
-      --ok-bg:#dbeafe;
-      --ok-bd:#93c5fd;
-      --bad-bg:#fee2e2;
-      --bad-bd:#fca5a5;
+      --ok:#2563eb; --bad:#dc2626;
+      --ok-bg:#dbeafe; --ok-bd:#93c5fd;
+      --bad-bg:#fee2e2; --bad-bd:#fca5a5;
 
-      --accent:#111827;
-      --highlight:#fef3c7;
+      --accent:#111827; --highlight:#fef3c7;
     }
 
     *{box-sizing:border-box}
@@ -86,7 +82,7 @@
     .nick{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .score{font-weight:800;white-space:nowrap}
 
-    /* HOST 뱃지(등수칸에서만 사용) */
+    /* HOST 뱃지(등수칸 전용) */
     .host-pill{display:inline-flex;align-items:center;padding:0 8px;height:18px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:12px;font-weight:800}
 
     /* 칩 */
@@ -163,7 +159,7 @@
     }
     @media (max-width:560px){
       .rowno-col, td.rowno{ display:none }
-      thead th:nth-child(5), tbody td:nth-child(5){ display:none }
+      thead th:nth-child(5), tbody td:nth-child(5){ display:none } /* 제출지 숨김(모바일) */
       .wrap{ padding:12px }
       .hero h1{ font-size:22px }
       .guides{ margin-top:8px }
@@ -251,8 +247,20 @@
     /* ====== 상수/규칙 ====== */
     const API_URL = 'https://script.google.com/macros/s/AKfycbxIR59WstV5BOCrCyN-jgTQkkLKhrWX3bhuz3Pru95JidMYdC2WCxwwCQ9F-ERxhb84tA/exec';
 
-    /* 특수고치: 항상 '?' + 점수 미반영 */
+    /* 특수고치 고정 세트 (표시 '?' 고정, 색칠 없음) */
     const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
+
+    /* 특수고치 점수 반영 토글 — 이 한 줄만 바꾸면 ON/OFF */
+    const ENABLE_SPECIALS_SCORING = false; // ← true 로 바꾸면 특수고치 점수 반영
+
+    /* 가중치 (원하면 변경 가능) */
+    const WEIGHT = {
+      '일반': { correct: +1, wrong: 0 },
+      '황금': { correct: +3, wrong: 0 },
+      '미믹': { correct: +2, wrong: -2 },
+      '함정': { correct: -3, wrong: 0 }
+    };
+    const getWeight = (cat, ok) => (WEIGHT[cat] || WEIGHT['일반'])[ok ? 'correct' : 'wrong'];
 
     /* 제외 문항(표시/점수 모두 제외) */
     const DISABLED_1BASED = new Set([17]);
@@ -265,7 +273,7 @@
     /* 반응형 단순화 */
     const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
 
-    /* 카테고리 보조 */
+    /* 보조 */
     const catToData = (cat) => cat==='황금'?'gold':cat==='미믹'?'mimic':cat==='함정'?'bomb':'normal';
     const isFM = v => v === 'F' || v === 'M';
     function medalRank(n){ if(n===1) return '🥇 1등'; if(n===2) return '🥈 2등'; if(n===3) return '🥉 3등'; return n+'등'; }
@@ -327,33 +335,75 @@
       tableWrap.addEventListener('mouseleave', hideCard);
     }
 
-    /* === 점수/정오답 계산 ===
-       - 특수고치: 항상 '?' / 점수 미반영 / 색칠 없음
-       - 일반고치: 참가자 답이 F/M이면 즉시 표시, 키가 있을 때만 +1/0 및 색칠 */
-    function computeScoreAndCorr(rowAnswersStr, keyArr, totalQ){
-      const ans = Array.from({length:totalQ}, (_,i)=> toFM(rowAnswersStr?.[i]));
+    /* === 채점/색칠/점수 계산 (corr 우선, 없으면 key, 둘 다 없으면 score fallback) === */
+    function computeRowMetrics(row, qCount, specials, disabled, keyArr, category) {
+      const ansArr = Array.from({length:qCount}, (_,i)=> toFM(row.answers?.[i]));
+      const outCorr = Array(qCount).fill(null);
       let score = 0;
-      const corr = Array(totalQ).fill(null);
 
-      for(let i=0;i<totalQ;i++){
-        const q1 = i+1;
-        if (DISABLED_1BASED.has(q1)) continue;
-        if (SPECIALS_1BASED.has(q1)) { corr[i] = null; continue; }
+      // case 1: 서버 corr 사용
+      if (Array.isArray(row.corr) && row.corr.length === qCount) {
+        for (let i=0;i<qCount;i++){
+          const q1=i+1;
+          if (disabled.has(q1)) continue;
 
-        const a = ans[i], k = keyArr[i];
-        if (isFM(k) && isFM(a)) {
-          const ok = (a===k);
-          corr[i] = ok ? 1 : 0;
-          score += ok ? 1 : 0;
-        } else {
-          corr[i] = null;
+          const cat = category?.[i] || '일반';
+          const c = row.corr[i];
+
+          if (specials.has(q1)) {
+            // 특수고치: 표시는 항상 '?', 색칠 없음. 점수는 토글에 따라 반영
+            if (ENABLE_SPECIALS_SCORING) {
+              if (c === 1) score += getWeight(cat, true);
+              else if (c === 0) score += getWeight(cat, false);
+            }
+            outCorr[i]=null;
+            continue;
+          }
+
+          // 일반고치: 색칠 & 점수 반영(일반 가중치)
+          if (c===1) { score += getWeight('일반', true); outCorr[i]=1; }
+          else if (c===0) { score += getWeight('일반', false); outCorr[i]=0; }
+          else { outCorr[i]=null; }
         }
+        return { ansArr, corr: outCorr, score };
       }
-      return { score, corr, ans };
+
+      // case 2: key 사용
+      if (Array.isArray(keyArr) && keyArr.length === qCount) {
+        for (let i=0;i<qCount;i++){
+          const q1=i+1;
+          if (disabled.has(q1)) continue;
+
+          const cat = category?.[i] || '일반';
+          const a = ansArr[i], k = keyArr[i];
+
+          if (specials.has(q1)) {
+            if (ENABLE_SPECIALS_SCORING && isFM(a) && isFM(k)) {
+              const ok = (a===k);
+              score += getWeight(cat, ok);
+            }
+            outCorr[i]=null;
+            continue;
+          }
+
+          if (isFM(a) && isFM(k)) {
+            const ok = (a===k);
+            score += getWeight('일반', ok);
+            outCorr[i] = ok ? 1 : 0;
+          } else {
+            outCorr[i]=null;
+          }
+        }
+        return { ansArr, corr: outCorr, score };
+      }
+
+      // case 3: 둘 다 없음 → 서버 score fallback
+      const scoreFallback = (typeof row.score==='number') ? row.score : 0;
+      return { ansArr, corr: outCorr, score: scoreFallback };
     }
 
     /* === 순위 계산(호스트 제외) === */
-    function denseRankExcludingHosts(rows){
+    function rankExcludingHosts(rows){
       const nonHost = rows.filter(r=> !isHost(r.nickname));
       const sorted = nonHost.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
       const uniq=[]; sorted.forEach(r=>{ const v=r._score_eff; if(typeof v==='number' && !uniq.includes(v)) uniq.push(v); });
@@ -364,21 +414,25 @@
         r._rank = isHost(r.nickname) ? null : (rankMap.get(r.nickname) ?? null);
       });
 
+      // 화면은 점수 내림차순으로 정렬
       return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
     }
 
     function renderBoard(payload){
-      const { qnames, qimgs, category, key:keyRaw, rows:rawRows } = payload;
-      const totalQ = qnames.length;
-      const keyArr = (keyRaw || []).map(toFM);
+      const { qnames=[], qimgs=[], category=[], key, rows:rawRows=[] } = payload;
+      const qCount = qnames.length || (rawRows[0]?.answers?.length ?? 0);
+      const keyArr = Array.isArray(key) ? key.map(toFM) : null;
 
-      const rows = (rawRows || []).map(r=>{
-        const { score, corr, ans } = computeScoreAndCorr(r.answers || '', keyArr, totalQ);
-        return { ...r, _score_eff: score, _corr: corr, _ansArr: ans };
+      // 참가자별 메트릭 계산
+      const rows = rawRows.map(r=>{
+        const { ansArr, corr, score } = computeRowMetrics(r, qCount, SPECIALS_1BASED, DISABLED_1BASED, keyArr, category);
+        return { ...r, _ansArr: ansArr, _corr: corr, _score_eff: score };
       });
 
-      const data = denseRankExcludingHosts(rows);
+      // 순위 계산(호스트 제외) 후 점수순 정렬
+      const data = rankExcludingHosts(rows);
 
+      // 테이블 구성
       const tbl = document.createElement('table');
       const thead = document.createElement('thead');
       thead.innerHTML = `
@@ -396,26 +450,28 @@
       data.forEach((row, rowIndex)=>{
         const tr = document.createElement('tr');
 
-        // #
-        const tdNo = document.createElement('td'); tdNo.className='rowno'; tdNo.textContent=(rowIndex+1)+'.';
+        // # (실제 등수 표시; HOST는 —)
+        const tdNo = document.createElement('td'); tdNo.className='rowno';
+        if (isHost(row.nickname)) {
+          tdNo.textContent = '—';
+        } else {
+          tdNo.textContent = (typeof row._rank==='number') ? (row._rank + '.') : '—';
+        }
 
-        // 순위 (HOST→ 뱃지)
+        // 순위(호스트면 HOST 뱃지)
         const tdRank = document.createElement('td'); tdRank.className='rank';
-        const nick = row.nickname || '-';
-        if (isHost(nick)) {
+        if (isHost(row.nickname)) {
           const hostBadge = document.createElement('span');
           hostBadge.className = 'host-pill';
           hostBadge.textContent = 'HOST';
-          tdRank.textContent = '';
           tdRank.appendChild(hostBadge);
         } else {
-          const rankText = (typeof row._rank==='number')? medalRank(row._rank) : '—';
-          tdRank.textContent = rankText;
+          tdRank.textContent = (typeof row._rank==='number')? medalRank(row._rank) : '—';
         }
 
         // 닉네임
         const tdNick = document.createElement('td'); tdNick.className='nick';
-        tdNick.textContent = nick;
+        tdNick.textContent = row.nickname || '-';
 
         // 점수
         const tdScore= document.createElement('td'); tdScore.className='score';
@@ -427,7 +483,7 @@
         if (!IS_MOBILE_SIMPLE) {
           const wrap = document.createElement('div'); wrap.className='answers';
 
-          for(let i=0;i<qnames.length;i++){
+          for(let i=0;i<qCount;i++){
             const q1 = i+1;
             const isDisabled = DISABLED_1BASED.has(q1);
             const isSpecial  = SPECIALS_1BASED.has(q1);
@@ -436,7 +492,7 @@
             chip.className = 'chip' + (isDisabled ? ' disabled' : '');
             chip.dataset.disabled = isDisabled ? '1' : '0';
 
-            const catStr = category?.[i] || '일반';
+            const catStr = isSpecial ? (category?.[i] || '황금') : (category?.[i] || '일반');
             const catKey = catToData(catStr);
             chip.dataset.cat   = catKey;
             chip.dataset.qindex= i;
@@ -450,11 +506,14 @@
 
             if(!isDisabled){
               if (isSpecial) {
-                label = '?'; // 특수고치: 항상 ?
+                // 특수고치: 항상 '?', 색칠 없음
+                label = '?';
               } else {
+                // 일반고치: 답 기록되면 즉시 F/M 표시
                 const ch = row._ansArr?.[i];
                 if (ch==='F' || ch==='M') label = ch;
 
+                // 정/오답 색칠 (corr가 있거나 key로 산출된 경우만)
                 const cflag = row._corr?.[i];
                 if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
               }
@@ -485,14 +544,16 @@
     fetch(API_URL, { cache:'no-store' })
       .then(r => r.json())
       .then(json => {
-        if(!json.ok) throw new Error(json.error || '서버 오류');
+        if(!json || json.ok === false){
+          throw new Error(json?.error || '응답 형식 오류');
+        }
         renderBoard(json);
       })
       .catch(err => {
         console.error(err);
         const host = document.getElementById('tableWrap');
         host.innerHTML =
-          '<div style="padding:14px;color:#b91c1c">데이터를 불러오지 못했습니다. 웹앱 URL(API_URL)과 접근 권한을 확인하세요.</div>';
+          '<div style="padding:14px;color:#b91c1c">데이터를 불러오지 못했습니다. 웹앱 URL과 응답 형식을 확인하세요.</div>';
       });
 
     /* 억제용 보안(완전 차단 불가) */
