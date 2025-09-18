@@ -87,7 +87,7 @@
     .score{font-weight:800;white-space:nowrap}
 
     /* HOST 뱃지 */
-    .host-pill{margin-left:8px;display:inline-flex;align-items:center;padding:0 8px;height:18px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:12px;font-weight:800}
+    .host-pill{margin-left:0;display:inline-flex;align-items:center;padding:0 8px;height:18px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:12px;font-weight:800}
 
     /* 칩 */
     .answers{display:grid;grid-template-columns:repeat(20, minmax(18px,1fr));gap:3px;align-items:center;width:100%}
@@ -125,6 +125,8 @@
     .legend .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
     /* 호버카드 */
+    <style>
+    </style>
     .hovercard{
       position:fixed; z-index:1000; pointer-events:none; opacity:0; transform:translateY(6px);
       transition:opacity .12s ease, transform .12s ease;
@@ -188,7 +190,25 @@
     </div>
   </header>
 
-<!-- HERO --> <main class="wrap"> <div class="hero"> <div class="hero-inner"> <h1>🐛제 3회 리더보드</h1> <p class="lead"> 지금은 <span class="em">비공개 모드</span>라 제출된 문항은 전부 <span class="tt">?</span> 한 글자로만 표시가 됩니다. </p> <ul class="guides"> <li><span class="em">일반고치</span>가 우화되는 순간 참여를 마무리하고 모든 제출지가 <span class="em">오픈</span>됩니다.</li> <li>제출지에는 <span class="em">암/수</span>로 표기가 되며, <span class="blue">파랑(정답)</span> · <span class="red">빨강(오답)</span>으로 구분합니다.</li> <li>제출지에 <span class="em">마우스를 올리면</span> 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li> <li><span class="em">1·2·3위</span>만 🥇/🥈/🥉 이모지, 그 외는 <span class="note">n등</span> 으로 표시 됩니다.</li> <li>동점자는 <span class="em">동일 순위</span>이며, 다음 순위는 <span class="em">연속</span>으로 이어집니다.</li> <li class="note"> 📱 <b>모바일</b>에서는 <b>순위·점수만</b> 확인할 수 있어요. 💻 <b>PC/태블릿</b>에서는 각 제출지의 <b>답(F/M)</b>과 칩에 마우스를 올리면 <b>누에 나방 사진</b>도 볼 수 있습니다. </li> </ul> </div> </div> </main>
+  <!-- HERO -->
+  <main class="wrap">
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>🐛제 3회 리더보드</h1>
+        <p class="lead">
+          지금은 <span class="em">비공개 모드</span>라 제출된 문항은 전부 <span class="tt">?</span> 한 글자로만 표시가 됩니다.
+        </p>
+        <ul class="guides">
+          <li><span class="em">일반고치</span>가 우화되는 순간 참여를 마무리하고 모든 제출지가 <span class="em">오픈</span>됩니다.</li>
+          <li>제출지에는 <span class="em">암/수</span>로 표기가 되며, <span class="blue">파랑(정답)</span> · <span class="red">빨강(오답)</span>으로 구분합니다.</li>
+          <li>제출지에 <span class="em">마우스를 올리면</span> 누에의 이름과 누에 나방사진을 확인할 수 있습니다.</li>
+          <li><span class="em">1·2·3위</span>만 🥇/🥈/🥉 이모지, 그 외는 <span class="note">n등</span> 으로 표시 됩니다.</li>
+          <li>동점자는 <span class="em">동일 순위</span>이며, 다음 순위는 <span class="em">연속</span>으로 이어집니다.</li>
+          <li class="note"> 📱 <b>모바일</b>에서는 <b>순위·점수만</b> 확인할 수 있어요. 💻 <b>PC/태블릿</b>에서는 각 제출지의 <b>답(F/M)</b>과 칩에 마우스를 올리면 <b>누에 나방 사진</b>도 볼 수 있습니다. </li>
+        </ul>
+      </div>
+    </div>
+  </main>
 
   <div class="wrap">
     <section class="card">
@@ -239,7 +259,7 @@
     /* 제외 문항(표시/점수 모두 제외) */
     const DISABLED_1BASED = new Set([17]);
 
-    /* 호스트 닉네임: 순위 산정 제외(점수 표기는 함) */
+    /* HOST 별칭 & 판정: 등수 제외 + 등수 칸에 HOST 뱃지 */
     const HOST_ALIASES = ['누에집사 (한리)', '누에집사', '호스트'];
     const normNick = s => String(s||'').replace(/\s+/g,' ').trim();
     const isHost   = s => HOST_ALIASES.some(a => normNick(s) === normNick(a));
@@ -278,7 +298,7 @@
         text.textContent = dispName;
         text.title = dispName;
 
-        // 이미지는 일반 문항만 보여줌(특수/제외는 숨김)
+        // 이미지는 일반 문항만
         if(url && !SPECIALS_1BASED.has(qi0+1) && !isDisabled){ img.src = url; img.alt = dispName; imgwrap.style.display='flex'; }
         else { img.removeAttribute('src'); img.alt=''; imgwrap.style.display='none'; }
 
@@ -306,10 +326,7 @@
       tableWrap.addEventListener('mouseleave', hideCard);
     }
 
-    /* === 점수/정오답 계산 ===
-       - 특수고치: 항상 '?' / 점수 미반영 / 색칠 없음
-       - 일반고치: 참가자 답이 F/M이면 즉시 표시,
-                   정답키가 F/M일 때만 +1/0 점수 및 색칠 */
+    /* === 점수/정오답 계산 === */
     function computeScoreAndCorr(rowAnswersStr, keyArr, totalQ){
       const ans = Array.from({length:totalQ}, (_,i)=> toFM(rowAnswersStr?.[i]));
       let score = 0;
@@ -318,17 +335,17 @@
       for(let i=0;i<totalQ;i++){
         const q1 = i+1;
         if (DISABLED_1BASED.has(q1)) continue;
-        if (SPECIALS_1BASED.has(q1)) { // 특수고치는 완전 배제
+        if (SPECIALS_1BASED.has(q1)) { // 특수고치 완전 배제
           corr[i] = null;
           continue;
         }
         const a = ans[i], k = keyArr[i];
         if (isFM(k) && isFM(a)) {
           const ok = (a===k);
-          corr[i] = ok ? 1 : 0;   // 색칠 허용
+          corr[i] = ok ? 1 : 0;   // 색칠
           score += ok ? 1 : 0;    // 일반고치 +1/0
         } else {
-          // 아직 키가 없거나 참가자 답이 없음 → 표시만 하고 색칠/점수는 미반영
+          // 키가 없거나 답이 없으면 표시만, 색칠/점수 X
           corr[i] = null;
         }
       }
@@ -337,32 +354,35 @@
 
     /* === 순위 계산(호스트 제외) === */
     function denseRankExcludingHosts(rows){
-  const nonHost = rows.filter(r=> !isHost(r.nickname));
-  const sorted = nonHost.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
-  const uniq=[]; sorted.forEach(r=>{ const v=r._score_eff; if(typeof v==='number' && !uniq.includes(v)) uniq.push(v); });
-  const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
-  const rankMap = new Map(sorted.map(r=> [r.nickname, m.get(r._score_eff)]));
-  rows.forEach(r=>{
-    r._rank = isHost(r.nickname) ? null : (rankMap.get(r.nickname) ?? null);
-  });
-  return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
-}
+      const nonHost = rows.filter(r=> !isHost(r.nickname));
+      const sorted = nonHost.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
+      const uniq=[]; sorted.forEach(r=>{ const v=r._score_eff; if(typeof v==='number' && !uniq.includes(v)) uniq.push(v); });
+      const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
+      const rankMap = new Map(sorted.map(r=> [r.nickname, m.get(r._score_eff)]));
+
+      rows.forEach(r=>{
+        r._rank = isHost(r.nickname) ? null : (rankMap.get(r.nickname) ?? null);
+      });
+
+      // 화면 정렬: 점수 내림차순
+      return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
+    }
 
     function renderBoard(payload){
       const { qnames, qimgs, category, key:keyRaw, rows:rawRows } = payload;
       const totalQ = qnames.length;
       const keyArr = (keyRaw || []).map(toFM);
 
-      // 각 참가자 점수/정오답 계산
+      // 참가자별 점수/정오답
       const rows = (rawRows || []).map(r=>{
         const { score, corr, ans } = computeScoreAndCorr(r.answers || '', keyArr, totalQ);
         return { ...r, _score_eff: score, _corr: corr, _ansArr: ans };
       });
 
-      // 순위(호스트 제외) 계산 → 점수순 재정렬
+      // 순위 계산(호스트 제외) + 점수순 정렬
       const data = denseRankExcludingHosts(rows);
 
-      // 테이블 구성
+      // 테이블
       const tbl = document.createElement('table');
       const thead = document.createElement('thead');
       thead.innerHTML = `
@@ -380,26 +400,39 @@
       data.forEach((row, rowIndex)=>{
         const tr = document.createElement('tr');
 
-        const tdNo = document.createElement('td'); tdNo.className='rowno'; tdNo.textContent=(rowIndex+1)+'.';
+        // #
+        const tdNo = document.createElement('td');
+        tdNo.className='rowno';
+        tdNo.textContent=(rowIndex+1)+'.';
 
-        const tdRank = document.createElement('td'); tdRank.className='rank';
-        const rankText = (typeof row._rank==='number')? medalRank(row._rank) : '—';
-        tdRank.textContent = rankText;
-
-        const tdNick = document.createElement('td'); tdNick.className='nick';
+        // 순위 (HOST면 여기 뱃지)
+        const tdRank = document.createElement('td');
+        tdRank.className='rank';
         const nick = row.nickname || '-';
-        tdNick.textContent = nick;
-if (isHost(nick)) {
-  const host = document.createElement('span'); host.className='host-pill'; host.textContent='HOST';
-  tdNick.appendChild(host);
-}
+        if (isHost(nick)) {
+          const hostBadge = document.createElement('span');
+          hostBadge.className = 'host-pill';
+          hostBadge.textContent = 'HOST';
+          tdRank.textContent = '';
+          tdRank.appendChild(hostBadge);
+        } else {
+          const rankText = (typeof row._rank==='number')? medalRank(row._rank) : '—';
+          tdRank.textContent = rankText;
+        }
 
-        const tdScore= document.createElement('td'); tdScore.className='score';
+        // 닉네임 (HOST 뱃지 없음)
+        const tdNick = document.createElement('td');
+        tdNick.className='nick';
+        tdNick.textContent = nick;
+
+        // 점수
+        const tdScore= document.createElement('td');
+        tdScore.className='score';
         const scoreToShow = (typeof row._score_eff==='number') ? row._score_eff : null;
         tdScore.textContent = (scoreToShow==null ? '—' : `${scoreToShow}점`);
 
+        // 제출지 칩
         const tdAns = document.createElement('td');
-
         if (!IS_MOBILE_SIMPLE) {
           const wrap = document.createElement('div'); wrap.className='answers';
 
@@ -427,14 +460,14 @@ if (isHost(nick)) {
 
             if(!isDisabled){
               if (isSpecial) {
-                // 특수고치: 항상 '?', 색칠 없음
+                // 특수고치: 항상 '?'
                 label = '?';
               } else {
                 // 일반고치: 참가자 답이 F/M이면 즉시 표시
                 const ch = row._ansArr?.[i];
                 if (ch==='F' || ch==='M') label = ch;
 
-                // 정답키가 있을 때만 색칠
+                // 키가 있을 때만 색칠
                 const cflag = row._corr?.[i];
                 if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
               }
