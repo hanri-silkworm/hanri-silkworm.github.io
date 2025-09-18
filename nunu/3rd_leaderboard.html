@@ -19,6 +19,7 @@
       --bad-bg:#fee2e2; --bad-bd:#fca5a5;
 
       --accent:#111827; --highlight:#fef3c7;
+      --mode-on:#16a34a; --mode-off:#6b7280;
     }
 
     *{box-sizing:border-box}
@@ -73,7 +74,7 @@
       text-align:left;padding:10px 12px;font-size:14px;color:#334155;white-space:nowrap}
     tbody td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;overflow:hidden}
     tbody tr:hover{background:#fafafa}
-    .rowno-col{width:46px;color:#64748b}
+    .rowno-col{width:60px;color:#64748b}
     .rank-col{width:120px}
     .nick-col{width:190px}
     .score-col{width:70px}
@@ -84,6 +85,39 @@
 
     /* HOST 뱃지(순위칸) */
     .host-pill{display:inline-flex;align-items:center;padding:0 8px;height:18px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:12px;font-weight:800}
+
+    /* 점수표 카드 */
+    .points-card{
+      margin:10px 0 14px;
+      border:1px solid var(--muted);
+      border-radius:12px;
+      background:#fff;
+      box-shadow:var(--shadow);
+      padding:12px 14px;
+    }
+    .points-head{
+      display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:8px;
+    }
+    .mode-pill{
+      display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;
+      font-weight:800;font-size:12px;color:#fff;
+    }
+    .mode-on{ background:var(--mode-on) }
+    .mode-off{ background:var(--mode-off) }
+    .points-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:8px 16px;
+    }
+    .points-row{display:flex;align-items:center;gap:10px}
+    .tag{
+      display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border:1px solid var(--muted);
+      border-radius:10px;font-weight:800;font-size:13px;background:#f9fafb;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .dot.gold{background:var(--gold)}
+    .dot.mimic{background:var(--mimic)}
+    .dot.bomb{background:var(--bomb)}
+    .dot.normal{background:var(--normal)}
+    .rule{font-size:13px;color:#374151}
 
     /* 칩 */
     .answers{display:grid;grid-template-columns:repeat(20, minmax(18px,1fr));gap:3px;align-items:center;width:100%}
@@ -153,6 +187,7 @@
     @media (max-width:560px){
       .nav-inner{ padding:8px 10px; gap:8px }
       .btn{ padding:6px 10px; font-size:13px }
+      .points-grid{ grid-template-columns:1fr }
     }
 
     /* 반응형: 칩 그리드 압축 */
@@ -238,6 +273,9 @@
           ※ 17번 고치는 성별 확인이 불가하여 <b>제외</b>되었고, 추첨으로 <b>16번 고치가 황금</b>입니다.
         </p>
 
+        <!-- 점수표 -->
+        <div id="pointsCard" class="points-card"></div>
+
         <div class="table-wrap" id="tableWrap"><div style="padding:14px;color:var(--sub)">데이터 로딩 중…</div></div>
       </div>
     </section>
@@ -253,11 +291,11 @@
     /* ====== 상수/규칙 ====== */
     const API_URL = 'https://script.google.com/macros/s/AKfycbxIR59WstV5BOCrCyN-jgTQkkLKhrWX3bhuz3Pru95JidMYdC2WCxwwCQ9F-ERxhb84tA/exec';
 
-    /* 특수고치 목록(표시 정책에 사용) */
+    /* 특수고치 목록 */
     const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
 
-    /* 특수고치 점수/공개 토글 — 한 줄로 ON/OFF */
-    const ENABLE_SPECIALS_SCORING = true;  // ← true: 특수고치 점수 반영 + 칩 공개(F/M/색칠), false: 점수 미반영 + 항상 '?'
+    /* 특수 점수/공개 토글 — 한 줄로 ON/OFF */
+    const ENABLE_SPECIALS_SCORING = true; // true: 특수 점수 반영 + 공개/색칠, false: 점수 미반영 + 항상 '?'
 
     /* 가중치 */
     const WEIGHT = {
@@ -268,10 +306,10 @@
     };
     const getWeight = (cat, ok) => (WEIGHT[cat] || WEIGHT['일반'])[ok ? 'correct' : 'wrong'];
 
-    /* 제외 문항(표시/점수 모두 제외) */
+    /* 제외 문항 */
     const DISABLED_1BASED = new Set([17]);
 
-    /* HOST 별칭 & 판정 (등수 제외 + 순위칸 HOST 뱃지, # 칼럼은 —) */
+    /* HOST(순위 제외, 순위칸 HOST 뱃지) */
     const HOST_ALIASES = ['누에집사 (한리)', '누에집사', '호스트'];
     const normNick = s => String(s||'').replace(/\s+/g,' ').trim();
     const isHost   = s => HOST_ALIASES.some(a => normNick(s) === normNick(a));
@@ -340,11 +378,37 @@
       tableWrap.addEventListener('mouseleave', hideCard);
     }
 
-    /* === 채점/색칠/점수 계산 ===
-       - 특수고치:
-         * ENABLE_SPECIALS_SCORING=true → 점수 반영 + 칩 공개 + 색칠
-         * ENABLE_SPECIALS_SCORING=false → 점수 미반영 + 칩 항상 '?'
-       - 16번은 무조건 '황금' 카테고리로 처리 */
+    /* === 점수표 렌더 === */
+    function renderPointsCard(){
+      const modeClass = ENABLE_SPECIALS_SCORING ? 'mode-on' : 'mode-off';
+      const modeText  = ENABLE_SPECIALS_SCORING ? '특수 점수: ON (공개/색칠/가중치 반영)' : '특수 점수: OFF (비공개·가중치 미반영)';
+      const html = `
+        <div class="points-head">
+          <strong>점수표</strong>
+          <span class="mode-pill ${modeClass}">${modeText}</span>
+        </div>
+        <div class="points-grid">
+          <div class="points-row">
+            <span class="tag"><span class="dot normal"></span>일반(13)</span>
+            <span class="rule">정답 <b>+1</b> / 오답 <b>0</b></span>
+          </div>
+          <div class="points-row">
+            <span class="tag"><span class="dot gold"></span>황금(2)</span>
+            <span class="rule">정답 <b>+3</b> / 오답 <b>0</b></span>
+          </div>
+          <div class="points-row">
+            <span class="tag"><span class="dot mimic"></span>미믹(위장)(3)</span>
+            <span class="rule">정답 <b>+2</b> / 오답 <b>−2</b></span>
+          </div>
+          <div class="points-row">
+            <span class="tag"><span class="dot bomb"></span>함정(2)</span>
+            <span class="rule">정답 <b>−3</b> / 오답 <b>0</b></span>
+          </div>
+        </div>`;
+      document.getElementById('pointsCard').innerHTML = html;
+    }
+
+    /* === 채점/색칠/점수 계산 === */
     function computeRowMetrics(row, qCount, specials, disabled, keyArr, category) {
       const ansArr = Array.from({length:qCount}, (_,i)=> toFM(row.answers?.[i]));
       const outCorr = Array(qCount).fill(null);
@@ -356,7 +420,7 @@
         return category?.[i] || (specials.has(q1) ? '황금' : '일반');
       };
 
-      // corr 우선 사용
+      // 서버 corr가 있으면 신뢰
       if (Array.isArray(row.corr) && row.corr.length === qCount) {
         for (let i=0;i<qCount;i++){
           const q1=i+1;
@@ -364,28 +428,24 @@
 
           const cat = getCat(i);
           const c = row.corr[i];
-
           const isSpecial = specials.has(q1);
+
           if (isSpecial) {
             if (ENABLE_SPECIALS_SCORING) {
               if (c===1) { score += getWeight(cat, true); outCorr[i]=1; }
               else if (c===0) { score += getWeight(cat, false); outCorr[i]=0; }
-              else { outCorr[i]=null; }
             } else {
-              // OFF: 점수/색칠 미반영
               outCorr[i]=null;
             }
           } else {
-            // 일반
             if (c===1) { score += getWeight('일반', true); outCorr[i]=1; }
             else if (c===0) { score += getWeight('일반', false); outCorr[i]=0; }
-            else { outCorr[i]=null; }
           }
         }
         return { ansArr, corr: outCorr, score };
       }
 
-      // key 사용
+      // 로컬 채점
       if (Array.isArray(keyArr) && keyArr.length === qCount) {
         for (let i=0;i<qCount;i++){
           const q1=i+1;
@@ -402,7 +462,7 @@
                 score += getWeight(cat, ok);
                 outCorr[i] = ok ? 1 : 0;
               } else {
-                outCorr[i] = null; // OFF: 색칠 안함
+                outCorr[i] = null;
               }
             } else {
               score += getWeight('일반', ok);
@@ -415,7 +475,6 @@
         return { ansArr, corr: outCorr, score };
       }
 
-      // fallback
       const scoreFallback = (typeof row.score==='number') ? row.score : 0;
       return { ansArr, corr: outCorr, score: scoreFallback };
     }
@@ -440,23 +499,26 @@
       const qCount = qnames.length || (rawRows[0]?.answers?.length ?? 0);
       const keyArr = Array.isArray(key) ? key.map(toFM) : null;
 
-      /* 이미지: 비어있으면 '직전 이미지 URL'을 사용 (carry-forward) */
+      /* 이미지 carry-forward */
       const filledImgs = (() => {
         let last = '';
         return Array.from({length:qCount}, (_,i)=>{
           const s = String(qimgs?.[i] || '').trim();
           if (s) { last = s; return s; }
-          return last; // 이전 값 유지(없으면 빈문자열)
+          return last;
         });
       })();
 
-      // 참가자별 메트릭 계산
+      // 점수표 렌더
+      renderPointsCard();
+
+      // 참가자별 메트릭
       const rows = rawRows.map(r=>{
         const { ansArr, corr, score } = computeRowMetrics(r, qCount, SPECIALS_1BASED, DISABLED_1BASED, keyArr, category);
         return { ...r, _ansArr: ansArr, _corr: corr, _score_eff: score };
       });
 
-      // 순위 계산(호스트 제외) 후 점수순 정렬
+      // 순위 계산 후 정렬
       const data = rankExcludingHosts(rows);
 
       // 테이블 구성
@@ -464,7 +526,7 @@
       const thead = document.createElement('thead');
       thead.innerHTML = `
         <tr>
-          <th class="rowno-col">#</th>
+          <th class="rowno-col">No</th>
           <th class="rank-col">순위</th>
           <th class="nick-col">닉네임</th>
           <th class="score-col">점수</th>
@@ -474,15 +536,14 @@
 
       const tbody = document.createElement('tbody');
 
-      data.forEach((row)=>{
+      data.forEach((row, rowIndex)=>{
         const tr = document.createElement('tr');
 
-        // # (실제 등수; HOST는 —)
+        /* No 칼럼: 화면 위에서부터 1,2,3… 고정 (순위와 무관) */
         const tdNo = document.createElement('td'); tdNo.className='rowno';
-        if (isHost(row.nickname)) tdNo.textContent = '—';
-        else tdNo.textContent = (typeof row._rank==='number') ? (row._rank + '.') : '—';
+        tdNo.textContent = (rowIndex + 1).toString();
 
-        // 순위(호스트면 HOST 뱃지)
+        /* 순위 칼럼: HOST는 뱃지, 일반은 메달/등수 표기 */
         const tdRank = document.createElement('td'); tdRank.className='rank';
         if (isHost(row.nickname)) {
           const hostBadge = document.createElement('span');
@@ -493,20 +554,16 @@
           tdRank.textContent = (typeof row._rank==='number')? medalRank(row._rank) : '—';
         }
 
-        // 닉네임
         const tdNick = document.createElement('td'); tdNick.className='nick';
         tdNick.textContent = row.nickname || '-';
 
-        // 점수
         const tdScore= document.createElement('td'); tdScore.className='score';
         const scoreToShow = (typeof row._score_eff==='number') ? row._score_eff : null;
         tdScore.textContent = (scoreToShow==null ? '—' : `${scoreToShow}점`);
 
-        // 제출지 칩
         const tdAns = document.createElement('td');
         if (!IS_MOBILE_SIMPLE) {
           const wrap = document.createElement('div'); wrap.className='answers';
-
           for(let i=0;i<qCount;i++){
             const q1 = i+1;
             const isDisabled = DISABLED_1BASED.has(q1);
@@ -535,17 +592,14 @@
             if(!isDisabled){
               if (isSpecial) {
                 if (ENABLE_SPECIALS_SCORING) {
-                  // 특수 ON: F/M 표시 + 색칠
                   const ch = row._ansArr?.[i];
                   if (ch==='F' || ch==='M') label = ch;
                   const cflag = row._corr?.[i];
                   if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
                 } else {
-                  // 특수 OFF: 항상 '?'
                   label = '?';
                 }
               } else {
-                // 일반: 답 기록되면 표시, corr 있으면 색칠
                 const ch = row._ansArr?.[i];
                 if (ch==='F' || ch==='M') label = ch;
                 const cflag = row._corr?.[i];
