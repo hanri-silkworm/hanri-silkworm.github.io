@@ -99,7 +99,7 @@
     .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* ⬇ 황금 칩은 상시 노란 배경/테두리 (요청사항) */
+    /* 황금 칩은 상시 노란 배경/테두리 */
     .chip[data-cat="gold"]{
       background:#fff7ed;     /* orange-50 */
       border-color:#fdba74;   /* orange-300 */
@@ -253,11 +253,11 @@
     /* ====== 상수/규칙 ====== */
     const API_URL = 'https://script.google.com/macros/s/AKfycbxIR59WstV5BOCrCyN-jgTQkkLKhrWX3bhuz3Pru95JidMYdC2WCxwwCQ9F-ERxhb84tA/exec';
 
-    /* 특수고치(표시는 항상 '?') */
+    /* 특수고치 목록(표시 정책에 사용) */
     const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
 
-    /* 특수고치 점수 반영 토글 — 한 줄로 ON/OFF */
-    const ENABLE_SPECIALS_SCORING = false; // ← true 로 바꾸면 특수고치 점수 반영
+    /* 특수고치 점수/공개 토글 — 한 줄로 ON/OFF */
+    const ENABLE_SPECIALS_SCORING = true;  // ← true: 특수고치 점수 반영 + 칩 공개(F/M/색칠), false: 점수 미반영 + 항상 '?'
 
     /* 가중치 */
     const WEIGHT = {
@@ -271,18 +271,10 @@
     /* 제외 문항(표시/점수 모두 제외) */
     const DISABLED_1BASED = new Set([17]);
 
-    /* HOST 별칭 & 판정 (등수 제외 + 순위칸 HOST 뱃지) */
+    /* HOST 별칭 & 판정 (등수 제외 + 순위칸 HOST 뱃지, # 칼럼은 —) */
     const HOST_ALIASES = ['누에집사 (한리)', '누에집사', '호스트'];
     const normNick = s => String(s||'').replace(/\s+/g,' ').trim();
     const isHost   = s => HOST_ALIASES.some(a => normNick(s) === normNick(a));
-
-    /* 이미지 기본 경로 빌더 (시트 qimgs[i] 비었을 때 자동 사용) */
-    const IMG_BASE = 'https://www.hanri.net/nunu/3rd_photo/';
-    function buildImgUrl(q1, name){
-      const filename = `${q1}_${String(name||'').trim()}_나방.jpg`;
-      // 전체 파일명만 인코딩 (한글/공백 안전)
-      return IMG_BASE + encodeURI(filename);
-    }
 
     /* 반응형 단순화 */
     const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
@@ -318,7 +310,6 @@
         text.textContent = dispName;
         text.title = dispName;
 
-        // 일반/특수 모두(제외만 제외) 호버 이미지 표시
         if(url && !isDisabled){
           img.src = url; img.alt = dispName; imgwrap.style.display='flex';
         } else {
@@ -350,10 +341,10 @@
     }
 
     /* === 채점/색칠/점수 계산 ===
-       corr 우선, 없으면 key, 둘 다 없으면 score fallback
-       - 특수고치: 칩 표시는 항상 '?', 색칠 없음
-         ↳ ENABLE_SPECIALS_SCORING=true 일 때만 가중치 반영
-       - 16번은 무조건 '황금' 카테고리로 처리(표시/가중치 모두) */
+       - 특수고치:
+         * ENABLE_SPECIALS_SCORING=true → 점수 반영 + 칩 공개 + 색칠
+         * ENABLE_SPECIALS_SCORING=false → 점수 미반영 + 칩 항상 '?'
+       - 16번은 무조건 '황금' 카테고리로 처리 */
     function computeRowMetrics(row, qCount, specials, disabled, keyArr, category) {
       const ansArr = Array.from({length:qCount}, (_,i)=> toFM(row.answers?.[i]));
       const outCorr = Array(qCount).fill(null);
@@ -361,11 +352,11 @@
 
       const getCat = (i) => {
         const q1 = i+1;
-        if (q1 === 16) return '황금'; // ⬅ 16번 강제 황금
+        if (q1 === 16) return '황금'; // 16번 강제 황금
         return category?.[i] || (specials.has(q1) ? '황금' : '일반');
       };
 
-      // 1) 서버 corr 사용
+      // corr 우선 사용
       if (Array.isArray(row.corr) && row.corr.length === qCount) {
         for (let i=0;i<qCount;i++){
           const q1=i+1;
@@ -374,24 +365,27 @@
           const cat = getCat(i);
           const c = row.corr[i];
 
-          if (specials.has(q1)) {
+          const isSpecial = specials.has(q1);
+          if (isSpecial) {
             if (ENABLE_SPECIALS_SCORING) {
-              if (c === 1) score += getWeight(cat, true);
-              else if (c === 0) score += getWeight(cat, false);
+              if (c===1) { score += getWeight(cat, true); outCorr[i]=1; }
+              else if (c===0) { score += getWeight(cat, false); outCorr[i]=0; }
+              else { outCorr[i]=null; }
+            } else {
+              // OFF: 점수/색칠 미반영
+              outCorr[i]=null;
             }
-            outCorr[i]=null; // 색칠 없음
-            continue;
+          } else {
+            // 일반
+            if (c===1) { score += getWeight('일반', true); outCorr[i]=1; }
+            else if (c===0) { score += getWeight('일반', false); outCorr[i]=0; }
+            else { outCorr[i]=null; }
           }
-
-          // 일반
-          if (c===1) { score += getWeight('일반', true); outCorr[i]=1; }
-          else if (c===0) { score += getWeight('일반', false); outCorr[i]=0; }
-          else { outCorr[i]=null; }
         }
         return { ansArr, corr: outCorr, score };
       }
 
-      // 2) key 사용
+      // key 사용
       if (Array.isArray(keyArr) && keyArr.length === qCount) {
         for (let i=0;i<qCount;i++){
           const q1=i+1;
@@ -399,28 +393,29 @@
 
           const cat = getCat(i);
           const a = ansArr[i], k = keyArr[i];
-
-          if (specials.has(q1)) {
-            if (ENABLE_SPECIALS_SCORING && isFM(a) && isFM(k)) {
-              const ok = (a===k);
-              score += getWeight(cat, ok); // 특수는 본인 카테고리 가중치
-            }
-            outCorr[i]=null;
-            continue;
-          }
+          const isSpecial = specials.has(q1);
 
           if (isFM(a) && isFM(k)) {
             const ok = (a===k);
-            score += getWeight('일반', ok);
-            outCorr[i] = ok ? 1 : 0;
+            if (isSpecial) {
+              if (ENABLE_SPECIALS_SCORING) {
+                score += getWeight(cat, ok);
+                outCorr[i] = ok ? 1 : 0;
+              } else {
+                outCorr[i] = null; // OFF: 색칠 안함
+              }
+            } else {
+              score += getWeight('일반', ok);
+              outCorr[i] = ok ? 1 : 0;
+            }
           } else {
-            outCorr[i]=null;
+            outCorr[i] = null;
           }
         }
         return { ansArr, corr: outCorr, score };
       }
 
-      // 3) 둘 다 없으면 서버 score 사용
+      // fallback
       const scoreFallback = (typeof row.score==='number') ? row.score : 0;
       return { ansArr, corr: outCorr, score: scoreFallback };
     }
@@ -437,7 +432,6 @@
         r._rank = isHost(r.nickname) ? null : (rankMap.get(r.nickname) ?? null);
       });
 
-      // 화면은 점수 내림차순으로 정렬
       return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
     }
 
@@ -445,6 +439,16 @@
       const { qnames=[], qimgs=[], category=[], key, rows:rawRows=[] } = payload;
       const qCount = qnames.length || (rawRows[0]?.answers?.length ?? 0);
       const keyArr = Array.isArray(key) ? key.map(toFM) : null;
+
+      /* 이미지: 비어있으면 '직전 이미지 URL'을 사용 (carry-forward) */
+      const filledImgs = (() => {
+        let last = '';
+        return Array.from({length:qCount}, (_,i)=>{
+          const s = String(qimgs?.[i] || '').trim();
+          if (s) { last = s; return s; }
+          return last; // 이전 값 유지(없으면 빈문자열)
+        });
+      })();
 
       // 참가자별 메트릭 계산
       const rows = rawRows.map(r=>{
@@ -512,17 +516,15 @@
             chip.className = 'chip' + (isDisabled ? ' disabled' : '');
             chip.dataset.disabled = isDisabled ? '1' : '0';
 
-            // ⬇ 라벨: 16번은 무조건 '황금'
-            let catStr = category?.[i] || (isSpecial ? (q1===16?'황금':'황금') : '일반');
+            // 라벨: 16번은 무조건 '황금'
+            let catStr = category?.[i] || (isSpecial ? '황금' : '일반');
             if (q1 === 16) catStr = '황금';
 
             const catKey = catToData(catStr);
             chip.dataset.cat   = catKey;
             chip.dataset.qindex= i;
             chip.dataset.qname = qnames[i] || `Q${i+1}`;
-            // 이미지: 시트값 우선, 없으면 규칙으로 자동 생성
-            const imgUrl = (qimgs && qimgs[i]) ? String(qimgs[i]).trim() : buildImgUrl(q1, qnames[i] || `Q${q1}`);
-            chip.dataset.qimg  = imgUrl;
+            chip.dataset.qimg  = filledImgs[i] || '';
             chip.dataset.qcat  = catStr;
 
             const t = document.createElement('span'); t.className='t';
@@ -532,14 +534,20 @@
 
             if(!isDisabled){
               if (isSpecial) {
-                // 특수고치: 항상 '?' 유지, 색칠 없음
-                label = '?';
+                if (ENABLE_SPECIALS_SCORING) {
+                  // 특수 ON: F/M 표시 + 색칠
+                  const ch = row._ansArr?.[i];
+                  if (ch==='F' || ch==='M') label = ch;
+                  const cflag = row._corr?.[i];
+                  if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
+                } else {
+                  // 특수 OFF: 항상 '?'
+                  label = '?';
+                }
               } else {
-                // 일반고치: 답 기록되면 즉시 F/M 표시
+                // 일반: 답 기록되면 표시, corr 있으면 색칠
                 const ch = row._ansArr?.[i];
                 if (ch==='F' || ch==='M') label = ch;
-
-                // 정/오답 색칠 (corr가 있을 때만)
                 const cflag = row._corr?.[i];
                 if (cflag!=null) chip.classList.add('open', cflag===1 ? 'correct' : 'wrong');
               }
