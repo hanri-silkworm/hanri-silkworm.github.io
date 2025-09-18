@@ -240,7 +240,9 @@
     const DISABLED_1BASED = new Set([17]);
 
     /* 호스트 닉네임: 순위 산정 제외(점수 표기는 함) */
-    const HOST_NICKS = new Set(['누에집사','호스트']);
+    const HOST_ALIASES = ['누에집사 (한리)', '누에집사', '호스트'];
+    const normNick = s => String(s||'').replace(/\s+/g,' ').trim();
+    const isHost   = s => HOST_ALIASES.some(a => normNick(s) === normNick(a));
 
     /* 반응형 단순화 */
     const IS_MOBILE_SIMPLE = window.matchMedia('(max-width: 560px)').matches;
@@ -335,17 +337,16 @@
 
     /* === 순위 계산(호스트 제외) === */
     function denseRankExcludingHosts(rows){
-      const nonHost = rows.filter(r=> !HOST_NICKS.has((r.nickname||'').trim()));
-      const sorted = nonHost.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
-      const uniq=[]; sorted.forEach(r=>{ const v=r._score_eff; if(typeof v==='number' && !uniq.includes(v)) uniq.push(v); });
-      const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
-      const rankMap = new Map(sorted.map(r=> [r.nickname, m.get(r._score_eff)]));
-      rows.forEach(r=>{
-        const nick = (r.nickname||'').trim();
-        r._rank = HOST_NICKS.has(nick) ? null : rankMap.get(nick) ?? null;
-      });
-      return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
-    }
+  const nonHost = rows.filter(r=> !isHost(r.nickname));
+  const sorted = nonHost.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
+  const uniq=[]; sorted.forEach(r=>{ const v=r._score_eff; if(typeof v==='number' && !uniq.includes(v)) uniq.push(v); });
+  const m = new Map(uniq.map((sc,i)=>[sc,i+1]));
+  const rankMap = new Map(sorted.map(r=> [r.nickname, m.get(r._score_eff)]));
+  rows.forEach(r=>{
+    r._rank = isHost(r.nickname) ? null : (rankMap.get(r.nickname) ?? null);
+  });
+  return rows.slice().sort((a,b)=> (b._score_eff??-Infinity) - (a._score_eff??-Infinity));
+}
 
     function renderBoard(payload){
       const { qnames, qimgs, category, key:keyRaw, rows:rawRows } = payload;
@@ -388,10 +389,10 @@
         const tdNick = document.createElement('td'); tdNick.className='nick';
         const nick = row.nickname || '-';
         tdNick.textContent = nick;
-        if (HOST_NICKS.has(nick.trim())) {
-          const host = document.createElement('span'); host.className='host-pill'; host.textContent='HOST';
-          tdNick.appendChild(host);
-        }
+if (isHost(nick)) {
+  const host = document.createElement('span'); host.className='host-pill'; host.textContent='HOST';
+  tdNick.appendChild(host);
+}
 
         const tdScore= document.createElement('td'); tdScore.className='score';
         const scoreToShow = (typeof row._score_eff==='number') ? row._score_eff : null;
