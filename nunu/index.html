@@ -181,7 +181,6 @@
       display:flex; align-items:center; justify-content:center;
       font-weight:900;
       font-size:clamp(22px, 7vw, 56px);
-      letter-spacing:.08em;
       color:rgba(17,24,39,0.10);
       transform:rotate(-18deg);
       text-shadow:0 1px 2px rgba(0,0,0,0.06);
@@ -288,43 +287,41 @@
       .up-img{ max-height:160px; }
       .up-img::after{ font-size:clamp(18px, 9vw, 44px); }
     }
-/* === Sponsor badges/chips: remove gradients === */
-.pill-tier.gold,
-.pill-tier.silver,
-.pill-tier.bronze,
-.badge.gold,
-.badge.silver,
-.badge.bronze{
-  background: #fff; /* flat background */
-}
-/* 후원자 배지 내부 텍스트 정확한 중앙 정렬 (좌측 점과 균형 맞춤) */
-.badge{
-  display: grid;                 /* flex → grid로 전환 */
-  grid-template-columns: 8px auto 8px;  /* 점(좌) | 텍스트 | 가짜 스페이서(우) */
-  align-items: center;
-  justify-items: center;         /* 텍스트를 중앙 셀에서 정확히 가운데 */
-  gap: 8px;                      /* 점/텍스트 간격 유지 */
-  padding: 8px 12px;             /* 기존 패딩 유지 */
-}
+    /* === Sponsor badges/chips: remove gradients === */
+    .pill-tier.gold,
+    .pill-tier.silver,
+    .pill-tier.bronze,
+    .badge.gold,
+    .badge.silver,
+    .badge.bronze{
+      background: #fff; /* flat background */
+    }
+    /* 후원자 배지 내부 텍스트 정확한 중앙 정렬 (좌측 점과 균형 맞춤) */
+    .badge{
+      display: grid;                 /* flex → grid로 전환 */
+      grid-template-columns: 8px auto 8px;  /* 점(좌) | 텍스트 | 가짜 스페이서(우) */
+      align-items: center;
+      justify-items: center;         /* 텍스트를 중앙 셀에서 정확히 가운데 */
+      gap: 8px;                      /* 점/텍스트 간격 유지 */
+      padding: 8px 12px;             /* 기존 패딩 유지 */
+    }
 
-.badge .dot{
-  grid-column: 1;                /* 왼쪽 고정 */
-  width: 8px; height: 8px; border-radius: 50%;
-}
+    .badge .dot{
+      grid-column: 1;                /* 왼쪽 고정 */
+      width: 8px; height: 8px; border-radius: 50%;
+    }
 
-.badge .who{
-  grid-column: 2;                /* 텍스트는 가운데 셀 */
-  text-align: center;
-  /* 필요 시 줄바꿈 허용: 아래 줄 주석 해제하거나 제거하세요 */
-  /* white-space: nowrap; */
-}
+    .badge .who{
+      grid-column: 2;                /* 텍스트는 가운데 셀 */
+      text-align: center;
+    }
 
-/* 오른쪽에 보이지 않는 스페이서로 좌측 점과 균형 맞추기 */
-.badge::after{
-  content: "";
-  grid-column: 3;
-  width: 8px; height: 8px;       /* 좌측 점과 동일한 폭 */
-}
+    /* 오른쪽에 보이지 않는 스페이서로 좌측 점과 균형 맞추기 */
+    .badge::after{
+      content: "";
+      grid-column: 3;
+      width: 8px; height: 8px;       /* 좌측 점과 동일한 폭 */
+    }
 
   </style>
 </head>
@@ -340,7 +337,8 @@
       <nav class="nav-actions" aria-label="주요 링크">
         <a class="btn" href="#sponsors">후원자</a>
         <a class="btn" href="#archive">아카이브</a>
-        <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html" id="btn-apply">제 3회 참여하기</a>
+        <!-- ✅ 참여하기 → 리더보드로 변경 -->
+        <a class="btn primary" href="https://www.hanri.net/nunu/3rd_leaderboard.html" id="btn-leaderboard">제 3회 리더보드</a>
       </nav>
 
       <!-- 모바일 햄버거 -->
@@ -354,7 +352,8 @@
       <div id="mobileDrawer" class="mobile-drawer" role="menu" aria-label="모바일 메뉴">
         <a role="menuitem" href="#sponsors">후원자</a>
         <a role="menuitem" href="#archive">아카이브</a>
-        <a role="menuitem" class="primary" href="https://www.hanri.net/nunu/3rd_submit.html">제 3회 참여하기</a>
+        <!-- ✅ 참여하기(모바일) → 리더보드 -->
+        <a role="menuitem" class="primary" href="https://www.hanri.net/nunu/3rd_leaderboard.html">제 3회 리더보드</a>
       </div>
     </div>
   </header>
@@ -374,12 +373,13 @@
         </h1>
 
         <p class="lead">
-          제 1·2회 결과를 열람하고, 제 3회는 설문으로 바로 참가하세요.<br>
+          제 1·2회 결과를 열람하고, 제 3회는 <b>리더보드</b>에서 실시간 현황을 확인하세요.<br>
           귀여운 누에도 누리고 작은 선물까지 누려보세요!
         </p>
 
         <div class="cta-row">
-          <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html" id="btn-apply-hero">제 3회 참여하기</a>
+          <!-- ✅ 히어로 CTA도 리더보드로 변경 -->
+          <a class="btn primary" href="https://www.hanri.net/nunu/3rd_leaderboard.html" id="btn-leaderboard-hero">제 3회 리더보드</a>
           <a class="btn" href="#faq">FAQ</a>
         </div>
       </section>
@@ -392,20 +392,20 @@
           </svg>
           <h3 id="notice-title" class="panel-title">이벤트 안내</h3>
         </div>
-        <div class="panel-desc">핵심만 확인하고 바로 참여하실 수 있도록 요약했습니다.</div>
+        <div class="panel-desc">핵심만 확인하고 바로 리더보드에서 진행 현황을 보실 수 있어요.</div>
         <div class="panel-divider" aria-hidden="true"></div>
         <ul class="panel-list">
           <li>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
               <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <div><strong>참가 방법</strong>: 설문 링크로 접수</div>
+            <div><strong>확인 방법</strong>: 리더보드 페이지에서 제출 현황/점수</div>
           </li>
           <li>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
               <path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <div><strong>점수 규칙</strong>: 정답 수를 기준으로 순위를 산정한다. 동점자의 경우 중복 등수를 부여합니다.</div>
+            <div><strong>점수 규칙</strong>: 정답 수를 기준으로 순위를 산정합니다(동순위).</div>
           </li>
           <li>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -515,12 +515,12 @@
           <div class="body">
             <div class="kicker">제 3회 (2025.09)</div>
             <h3 style="margin:6px 0 6px">제 3회 진행중</h3>
-            <p style="margin:0 0 10px;color:var(--sub)">이벤트 참가 · 일정/규정 필독</p>
+            <p style="margin:0 0 10px;color:var(--sub)">리더보드에서 실시간 현황/제출 확인</p>
             <div class="meta">
-              <a class="btn primary" href="https://www.hanri.net/nunu/3rd_submit.html">참여하기</a>
-              <a class="btn disabled" href="#" aria-disabled="true" tabindex="-1" title="준비중입니다">리더보드 (준비중)</a>
+              <!-- ✅ 카드 버튼도 리더보드로 통일 -->
+              <a class="btn primary" href="https://www.hanri.net/nunu/3rd_leaderboard.html">제 3회 리더보드</a>
             </div>
-            <div class="hint">참여 확인은 <strong>참가 제출지</strong> 페이지에서 가능합니다.</div>
+            <div class="hint">진행 현황과 제출지는 <strong>리더보드</strong>에서 확인하세요.</div>
           </div>
         </article>
       </div>
