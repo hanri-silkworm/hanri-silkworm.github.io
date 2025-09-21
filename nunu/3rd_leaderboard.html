@@ -133,10 +133,10 @@
     .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* 황금 칩은 상시 노란 배경/테두리 */
+    /* 황금 칩은 상시 노란 배경, 테두리는 일반 칩과 동일(회색) */
     .chip[data-cat="gold"]{
       background:#fff7ed;     /* orange-50 */
-      border-color:#fdba74;   /* orange-300 */
+      border-color:var(--chip-bd);   /* ← 여기만 변경 */
     }
 
     /* 공개 시 정/오답 강조 */
