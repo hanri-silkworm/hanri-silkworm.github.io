@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ri Han — CV</title>
+  <meta name="description" content="Curriculum Vitae of Ri Han, Ph.D. candidate in computational drug design at Chung‑Ang University." />
+  <meta property="og:title" content="Ri Han — CV" />
+  <meta property="og:description" content="Computational Drug Design · FEP · MD · Virtual Screening" />
+  <meta name="color-scheme" content="light" />
+  <style>
+    :root{
+      --bg:#f3f4f6;           /* page background (bright gray) */
+      --paper:#ffffff;         /* card background */
+      --ink:#111827;           /* primary text */
+      --sub:#6b7280;           /* secondary text */
+      --muted:#e5e7eb;         /* separators */
+      --ring:rgba(79,70,229,.25);
+      --pri:#7c3aed;           /* accent */
+      --pri-2:#22d3ee;         /* accent 2 */
+      --chip:#f3f4f6;          /* chip bg */
+      --radius:16px;
+      --shadow:0 12px 40px rgba(17,24,39,.08);
+      --w:1000px;
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font:16px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display","Segoe UI", Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color:var(--ink);
+    }
+    .wrap{ max-width:var(--w); margin:0 auto; padding:32px 18px 80px }
+
+    /* Header */
+    .hdr{ display:grid; grid-template-columns:80px 1fr auto; gap:18px; align-items:center; margin:18px 0 26px }
+    .avatar{ width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#1f2937,#0b0c0f); display:grid; place-items:center; color:#fff; font-weight:700; font-size:22px; border:1px solid rgba(0,0,0,.08) }
+    .title h1{ margin:0; font-size:28px; letter-spacing:-.01em }
+    .title .role{ color:var(--sub); font-size:15px; margin-top:2px }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap }
+    .btn{ appearance:none; border:1px solid var(--muted); background:var(--paper); color:var(--ink); padding:9px 12px; border-radius:12px; font-weight:600; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:8px; text-decoration:none }
+    .btn:hover{ border-color:var(--ring) }
+    .btn svg{ width:16px; height:16px }
+    .btn.sm{ padding:7px 10px; font-size:13px; box-shadow:none }
+
+    /* Contact chips */
+    .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
+    .chip{ background:var(--chip); color:var(--ink); border:1px solid var(--muted); padding:6px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; font-size:13px; text-decoration:none }
+    .chip svg{ width:14px; height:14px }
+
+    /* Card + Sections */
+    .card{ background:var(--paper); border:1px solid var(--muted); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px }
+    .grid{ display:grid; gap:16px }
+    .grid.cols-2{ grid-template-columns:1.2fr .8fr }
+    @media (max-width:900px){ .hdr{ grid-template-columns:60px 1fr } .grid.cols-2{ grid-template-columns:1fr } }
+
+    h2{ font-size:20px; letter-spacing:-.01em; margin:0 0 8px }
+    .sub{ color:var(--sub) }
+    hr.sep{ border:none; border-top:1px solid var(--muted); margin:14px 0 }
+
+    /* Lists */
+    ul.clean{ list-style:none; padding:0; margin:0 }
+    ul.bul{ padding-left:18px; margin:10px 0 }
+    ul.bul li{ margin:6px 0 }
+
+    /* Timeline */
+    .tl{ position:relative; }
+    .tl::before{ content:""; position:absolute; left:10px; top:6px; bottom:6px; width:2px; background:linear-gradient(var(--pri), transparent) }
+    .tl-item{ position:relative; padding-left:28px; margin:14px 0 }
+    .tl-bullet{ position:absolute; left:4px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--pri); box-shadow:0 0 0 3px rgba(124,58,237,.15) }
+    .tl-item h3{ margin:0 0 4px; font-size:16px }
+    .tl-item .meta{ font-size:13px; color:var(--sub) }
+
+    /* Publication */
+    .pub-item{ padding:12px 0; border-bottom:1px dashed var(--muted) }
+    .pub-item:last-child{ border-bottom:none }
+    .pub-title{ font-weight:600 }
+    .badge{ display:inline-block; font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid var(--muted); background:var(--chip); margin-left:8px }    .pub-actions{ margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    .doi{ font-size:13px; color:var(--sub) }
+    .doi a{ color:var(--pri) }
+    .year-heading{ font-size:15px; font-weight:700; color:var(--pri); margin:8px 0 6px }
+
+    /* Footer */
+    footer{ color:var(--sub); font-size:13px; margin-top:28px; text-align:center }
+
+    /* Print */
+    @media print{
+      body{ background:#fff }
+      .wrap{ padding:0 }
+      .actions, .btn-print-only{ display:none !important }
+      .card{ box-shadow:none }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" itemscope itemtype="https://schema.org/Person">
+
+    <!-- HEADER -->
+    <header class="hdr">
+      <div class="avatar" aria-hidden="true">RH</div>
+      <div class="title">
+        <h1 itemprop="name">Ri Han</h1>
+        <div class="role">Ph.D. Candidate · Computational Drug Design · Chem/Bioinformatics Lab, Chung‑Ang University</div>
+        <div class="chips" aria-label="Contacts">
+          <a class="chip" href="mailto:hanri@hanri.net" rel="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>hanri@hanri.net</a>
+          <a class="chip" href="mailto:hanri@cau.ac.kr" rel="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>hanri@cau.ac.kr</a>
+          <a class="chip" href="https://orcid.org/0000-0001-7266-7996" target="_blank" aria-label="ORCID"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#A6CE39"/><path d="M8.9 7.5h1.7v9H8.9zM12.9 7.5c2.7 0 4.6 1.8 4.6 4.5s-1.9 4.5-4.6 4.5h-1V7.5h1zm.2 1.6v6c1.8.1 3-1.2 3-3s-1.1-3-3-3z" fill="#1A1A1A"/></svg>ORCID</a>
+          <a class="chip" href="https://scholar.google.com/citations?user=kexhv28AAAAJ" target="_blank" aria-label="Google Scholar"><svg viewBox="0 0 24 24"><path d="M12 3 2 9l10 6 10-6-10-6zM2 15l10 6 10-6" fill="currentColor"/></svg>Scholar</a>
+          <a class="chip" href="https://github.com/Magic-Corn" target="_blank" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12.4c0 5.25 3.4 9.7 8.2 11.28.6.11.82-.27.82-.6l-.02-2.17c-3.34.74-4.04-1.61-4.04-1.61-.55-1.42-1.34-1.8-1.34-1.8-1.09-.76.08-.75.08-.75 1.2.09 1.83 1.25 1.83 1.25 1.07 1.86 2.82 1.32 3.5 1.01.11-.79.42-1.32.76-1.63-2.66-.31-5.46-1.36-5.46-6.05 0-1.34.47-2.44 1.24-3.3-.12-.31-.54-1.57.12-3.28 0 0 1.01-.33 3.3 1.26a11.4 11.4 0 0 1 6 0c2.29-1.59 3.3-1.26 3.3-1.26.66 1.71.24 2.97.12 3.28.77.86 1.24 1.96 1.24 3.3 0 4.7-2.8 5.73-5.47 6.04.43.38.82 1.12.82 2.26l-.01 3.35c0 .33.21.72.83.6A11.5 11.5 0 0 0 23.5 12.4 11.5 11.5 0 0 0 12 .5Z"/></svg>GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- SUMMARY -->
+    <section class="card">
+      <h2>Summary</h2>
+      <p>I am a Ph.D. candidate in <strong>computational drug design</strong> focusing on <strong>virtual screening</strong>, <strong>free energy perturbation (FEP)</strong>, and <strong>molecular dynamics (MD)</strong> for receptor–ligand interaction studies. I build data‑ and physics‑based pipelines that connect bio/cheminformatics with molecular modeling to support precise lead optimization.</p>
+      <ul class="bul" style="margin-top:10px">
+        <li>Sequence–structure analyses of purinergic (P1/P2Y) receptors and selectivity mechanisms</li>
+        <li>Virtual screening and docking pipeline development</li>
+        <li>FEP‑based affinity prediction and MD sampling/analysis</li>
+      </ul>
+    </section>
+
+    <div class="grid cols-2" style="margin-top:16px">
+      <!-- LEFT COLUMN -->
+      <section class="card">
+        <h2>Research Interests</h2>
+        <ul class="bul">
+          <li>Purinergic receptor sequence–structure analysis</li>
+          <li>Virtual screening</li>
+          <li>Small‑molecule docking</li>
+          <li>Free energy perturbation (FEP) calculation</li>
+          <li>Molecular dynamics (MD) simulation</li>
+        </ul>
+      </section>
+
+      <!-- RIGHT COLUMN -->
+      <section class="card">
+        <h2>Affiliation</h2>
+        <p><strong>Chung‑Ang University</strong> · Chem/Bioinformatics Lab <a class="btn sm" href="https://sites.google.com/view/cau-chembioinfo/home" target="_blank" rel="noopener" style="margin-left:8px">Lab site</a></p>
+        <p class="sub">Graduate student (Ph.D. program), Division of Chem/Bioinformatics</p>
+      </section>
+    </div>
+
+    <!-- EDUCATION -->
+    <section class="card" style="margin-top:16px">
+      <h2>Education</h2>
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-bullet"></div>
+          <h3><strong>Ph.D.</strong> in Global Innovative Drugs — Chung‑Ang University</h3>
+          <div class="meta">Mar 2023 – Present · Division of Chem/Bioinformatics (Advisor: Prof. Yoonji Lee)</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-bullet"></div>
+          <h3><strong>M.S.</strong> in Pharmacy — Chung‑Ang University</h3>
+          <div class="meta">Mar 2021 – Feb 2023 · Division of Chem/Bioinformatics (Advisor: Prof. Yoonji Lee)</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-bullet"></div>
+          <h3><strong>B.S.</strong> in Life Sciences — Daejin University</h3>
+          <div class="meta">Mar 2009 – Feb 2013 · Department of Life Sciences</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PUBLICATIONS -->
+    <section class="card" style="margin-top:16px">
+      <h2>Publications</h2>
+
+      <h3 class="year-heading">2025</h3>
+
+      <div class="pub-item">
+        <div class="pub-title">MetaboGNN: predicting liver metabolic stability with graph neural networks and cross-species data
+          <span class="badge">J Cheminform (2025) 17:140</span>
+        </div>
+        <div class="sub">Park JH†, <strong>Han R</strong>†, Jang J†, Kim J†, Paik J*, Heo J*, Lee Y*</div>
+        <div class="pub-actions">
+          <a class="btn sm" href="https://doi.org/10.1186/s13321-025-01089-y" target="_blank" rel="noopener">Read paper</a>
+          <span class="doi">DOI: <a href="https://doi.org/10.1186/s13321-025-01089-y" target="_blank" rel="noopener">10.1186/s13321-025-01089-y</a></span>
+        </div>
+      </div>
+
+      <h3 class="year-heading">2023</h3>
+
+      <div class="pub-item">
+        <div class="pub-title">Revolutionizing Medicinal Chemistry: The Application of AI in Early Drug Discovery
+          <span class="badge">Pharmaceuticals (2023) 16(9):1259</span>
+        </div>
+        <div class="sub"><strong>R Han</strong>†, H Yoon†, G Kim, H Lee, Y Lee*</div>
+        <div class="pub-actions">
+          <a class="btn sm" href="https://doi.org/10.3390/ph16091259" target="_blank" rel="noopener">Read paper</a>
+          <span class="doi">DOI: <a href="https://doi.org/10.3390/ph16091259" target="_blank" rel="noopener">10.3390/ph16091259</a></span>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-title">Identification of a Non‑Nucleoside Reverse Transcriptase Inhibitor against HIV‑1
+          <span class="badge">ACS Infect Dis (2023) 9(8):1582–1592</span>
+        </div>
+        <div class="sub">Kim MJ, Yu KL, <strong>Han R</strong>, Lee Y, Oh K, You JC</div>
+        <div class="pub-actions">
+          <a class="btn sm" href="https://doi.org/10.1021/acsinfecdis.3c00166" target="_blank" rel="noopener">Read paper</a>
+          <span class="doi">DOI: <a href="https://doi.org/10.1021/acsinfecdis.3c00166" target="_blank" rel="noopener">10.1021/acsinfecdis.3c00166</a></span>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-title">Systematic analyses of sequence conservation and ligand interactions of purinergic P1 and P2Y receptors
+          <span class="badge">Comput Struct Biotechnol J (2023) 21:889–898</span>
+        </div>
+        <div class="sub"><strong>Han R</strong>, Yoon H, Yoo J*, Lee Y*</div>
+        <div class="pub-actions">
+          <a class="btn sm" href="https://doi.org/10.1016/j.csbj.2023.01.010" target="_blank" rel="noopener">Read paper</a>
+          <span class="doi">DOI: <a href="https://doi.org/10.1016/j.csbj.2023.01.010" target="_blank" rel="noopener">10.1016/j.csbj.2023.01.010</a></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- AWARDS & GRANTS -->
+    <div class="grid cols-2" style="margin-top:16px">
+      <section class="card">
+        <h2>Awards</h2>
+        <ul class="bul">
+          <li>2024 — <strong>PSK Travel Award</strong> (Fall International Convention of The Pharmaceutical Society of Korea)</li>
+          <li>2023 — <strong>New Drug Development AI Competition, Grand Prize</strong> (Ministry of Science and ICT)</li>
+          <li>2023 — <strong>Best Poster Presentation Award</strong>, 14th AIMECS (AFMC International Medicinal Chemistry Symposium), Seoul</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h2>Grants</h2>
+        <ul class="bul">
+          <li><strong>2023–2024</strong> — CAU Graduate Research Scholarship (GRS)</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- EXTRA -->
+    <section class="card" style="margin-top:16px">
+      <h2>Extracurricular</h2>
+      <ul class="bul">
+        <li>2023 — <strong>8th GSDC Schools of Data Computing</strong> (Hosted by MSIT; Organizer: KISTI & GSDC)</li>
+        <li>2023 — <strong>LAIDD Mentoring Project: Molecular Virtual Screening</strong> (KPBMA)</li>
+      </ul>
+    </section>
+
+    <footer>
+      <div>Last updated: <time id="lu">—</time></div>
+      <div class="sub">© <span id="yy"></span> Ri Han. All rights reserved.</div>
+    </footer>
+  </div>
+
+  <script>
+    // Last updated + year
+    const d=new Date();
+    document.getElementById('yy').textContent=d.getFullYear();
+    document.getElementById('lu').textContent=d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'2-digit'});
+  </script>
+</body>
+</html>
