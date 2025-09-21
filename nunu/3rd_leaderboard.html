@@ -133,10 +133,10 @@
     .chip[data-cat="bomb"]::after{  border-left-color:var(--bomb)}
     .chip[data-cat="normal"]::after{border-left-color:var(--normal)}
 
-    /* 황금 칩은 상시 노란 배경, 테두리는 일반 칩과 동일(회색) */
+    /* ✅ 황금 칩도 기본(회색) 배경/테두리로 통일 */
     .chip[data-cat="gold"]{
-      background:#fff7ed;     /* orange-50 */
-      border-color:var(--chip-bd);   /* ← 여기만 변경 */
+      background:var(--chip-bg);
+      border-color:var(--chip-bd);
     }
 
     /* 공개 시 정/오답 강조 */
@@ -231,7 +231,7 @@
       <div class="hero-inner">
         <h1>🐛제 3회 리더보드</h1>
         <p class="lead">
-          지금은 특수고치는 <span class="em">비공개 모드</span>라 <span class="tt">?</span> 한 글자로만 표시가 됩니다.
+          지금은 <span class="em">비공개 모드</span>라 제출된 문항은 전부 <span class="tt">?</span> 한 글자로만 표시가 됩니다.
         </p>
         <ul class="guides">
           <li><span class="em">일반고치</span>가 우화되는 순간 참여를 마무리하고 모든 제출지가 <span class="em">오픈</span>됩니다.</li>
@@ -295,7 +295,10 @@
     const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
 
     /* 특수 점수/공개 토글 — 한 줄로 ON/OFF */
-    const ENABLE_SPECIALS_SCORING = false; // true: 특수 점수 반영 + 공개/색칠, false: 점수 미반영 + 항상 '?'
+    const ENABLE_SPECIALS_SCORING = false; // true: 특수 전부 반영/공개, false: 전부 비공개(아래 개별 공개 세트로 일부만 ON 가능)
+
+    /* ✅ 개별 공개·채점 반영할 특수 고치 번호(1-based) */
+    const OPEN_SPECIALS_1BASED = new Set([5]); // 5번만 공개/반영
 
     /* 가중치 */
     const WEIGHT = {
@@ -380,8 +383,10 @@
 
     /* === 점수표 렌더 === */
     function renderPointsCard(){
-      const modeClass = ENABLE_SPECIALS_SCORING ? 'mode-on' : 'mode-off';
-      const modeText  = ENABLE_SPECIALS_SCORING ? '특수 점수: ON (공개/색칠/가중치 반영)' : '특수 점수: OFF (비공개·가중치 미반영)';
+      const modeClass = (ENABLE_SPECIALS_SCORING || OPEN_SPECIALS_1BASED.size>0) ? 'mode-on' : 'mode-off';
+      const modeText  = (ENABLE_SPECIALS_SCORING || OPEN_SPECIALS_1BASED.size>0)
+        ? '특수 점수: ON (일부/전체 공개·색칠·가중치 반영)'
+        : '특수 점수: OFF (비공개·가중치 미반영)';
       const html = `
         <div class="points-head">
           <strong>점수표</strong>
@@ -420,63 +425,41 @@
         return category?.[i] || (specials.has(q1) ? '황금' : '일반');
       };
 
-      // 서버 corr가 있으면 신뢰
-      if (Array.isArray(row.corr) && row.corr.length === qCount) {
-        for (let i=0;i<qCount;i++){
-          const q1=i+1;
-          if (disabled.has(q1)) continue;
+      const useCorr = Array.isArray(row.corr) && row.corr.length === qCount;
 
-          const cat = getCat(i);
+      for (let i=0;i<qCount;i++){
+        const q1=i+1;
+        if (disabled.has(q1)) continue;
+
+        const cat = getCat(i);
+        const isSpecial = specials.has(q1);
+        const isOpenSpecial = ENABLE_SPECIALS_SCORING || OPEN_SPECIALS_1BASED.has(q1);
+
+        let cflag = null;
+        if (useCorr){
           const c = row.corr[i];
-          const isSpecial = specials.has(q1);
-
-          if (isSpecial) {
-            if (ENABLE_SPECIALS_SCORING) {
-              if (c===1) { score += getWeight(cat, true); outCorr[i]=1; }
-              else if (c===0) { score += getWeight(cat, false); outCorr[i]=0; }
-            } else {
-              outCorr[i]=null;
-            }
-          } else {
-            if (c===1) { score += getWeight('일반', true); outCorr[i]=1; }
-            else if (c===0) { score += getWeight('일반', false); outCorr[i]=0; }
-          }
-        }
-        return { ansArr, corr: outCorr, score };
-      }
-
-      // 로컬 채점
-      if (Array.isArray(keyArr) && keyArr.length === qCount) {
-        for (let i=0;i<qCount;i++){
-          const q1=i+1;
-          if (disabled.has(q1)) continue;
-
-          const cat = getCat(i);
+          if (c===1 || c===0) cflag = c;
+        } else if (Array.isArray(keyArr) && keyArr.length === qCount){
           const a = ansArr[i], k = keyArr[i];
-          const isSpecial = specials.has(q1);
-
-          if (isFM(a) && isFM(k)) {
-            const ok = (a===k);
-            if (isSpecial) {
-              if (ENABLE_SPECIALS_SCORING) {
-                score += getWeight(cat, ok);
-                outCorr[i] = ok ? 1 : 0;
-              } else {
-                outCorr[i] = null;
-              }
-            } else {
-              score += getWeight('일반', ok);
-              outCorr[i] = ok ? 1 : 0;
-            }
-          } else {
-            outCorr[i] = null;
-          }
+          if (isFM(a) && isFM(k)) cflag = (a===k) ? 1 : 0;
         }
-        return { ansArr, corr: outCorr, score };
+
+        if (isSpecial){
+          if (isOpenSpecial){
+            if (cflag===1){ score += getWeight(cat, true);  outCorr[i]=1; }
+            else if (cflag===0){ score += getWeight(cat, false); outCorr[i]=0; }
+            else { outCorr[i]=null; }
+          } else {
+            outCorr[i]=null; // 비공개/미반영
+          }
+        } else {
+          if (cflag===1){ score += getWeight('일반', true);  outCorr[i]=1; }
+          else if (cflag===0){ score += getWeight('일반', false); outCorr[i]=0; }
+          else { outCorr[i]=null; }
+        }
       }
 
-      const scoreFallback = (typeof row.score==='number') ? row.score : 0;
-      return { ansArr, corr: outCorr, score: scoreFallback };
+      return { ansArr, corr: outCorr, score };
     }
 
     /* === 순위 계산(호스트 제외) === */
@@ -568,6 +551,7 @@
             const q1 = i+1;
             const isDisabled = DISABLED_1BASED.has(q1);
             const isSpecial  = SPECIALS_1BASED.has(q1);
+            const isOpenSpecial = ENABLE_SPECIALS_SCORING || OPEN_SPECIALS_1BASED.has(q1);
 
             const chip = document.createElement('span');
             chip.className = 'chip' + (isDisabled ? ' disabled' : '');
@@ -591,7 +575,7 @@
 
             if(!isDisabled){
               if (isSpecial) {
-                if (ENABLE_SPECIALS_SCORING) {
+                if (isOpenSpecial) {
                   const ch = row._ansArr?.[i];
                   if (ch==='F' || ch==='M') label = ch;
                   const cflag = row._corr?.[i];
