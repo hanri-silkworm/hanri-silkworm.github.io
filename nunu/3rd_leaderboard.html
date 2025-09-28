@@ -295,10 +295,10 @@
     const SPECIALS_1BASED = new Set([3,5,8,10,13,16,20]);
 
     /* 특수 점수/공개 토글 — 한 줄로 ON/OFF */
-    const ENABLE_SPECIALS_SCORING = false; // true: 특수 전부 반영/공개, false: 전부 비공개(아래 개별 공개 세트로 일부만 ON 가능)
+    const ENABLE_SPECIALS_SCORING = true; // true: 특수 전부 반영/공개, false: 전부 비공개(아래 개별 공개 세트로 일부만 ON 가능)
 
     /* ✅ 개별 공개·채점 반영할 특수 고치 번호(1-based) */
-    const OPEN_SPECIALS_1BASED = new Set([3, 5]); // 5번만 공개/반영
+    const OPEN_SPECIALS_1BASED = new Set([5]); // 5번만 공개/반영
 
     /* 가중치 */
     const WEIGHT = {
