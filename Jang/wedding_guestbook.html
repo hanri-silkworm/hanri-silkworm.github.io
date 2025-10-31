@@ -45,7 +45,10 @@
     /* ===== LAYOUT ===== */
     main { max-width: 1100px; margin: 0 auto 64px; padding: 0 16px; }
     .grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
-    @media (min-width: 980px) { .grid { grid-template-columns: 1fr 1fr; } }
+    /* 가운데 정렬 + 폭 제한 */
+    #writeCard, #readCard { grid-column: 1 / -1; justify-self: center; width: 100%; }
+    #writeCard { max-width: 720px; }
+    #readCard  { max-width: 1100px; }
 
     section.card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 24px rgba(0,0,0,0.06); border: 1px solid #edecec; }
     section.card h2 { margin: 6px 0 12px; font-size: 20px; }
@@ -102,8 +105,8 @@
 
   <main>
     <div class="grid">
-      <!-- 작성 영역 -->
-      <section class="card" aria-labelledby="write-title">
+      <!-- 작성 영역 (가운데 배치) -->
+      <section id="writeCard" class="card" aria-labelledby="write-title">
         <h2 id="write-title">방명록 남기기</h2>
         <p class="hint">필수 항목은 닉네임과 한줄 글입니다. 이벤트 참여 시 휴대폰 번호가 필요합니다.</p>
         <form id="guestForm" novalidate>
@@ -140,10 +143,11 @@
       </section>
 
       <!-- 읽기 영역 -->
-      <section class="card" aria-labelledby="read-title">
+      <section id="readCard" class="card" aria-labelledby="read-title">
         <h2 id="read-title">모두의 메시지</h2>
         <div id="list" class="list" aria-live="polite"></div>
         <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+          <button id="refreshBtn" class="btn-secondary" type="button" title="목록 새로고침">새로고침</button>
           <button id="moreBtn" class="btn-secondary" type="button">더 보기</button>
           <span id="listStatus" class="status"></span>
         </div>
@@ -165,9 +169,8 @@
   </footer>
 
   <script>
-    // ===== 환경설정 (교체 필요) =====
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAWmdMbJ7gAqgPi5ihFclT9b17bOD3BARzCZuySA3qzHKoqZeoSGYSKRey67ZHLmP6/exec"; // Apps Script 웹앱 URL
-    const SECRET_KEY = ""; // (선택) 보안 키. Apps Script에도 동일 값 설정
+    // ===== 환경설정 =====
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzW5GCI3LWAj-4vuCs5YFHyQycyOeJd5CRs5v1B_OD9n_KH-jS7rNLg0hp7bfgbFo6e/exec";
 
     // 이벤트 안내 설정
     const RAFFLE = { PRIZE_NAME: "스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
@@ -189,39 +192,62 @@
       if(checked){ phone.setAttribute('required','required'); } else { phone.removeAttribute('required'); }
     }
 
-    function digitsOnly(s){ return String(s||'').replace(/[^0-9]/g,''); }
+    function digitsOnly(s){ return String(s||'').replace(/\D/g,''); }
     function formatKoreanPhone(d){
-      // d: digits only
       if(d.length <= 3) return d;
       if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
       if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
-      // default 11
       return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
     }
-
     function handlePhoneInput(){
-      const el = $("#phone");
-      const d = digitsOnly(el.value).slice(0,11);
+      const el = $("#phone"); const d = digitsOnly(el.value).slice(0,11);
       el.value = formatKoreanPhone(d);
     }
-
     function setStatus(el, msg, cls){ el.textContent = msg || ''; el.className = `status ${cls||''}`; }
 
-    // 목록 불러오기
+    // ===== 목록 불러오기 (fetch → 실패 시 JSONP 폴백) =====
     async function loadMessages(){
-      const list = $("#list"); const listStatus = $("#listStatus"); const nextCount = loadedCount + PAGE_SIZE;
+      const listStatus = $("#listStatus");
+      const nextCount = loadedCount + PAGE_SIZE;
       try {
         setStatus(listStatus, "불러오는 중…", "warn");
         const url = `${SCRIPT_URL}?mode=list&limit=${nextCount}&_=${Date.now()}`;
-        const res = await fetch(url, { method: 'GET' }); const data = await res.json();
+        const res = await fetch(url, { method: 'GET' });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         const rows = (data && data.rows) || [];
-        list.replaceChildren(...rows.map(createMsgEl));
-        loadedCount = rows.length;
+        renderList(rows); loadedCount = rows.length;
         setStatus(listStatus, `${loadedCount}개 표시`, "");
         $("#moreBtn").style.display = rows.length < nextCount ? 'none' : 'inline-flex';
-      } catch(err){ setStatus(listStatus, `목록을 불러오지 못했습니다: ${err}`, "err"); }
+      } catch(err){
+        jsonpLoad(nextCount);
+      }
     }
 
+    function jsonpLoad(limit){
+      const listStatus = $("#listStatus");
+      setStatus(listStatus, "불러오는 중…(JSONP)", "warn");
+      const cbName = `__guestbookCB_${Date.now()}`;
+      window[cbName] = (data)=>{
+        try{
+          const rows = (data && data.rows) || [];
+          renderList(rows); loadedCount = rows.length;
+          setStatus(listStatus, `${loadedCount}개 표시`, "");
+          $("#moreBtn").style.display = rows.length < limit ? 'none' : 'inline-flex';
+        } finally {
+          delete window[cbName]; s.remove();
+        }
+      };
+      const s = document.createElement('script');
+      s.src = `${SCRIPT_URL}?mode=list&limit=${limit}&callback=${cbName}&_=${Date.now()}`;
+      s.onerror = ()=>{ setStatus(listStatus, `목록을 불러오지 못했습니다`, "err"); s.remove(); delete window[cbName]; };
+      document.body.appendChild(s);
+    }
+
+    function renderList(rows){
+      const list = $("#list");
+      list.replaceChildren(...rows.map(createMsgEl));
+    }
     function createMsgEl(r){
       const art = document.createElement('article'); art.className = 'msg';
       const top = document.createElement('div'); top.className = 'msg-top';
@@ -231,10 +257,11 @@
       top.append(nick, time); art.append(top, p); return art;
     }
 
-    // 이벤트
+    // ===== 이벤트 =====
     $("#eventOptin").addEventListener('change', togglePhoneRequired);
     $("#phone").addEventListener('input', handlePhoneInput);
     $("#moreBtn").addEventListener('click', () => loadMessages());
+    $("#refreshBtn").addEventListener('click', () => { loadedCount = 0; loadMessages(); });
 
     $("#guestForm").addEventListener('submit', async (e)=>{
       e.preventDefault(); const status = $("#formStatus"); const btn = $("#submitBtn");
@@ -254,16 +281,18 @@
 
       try {
         btn.disabled = true; setStatus(status, "전송 중…", "warn");
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(SECRET_KEY ? { 'X-Guestbook-Key': SECRET_KEY } : {}) },
-          body: JSON.stringify({ nickname, email, phone: formatKoreanPhone(d), message, eventOptin })
+        // 프리플라이트 회피: urlencoded 로 전송(헤더 지정 안 함)
+        const body = new URLSearchParams({
+          nickname, email, message,
+          eventOptin: eventOptin ? 'true' : 'false',
+          phone: eventOptin ? formatKoreanPhone(d) : ''
         });
-        const data = await res.json();
-        if(!data || data.ok !== true) throw new Error((data && data.error) || '서버 오류');
+        const res = await fetch(SCRIPT_URL, { method: 'POST', body });
+        try { if(res && res.ok){ await res.text(); } } catch(_) {}
         setStatus(status, "등록되었습니다. 축하와 응원에 감사드립니다!", "ok");
         $("#message").value = ''; $("#email").value = ''; if(!eventOptin){ $("#phone").value = ''; }
         await loadMessages();
+        document.getElementById("read-title").scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch(err){ setStatus(status, `전송 실패: ${err}`, "err"); }
       finally { btn.disabled = false; }
     });
@@ -276,89 +305,69 @@
   =============================
   설치 가이드 (Google Apps Script)
   =============================
-  1) Google 스프레드시트 생성 → 시트 이름: guestbook
-     **헤더(1행)를 정확히 아래와 같이 입력**
-       시간 | 닉네임 | 이메일 | 휴대폰번호 | 한줄 | 이벤트
+  시트: guestbook / 헤더(1행)
+    시간 | 닉네임 | 이메일 | 휴대폰번호 | 한줄 | 이벤트
 
-  2) 시트에서 "확장 프로그램 → Apps Script" 열기 → 아래 코드 붙여넣기
-
-  3) "배포 → 새 배포 → 유형: 웹 앱"으로 배포
-     - 실행 사용자: 본인
-     - 액세스: 누구나
-     - 발급된 웹 앱 URL을 HTML 상단의 SCRIPT_URL에 붙여넣기
-
-  4) (선택) 보안 강화를 원하면 SECRET/SECRET_KEY를 동일한 값으로 설정
-
-  ---------- 복사할 Apps Script 코드 ----------
-
+  Apps Script (doGet JSONP + doPost urlencoded 대응):
+  -------------------------------------------
   const SHEET_NAME = 'guestbook';
   const TIMEZONE = 'Asia/Seoul';
-  const SECRET = ''; // 선택: 비워두면 키 체크 없음
-
-  const COLS = ['시간','닉네임','이메일','휴대폰번호','한줄','이벤트'];
 
   function doGet(e){
-    const limit = Math.min(parseInt((e.parameter && e.parameter.limit) || '50', 10), 200);
+    const limit = Math.min(parseInt((e && e.parameter && e.parameter.limit) || '50', 10), 200);
     const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
     const values = sh.getDataRange().getValues();
     const header = values.shift();
     const idx = Object.fromEntries(header.map((h,i)=>[String(h).trim(), i]));
-
     const rows = values.slice(-limit).reverse().map(r => ({
       timestamp: Utilities.formatDate(new Date(r[idx['시간']]), TIMEZONE, 'yyyy-MM-dd HH:mm'),
-      nickname: String(r[idx['닉네임']]||'').trim(),
-      message: String(r[idx['한줄']]||'').trim()
+      nickname : String(r[idx['닉네임']]||'').trim(),
+      message  : String(r[idx['한줄']]||'').trim()
     }));
-
-    return ContentService.createTextOutput(JSON.stringify({ ok:true, rows }))
-      .setMimeType(ContentService.MimeType.JSON);
+    const payload = JSON.stringify({ ok:true, rows });
+    const cb = e && e.parameter && e.parameter.callback;
+    return cb
+      ? ContentService.createTextOutput(`${cb}(${payload})`).setMimeType(ContentService.MimeType.JAVASCRIPT)
+      : ContentService.createTextOutput(payload).setMimeType(ContentService.MimeType.JSON);
   }
 
   function doPost(e){
     try{
-      const key = (e && e.headers && e.headers['X-Guestbook-Key']) || '';
-      if(SECRET && key !== SECRET) throw new Error('Unauthorized');
+      const type = (e && e.postData && e.postData.type) || '';
+      let data = {};
+      if(type === 'application/x-www-form-urlencoded'){
+        data.nickname   = e.parameter.nickname || '';
+        data.email      = e.parameter.email    || '';
+        data.message    = e.parameter.message  || '';
+        data.eventOptin = /^(true|1|y|Y)$/i.test(String(e.parameter.eventOptin||''));
+        data.phone      = e.parameter.phone    || '';
+      } else if(type === 'application/json'){
+        data = JSON.parse(e.postData.contents);
+      } else {
+        try{ data = JSON.parse(e.postData.contents||'{}'); }catch(_){ data = e.parameter || {}; }
+      }
 
-      const data = JSON.parse(e.postData.contents);
-      const nickname = sanitizeText_(data.nickname, 1, 30);
-      const email = sanitizeText_(data.email || '', 0, 120);
-      const message = sanitizeText_(data.message, 1, 200);
+      const nickname   = sanitize_(data.nickname, 1, 30);
+      const email      = sanitize_(data.email||'', 0, 120);
+      const message    = sanitize_(data.message, 1, 200);
       const eventOptin = !!data.eventOptin;
-      const phoneDigits = String(data.phone||'').replace(/[^0-9]/g,'');
-      if(eventOptin && (phoneDigits.length < 10 || phoneDigits.length > 11)) throw new Error('Invalid phone length');
-      const phonePretty = eventOptin ? fmtKoreanPhone_(phoneDigits) : '';
+      const digits     = String(data.phone||'').replace(/\D/g,'');
+      if(eventOptin && (digits.length < 10 || digits.length > 11)) throw new Error('Invalid phone length');
+      const phonePretty = eventOptin ? fmtKR_(digits) : '';
 
-      const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
-      const row = [ new Date(), nickname, email, phonePretty, message, eventOptin ? 'Y':'N' ];
-      sh.appendRow(row);
+      SpreadsheetApp.getActive().getSheetByName(SHEET_NAME)
+        .appendRow([ new Date(), nickname, email, phonePretty, message, eventOptin ? 'Y':'N' ]);
 
-      return ContentService.createTextOutput(JSON.stringify({ ok:true }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({ ok:true })).setMimeType(ContentService.MimeType.JSON);
     }catch(err){
-      return ContentService.createTextOutput(JSON.stringify({ ok:false, error: String(err) }))
+      return ContentService.createTextOutput(JSON.stringify({ ok:false, error:String(err) }))
         .setMimeType(ContentService.MimeType.JSON);
     }
   }
 
-  function sanitizeText_(s, min, max){
-    s = String(s||'').trim();
-    if(s.length < min) throw new Error('Too short');
-    if(s.length > max) s = s.slice(0, max);
-    return s.replace(/[<>]/g,'');
-  }
-
-  function fmtKoreanPhone_(d){
-    // d: digits only
-    if(d.length <= 3) return d;
-    if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
-    if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
-    return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
-  }
-
+  function sanitize_(s, min, max){ s=String(s||'').trim(); if(s.length<min) throw new Error('Too short'); if(s.length>max) s=s.slice(0,max); return s.replace(/[<>]/g,''); }
+  function fmtKR_(d){ if(d.length<=3) return d; if(d.length<=7) return d.slice(0,3)+'-'+d.slice(3); if(d.length===10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6); return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11); }
   -------------------------------------------
-  * doGet() 응답에는 시간·닉네임·한줄만 내려 최신순으로 렌더링합니다.
-  * 이메일/휴대폰번호는 목록에 노출하지 않습니다(시트에는 저장).
-  * 필요 시 컬럼명을 변경하면 COLS/인덱스 키도 함께 바꾸세요.
   -->
 </body>
 </html>
