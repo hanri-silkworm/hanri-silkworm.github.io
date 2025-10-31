@@ -16,7 +16,7 @@
       --purple: #8b5cf6;  /* violet-500 */
       --purple-100: #ede9fe;
       --card: #ffffff;
-      --ring: rgba(139, 92, 246, 0.28); /* purple ring */
+      --ring: rgba(139, 92, 246, 0.28);
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -54,7 +54,7 @@
     /* ===== FORM ===== */
     form .row { margin-bottom: 12px; }
     label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-    input[type="text"], input[type="email"], input[type="tel"] {
+    input[type="text"], input[type="tel"] {
       width: 100%; padding: 12px 12px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; font-size: 15px;
       outline: none; box-shadow: 0 1px 0 rgba(0,0,0,0.02) inset;
     }
@@ -67,8 +67,10 @@
       background: linear-gradient(90deg, var(--pink), var(--purple)); box-shadow: 0 6px 16px rgba(139,92,246,0.25); }
     .btn[disabled] { opacity: .6; cursor: not-allowed; }
     .btn-secondary { border: 1px solid var(--purple-100); background: #f5f3ff; color: #4c1d95; font-weight: 700; padding: 10px 14px; border-radius: 12px; }
-
     .note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    /* 버튼만 중앙 정렬 */
+    #submitBtn{display:block;margin:12px auto 0;}
 
     /* ===== LIST ===== */
     .list { display: grid; gap: 12px; }
@@ -84,7 +86,6 @@
     .err { color: #dc2626; }
 
     footer { text-align: center; color: var(--muted); padding: 32px 16px 56px; }
-    #submitBtn{display:block;margin:12px auto 0;}
   </style>
 </head>
 <body>
@@ -106,21 +107,34 @@
       <!-- 작성 영역 -->
       <section class="card" aria-labelledby="write-title">
         <h2 id="write-title">방명록 남기기</h2>
-        대폰 번호를 입력합니다. <em>이벤트 미참여자는 체크할 필요가 없습니다.</em></p>
+        <p class="hint">
+          필수 항목은 <strong>닉네임</strong>과 <strong>한줄 글</strong>입니다.
+          <strong>이벤트 참여자만</strong> 휴대폰 번호를 입력합니다.
+          <em>이벤트 미참여자는 체크할 필요가 없습니다.</em>
+        </p>
         <form id="guestForm" novalidate>
           <div class="row">
             <label for="nickname">닉네임 *</label>
             <input id="nickname" name="nickname" type="text" autocomplete="nickname" required minlength="1" maxlength="30" placeholder="예: 장풍이사랑" />
           </div>
+
           <div class="row checkbox">
-            <input id="eve여 시 필수)</span></label>
-            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="예: 010-1234-5678" maxlength="13" pattern="^[0-9-]+$" />
+            <input id="eventOptin" name="eventOptin" type="checkbox" />
+            <label for="eventOptin">이벤트에 참여합니다(개인정보 수집·이용 동의)</label>
+          </div>
+
+          <div class="row" id="phoneRow">
+            <label for="phone">휴대폰 번호 <span class="muted">(이벤트 참여 시 필수)</span></label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"
+                   placeholder="예: 010-1234-5678" maxlength="13" pattern="^[0-9-]+$" />
             <div class="note">숫자만 입력하면 자동으로 하이픈이 들어갑니다. 경품 발송 후 파기합니다.</div>
           </div>
+
           <div class="row">
             <label for="message">한줄 글 *</label>
             <input id="message" name="message" type="text" required maxlength="120" placeholder="축하 메시지를 120자 이내로 남겨 주세요" />
           </div>
+
           <!-- 스팸 방지용 허니팟: 비워 두세요 -->
           <div class="hp">
             <label for="website">Leave this empty</label>
@@ -137,6 +151,7 @@
         <h2 id="read-title">모두의 메시지</h2>
         <div id="list" class="list" aria-live="polite"></div>
         <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+          <button id="refreshBtn" class="btn-secondary" type="button" title="목록 새로고침">새로고침</button>
           <button id="moreBtn" class="btn-secondary" type="button">더 보기</button>
           <span id="listStatus" class="status"></span>
         </div>
@@ -158,11 +173,10 @@
   </footer>
 
   <script>
-    // ===== 환경설정 (교체 필요) =====
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzW5GCI3LWAj-4vuCs5YFHyQycyOeJd5CRs5v1B_OD9n_KH-jS7rNLg0hp7bfgbFo6e/exec"; // Apps Script 웹앱 URL 
-    const SECRET_KEY = ""; // (선택) 보안 키. Apps Script에도 동일 값 설정
+    // ===== 환경설정 =====
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzW5GCI3LWAj-4vuCs5YFHyQycyOeJd5CRs5v1B_OD9n_KH-jS7rNLg0hp7bfgbFo6e/exec";
 
-    // 이벤트 안내 설정
+    // 이벤트 안내 (필요하면 바꾸기)
     const RAFFLE = { PRIZE_NAME: "스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
 
     // 목록 페이징
@@ -170,51 +184,71 @@
 
     // 유틸
     const $ = (sel, el=document) => el.querySelector(sel);
-
-    function setRaffleText(){
-      const txt = `추첨 ${RAFFLE.PRIZES_COUNT}명 / 마감: ${RAFFLE.DEADLINE} / ${RAFFLE.CONTACT}`;
-      $("#prizeName").textContent = RAFFLE.PRIZE_NAME;
-      $("#raffleInfo").textContent = txt;
+    function setStatus(el, msg, cls){ el.textContent = msg || ''; el.className = `status ${cls||''}`; }
+    function digitsOnly(s){ return String(s||'').replace(/\D/g,''); }
+    function formatKoreanPhone(d){
+      if(d.length <= 3) return d;
+      if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
+      if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
+      return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
     }
-
+    function handlePhoneInput(){
+      const el = $("#phone"); const d = digitsOnly(el.value).slice(0,11);
+      el.value = formatKoreanPhone(d);
+    }
     function togglePhoneRequired(){
       const checked = $("#eventOptin").checked; const phone = $("#phone");
       if(checked){ phone.setAttribute('required','required'); } else { phone.removeAttribute('required'); }
     }
-
-    function digitsOnly(s){ return String(s||'').replace(/[^0-9]/g,''); }
-    function formatKoreanPhone(d){
-      // d: digits only
-      if(d.length <= 3) return d;
-      if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
-      if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
-      // default 11
-      return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
+    function setRaffleText(){
+      const txt = `추첨 ${RAFFLE.PRIZES_COUNT}명 / 마감: ${RAFFLE.DEADLINE} / ${RAFFLE.CONTACT}`;
+      const PN = document.getElementById("prizeName"); if(PN) PN.textContent = RAFFLE.PRIZE_NAME;
+      const RI = document.getElementById("raffleInfo"); if(RI) RI.textContent = txt;
     }
 
-    function handlePhoneInput(){
-      const el = $("#phone");
-      const d = digitsOnly(el.value).slice(0,11);
-      el.value = formatKoreanPhone(d);
-    }
-
-    function setStatus(el, msg, cls){ el.textContent = msg || ''; el.className = `status ${cls||''}`; }
-
-    // 목록 불러오기
+    // ===== 목록 불러오기 (fetch → 실패 시 JSONP 폴백) =====
     async function loadMessages(){
-      const list = $("#list"); const listStatus = $("#listStatus"); const nextCount = loadedCount + PAGE_SIZE;
+      const listStatus = $("#listStatus");
+      const nextCount = loadedCount + PAGE_SIZE;
       try {
         setStatus(listStatus, "불러오는 중…", "warn");
         const url = `${SCRIPT_URL}?mode=list&limit=${nextCount}&_=${Date.now()}`;
-        const res = await fetch(url, { method: 'GET' }); const data = await res.json();
+        const res = await fetch(url, { method: 'GET' });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         const rows = (data && data.rows) || [];
-        list.replaceChildren(...rows.map(createMsgEl));
-        loadedCount = rows.length;
+        renderList(rows); loadedCount = rows.length;
         setStatus(listStatus, `${loadedCount}개 표시`, "");
         $("#moreBtn").style.display = rows.length < nextCount ? 'none' : 'inline-flex';
-      } catch(err){ setStatus(listStatus, `목록을 불러오지 못했습니다: ${err}`, "err"); }
+      } catch(err){
+        jsonpLoad(nextCount);
+      }
     }
 
+    function jsonpLoad(limit){
+      const listStatus = $("#listStatus");
+      setStatus(listStatus, "불러오는 중…(JSONP)", "warn");
+      const cbName = `__guestbookCB_${Date.now()}`;
+      window[cbName] = (data)=>{
+        try{
+          const rows = (data && data.rows) || [];
+          renderList(rows); loadedCount = rows.length;
+          setStatus(listStatus, `${loadedCount}개 표시`, "");
+          $("#moreBtn").style.display = rows.length < limit ? 'none' : 'inline-flex';
+        } finally {
+          delete window[cbName]; s.remove();
+        }
+      };
+      const s = document.createElement('script');
+      s.src = `${SCRIPT_URL}?mode=list&limit=${limit}&callback=${cbName}&_=${Date.now()}`;
+      s.onerror = ()=>{ setStatus(listStatus, `목록을 불러오지 못했습니다`, "err"); s.remove(); delete window[cbName]; };
+      document.body.appendChild(s);
+    }
+
+    function renderList(rows){
+      const list = $("#list");
+      list.replaceChildren(...rows.map(createMsgEl));
+    }
     function createMsgEl(r){
       const art = document.createElement('article'); art.className = 'msg';
       const top = document.createElement('div'); top.className = 'msg-top';
@@ -224,32 +258,54 @@
       top.append(nick, time); art.append(top, p); return art;
     }
 
-    // 이벤트
+    // ===== 이벤트 =====
     $("#eventOptin").addEventListener('change', togglePhoneRequired);
     $("#phone").addEventListener('input', handlePhoneInput);
     $("#moreBtn").addEventListener('click', () => loadMessages());
+    $("#refreshBtn").addEventListener('click', () => { loadedCount = 0; loadMessages(); });
 
     $("#guestForm").addEventListener('submit', async (e)=>{
-      e.preventDefault(); const status = $("#formStatus"); const btn = $("#submitBtn");
+      e.preventDefault();
+      const status = $("#formStatus"); const btn = $("#submitBtn");
       if($("#website").value){ setStatus(status, "스팸이 의심되어 전송하지 않습니다.", "err"); return; }
 
       const nickname = $("#nickname").value.trim();
       const eventOptin = $("#eventOptin").checked;
-      const phoneView = $("#phone").value.trim();
-      const d = digitsOnly(phoneView);
+      const phoneDigits = digitsOnly($("#phone").value.trim());
       const message = $("#message").value.trim();
 
-      if(!nickname || nickname.length > "err"); return; }
-      if(!eventOptin && d.length > 0){ setStatus(status, "이벤트 참여자만 휴대폰 번호를 입력합니다. 참여하려면 이벤트 체크를 해 주세요.", "err"); return; }
-      if(eventOptin && (d.length < 10 || d.length > 11)){ setStatus(status, "휴대폰 번호는 10~11자리여야 합니다.", "err"); return; }
-      if(!message){ setStatus(stat…", "wa{ nickname, message, eventOptin: eventOptin ? 'true' : 'false', phone: eventOptin ? formatKoreanPhone(d) : '' })
+      if(!nickname || nickname.length > 30){ setStatus(status, "닉네임을 1–30자로 입력해 주세요.", "err"); return; }
+      if(!eventOptin && phoneDigits.length > 0){
+        setStatus(status, "이벤트 참여자만 휴대폰 번호를 입력합니다. 참여하려면 이벤트 체크를 해 주세요.", "err"); return;
+      }
+      if(eventOptin && (phoneDigits.length < 10 || phoneDigits.length > 11)){
+        setStatus(status, "휴대폰 번호는 10~11자리여야 합니다.", "err"); return;
+      }
+      if(!message){ setStatus(status, "한줄 글을 입력해 주세요.", "err"); return; }
+
+      try {
+        btn.disabled = true; setStatus(status, "전송 중…", "warn");
+
+        // 프리플라이트 회피: urlencoded 로 전송(헤더 지정 안 함)
+        const body = new URLSearchParams({
+          nickname,
+          message,
+          eventOptin: eventOptin ? 'true' : 'false',
+          phone: eventOptin ? formatKoreanPhone(phoneDigits) : ''
         });
+        const res = await fetch(SCRIPT_URL, { method: 'POST', body });
         try { if(res && res.ok){ await res.text(); } } catch(_) {}
+
         setStatus(status, "등록되었습니다. 축하와 응원에 감사드립니다!", "ok");
-        $("#message").value = '';if(!eventOptin){ $("#phone").value = ''; }
+        $("#message").value = '';
+        if(!eventOptin){ $("#phone").value = ''; }
         await loadMessages();
-      } catch(err){ setStatus(status, `전송 실패: ${err}`, "err"); }
-      finally { btn.disabled = false; }
+        document.getElementById("read-title").scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch(err){
+        setStatus(status, `전송 실패: ${err}`, "err");
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     // 초기화
