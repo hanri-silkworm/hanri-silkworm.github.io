@@ -22,14 +22,8 @@
 
     /* ===== HERO ===== */
     header.hero{position:relative}
-    .hero-imgwrap{
-      position:relative;width:100%;
-      height:clamp(220px,38vw,420px); overflow:hidden
-    }
-    .hero-imgwrap img{
-      width:100%;height:100%;object-fit:cover;display:block;
-      filter:saturate(1.05) contrast(1.03)
-    }
+    .hero-imgwrap{position:relative;width:100%;height:clamp(220px,38vw,420px);overflow:hidden}
+    .hero-imgwrap img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.03)}
     .hero-overlay{position:absolute;inset:0;background:
       radial-gradient(1000px 400px at 10% 10%, var(--pink-100), transparent),
       radial-gradient(800px 300px at 90% 0%, var(--purple-100), transparent),
@@ -45,12 +39,12 @@
     /* ===== LAYOUT ===== */
     main{max-width:1100px;margin:0 auto 64px;padding:0 16px}
     .grid{display:grid;gap:24px;grid-template-columns:1fr}
-    /* 데스크톱에서만 2열, 모바일은 자동으로 상/하 배치(방명록 → 메시지) */
     @media (min-width:980px){ .grid{ grid-template-columns:1fr 1fr } }
 
     section.card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 10px 24px rgba(0,0,0,.06);border:1px solid #edecec}
     section.card h2{margin:6px 0 12px;font-size:20px}
     .hint{color:var(--muted);font-size:13px;margin:8px 0 16px}
+    .row-between{display:flex;align-items:center;justify-content:space-between;gap:12px}
 
     /* ===== FORM ===== */
     form .row{margin-bottom:12px}
@@ -63,38 +57,32 @@
     .checkbox{display:flex;align-items:center;gap:10px}
     .checkbox input{width:18px;height:18px;accent-color:var(--purple)}
     .hp{position:absolute;left:-5000px;top:-5000px}
-
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;border:0;color:#fff;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--pink),var(--purple));box-shadow:0 6px 16px rgba(139,92,246,.25)}
     .btn[disabled]{opacity:.6;cursor:not-allowed}
     .btn-secondary{border:1px solid var(--purple-100);background:#f5f3ff;color:#4c1d95;font-weight:700;padding:10px 14px;border-radius:12px}
     .note{font-size:13px;color:var(--muted);margin-top:6px}
+    #submitBtn{display:block;margin:12px auto 0} /* 방명록 남기기 버튼만 중앙정렬 */
 
-    /* “방명록 남기기” 버튼만 중앙 정렬 */
-    #submitBtn{display:block;margin:12px auto 0}
+    /* ===== LIST (페이지네이션: 10개/페이지) ===== */
+    #list{display:grid;gap:12px}
+    @media (min-width:980px){
+      /* 데스크톱: 5열 × 2줄 = 10개 */
+      #list{ grid-template-columns:repeat(5, minmax(0,1fr)); }
+    }
+    @media (max-width:979px){
+      /* 모바일/태블릿: 자동 반응형(2~3열) */
+      #list{ grid-template-columns:repeat( min(3, max(2, floor(100vw/260)) ), minmax(0,1fr) ); }
+    }
 
-    /* ===== LIST (모바일 가로 스와이프) ===== */
-    .list{display:grid;gap:12px}
     .msg{border:1px solid #e5e7eb;border-radius:14px;padding:12px 14px;background:#fff}
     .msg-top{display:flex;align-items:baseline;gap:8px}
     .nick{font-weight:700}.time{font-size:12px;color:var(--muted)}
     .text{margin:6px 0 0;word-break:break-word}
 
-    /* 모바일(폭 < 980px)에서는 가로 스와이프 캐러셀 */
-    @media (max-width:979px){
-      #list{
-        display:flex; overflow-x:auto; gap:12px;
-        scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding-bottom:6px
-      }
-      #list::-webkit-scrollbar{ display:none; }
-      .msg{flex:0 0 86%; min-width:86%; scroll-snap-align:start}
-      .carouselNav{display:inline-flex}
-    }
-    /* 데스크톱에서는 그리드 카드 */
-    @media (min-width:980px){
-      #list{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .carouselNav{display:none}
-    }
-
+    .pager{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-top:10px}
+    .pager .pages{display:flex;gap:6px;align-items:center}
+    .page-btn{border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .page-btn.active{border-color:#c7d2fe;background:#eef2ff;color:#3730a3}
     .status{font-size:13px}.ok{color:#16a34a}.warn{color:#a16207}.err{color:#dc2626}
     footer{text-align:center;color:var(--muted);padding:32px 16px 56px}
   </style>
@@ -102,11 +90,11 @@
 <body>
   <header class="hero">
     <div class="hero-imgwrap">
-      <img src="HERO_IMAGE_URL" alt="Jangpoon_jangsoon_title.png" />
+      <img src="HERO_IMAGE_URL" alt="장순이 × 장풍이 웨딩 이미지" />
       <div class="hero-overlay"></div>
     </div>
     <div class="hero-inner">
-      <span class="badge" aria-label="축하 배지">Wedding Guestbook</span>
+      <span class="badge">Wedding Guestbook</span>
       <h1>장순이 × 장풍이</h1>
       <p class="sub">소중한 마음을 방명록으로 남겨 주세요. 두 주인공이 평생 간직합니다.</p>
       <p class="raffle"><strong>이벤트 안내:</strong> 방명록을 남겨 주신 분 중 추첨으로 <strong id="prizeName">장순이·장풍이 청첩장 아크릴 키링과 스타벅스 쿠폰</strong>을 드립니다. <span id="raffleInfo">마감 · 당첨자 개별 연락</span></p>
@@ -115,7 +103,7 @@
 
   <main>
     <div class="grid">
-      <!-- 작성 영역 (항상 상단/좌측) -->
+      <!-- 작성 영역 -->
       <section class="card" aria-labelledby="write-title">
         <h2 id="write-title">방명록 남기기</h2>
         <p class="hint">필수 항목은 <strong>닉네임</strong>과 <strong>한줄 글</strong>입니다. <strong>이벤트 참여자만</strong> 휴대폰 번호를 입력합니다. <em>이벤트 미참여자는 체크할 필요가 없습니다.</em></p>
@@ -152,17 +140,19 @@
         </form>
       </section>
 
-      <!-- 읽기 영역 (항상 하단/우측) -->
+      <!-- 읽기 영역 -->
       <section class="card" aria-labelledby="read-title">
-        <h2 id="read-title">모두의 메시지</h2>
-        <div id="list" class="list" aria-live="polite"></div>
-        <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <span class="carouselNav" style="display:none; gap:8px;">
-            <button id="prevBtn" class="btn-secondary" type="button" title="이전">이전</button>
-            <button id="nextBtn" class="btn-secondary" type="button" title="다음">다음</button>
-          </span>
+        <div class="row-between">
+          <h2 id="read-title">모두의 메시지</h2>
           <button id="refreshBtn" class="btn-secondary" type="button" title="목록 새로고침">새로고침</button>
-          <button id="moreBtn" class="btn-secondary" type="button">더 보기</button>
+        </div>
+
+        <div id="list" class="list" aria-live="polite"></div>
+
+        <div class="pager">
+          <button id="prevPage" class="btn-secondary" type="button">이전</button>
+          <span id="pageNumbers" class="pages"></span>
+          <button id="nextPage" class="btn-secondary" type="button">다음</button>
           <span id="listStatus" class="status"></span>
         </div>
       </section>
@@ -179,26 +169,29 @@
   </main>
 
   <footer>
-    <p>♥️축하해 주셔서 고맙습니다♥️</p>
+    <p>축하해 주셔서 고맙습니다 💗💜</p>
   </footer>
 
   <script>
     // ===== 설정 =====
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-xBykDWzkt6MT-30sGsrAvqaed_G_hRmEhewKV4j7gUG5D-m3MG1UEQarxiCzYMtp/exec";
 
-    const RAFFLE = { PRIZE_NAME: "장순이&장풍이 청첩장 아크릴 키링과 스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
-    const PAGE_SIZE = 20;
-    let loadedCount = 0;
+    const RAFFLE = { PRIZE_NAME: "장순이·장풍이 청첩장 아크릴 키링과 스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
+    const VIEW_PAGE_SIZE = 10;         // 10개/페이지
+    const FETCH_LIMIT = 300;           // 한 번에 최대 300개 받아서 클라이언트 페이지네이션
+    let rowsCache = [];                 // 전체 메시지 캐시
+    let currentPage = 1;               // 현재 페이지(1-based)
 
     const $ = (sel, el=document) => el.querySelector(sel);
     const setStatus = (el, msg, cls) => { el.textContent = msg || ''; el.className = `status ${cls||''}`; };
     const digitsOnly = s => String(s||'').replace(/\D/g,'');
+
     function formatKoreanPhone(d){ if(d.length<=3) return d; if(d.length<=7) return d.slice(0,3)+'-'+d.slice(3); if(d.length===10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6); return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11); }
     function handlePhoneInput(){ const el=$("#phone"); const d=digitsOnly(el.value).slice(0,11); el.value=formatKoreanPhone(d); }
     function togglePhoneRequired(){ const checked=$("#eventOptin").checked; const phone=$("#phone"); if(checked){phone.setAttribute('required','required')}else{phone.removeAttribute('required')} }
     function setRaffleText(){ const txt=`추첨 ${RAFFLE.PRIZES_COUNT}명 / 마감: ${RAFFLE.DEADLINE} / ${RAFFLE.CONTACT}`; const PN=$("#prizeName"); if(PN) PN.textContent=RAFFLE.PRIZE_NAME; const RI=$("#raffleInfo"); if(RI) RI.textContent=txt; }
 
-    // --- 메시지 가져오기 (JSON → 실패 시 JSONP) ---
+    // --- 서버에서 메시지(최대 FETCH_LIMIT) 가져오기 (JSON → 실패 시 JSONP) ---
     async function fetchMessages(limit){
       const url = `${SCRIPT_URL}?mode=list&limit=${limit}&_=${Date.now()}`;
       try{
@@ -207,7 +200,6 @@
         const data = await res.json();
         return (data && data.rows) || [];
       }catch(_){
-        // JSONP 폴백
         return new Promise((resolve,reject)=>{
           const cbName = `__guestbookCB_${Date.now()}`;
           window[cbName] = (data)=>{ try{ resolve((data&&data.rows)||[]); } finally { delete window[cbName]; s.remove(); } };
@@ -219,28 +211,17 @@
       }
     }
 
-    async function loadMessages(){
-      const listStatus = $("#listStatus");
-      try{
-        setStatus(listStatus,"불러오는 중…","warn");
-        const rows = await fetchMessages(loadedCount + PAGE_SIZE);
-        renderList(rows); loadedCount = rows.length;
-        setStatus(listStatus, `${loadedCount}개 표시`, "");
-        $("#moreBtn").style.display = rows.length < (loadedCount + PAGE_SIZE) ? 'none' : 'inline-flex';
-
-        // 모바일에서 카드가 2개 이상이면 캐러셀 내비 표시
-        const navWrap = document.querySelector('.carouselNav');
-        if(navWrap){ navWrap.style.display = (window.innerWidth < 980 && rows.length > 1) ? 'inline-flex' : 'none'; }
-        return rows;
-      }catch(err){
-        setStatus(listStatus, `목록을 불러오지 못했습니다: ${err.message}`, "err");
-        return [];
-      }
-    }
-
-    function renderList(rows){
+    // --- 페이지 렌더링 ---
+    function renderPage(page){
       const list = $("#list");
-      list.replaceChildren(...rows.map(r=>{
+      const totalPages = Math.max(1, Math.ceil(rowsCache.length / VIEW_PAGE_SIZE));
+      currentPage = Math.min(Math.max(1, page), totalPages);
+
+      const start = (currentPage - 1) * VIEW_PAGE_SIZE;
+      const end = start + VIEW_PAGE_SIZE;
+      const slice = rowsCache.slice(start, end);
+
+      list.replaceChildren(...slice.map(r=>{
         const art=document.createElement('article'); art.className='msg';
         const top=document.createElement('div'); top.className='msg-top';
         const nick=document.createElement('span'); nick.className='nick'; nick.textContent=r.nickname||'익명';
@@ -248,26 +229,42 @@
         const p=document.createElement('p'); p.className='text'; p.textContent=r.message||'';
         top.append(nick,time); art.append(top,p); return art;
       }));
+
+      // 페이지 네비
+      buildPageNumbers(totalPages);
+      $("#prevPage").disabled = currentPage === 1;
+      $("#nextPage").disabled = currentPage === totalPages;
+      setStatus($("#listStatus"), `${currentPage}/${totalPages}페이지 · 총 ${rowsCache.length}개`, "");
     }
 
-    // 캐러셀 스크롤
-    function scrollStep(dir){
-      const list = $("#list");
-      const card = list.querySelector('.msg');
-      const step = Math.max((card?.offsetWidth||Math.floor(list.clientWidth*0.9)), 240) + 12; // 카드폭+간격
-      list.scrollBy({ left: dir * step, behavior: 'smooth' });
+    function buildPageNumbers(totalPages){
+      const wrap = $("#pageNumbers");
+      wrap.replaceChildren();
+      // 페이지가 많아도 1,2,...,n 전부 보여줌(간단 구현)
+      for(let p=1; p<=totalPages; p++){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'page-btn' + (p===currentPage ? ' active' : '');
+        b.textContent = String(p);
+        b.addEventListener('click', ()=>renderPage(p));
+        wrap.appendChild(b);
+      }
     }
 
-    // 이벤트 바인딩
-    $("#eventOptin").addEventListener('change', togglePhoneRequired);
-    $("#phone").addEventListener('input', handlePhoneInput);
-    $("#moreBtn").addEventListener('click', () => loadMessages());
-    $("#refreshBtn").addEventListener('click', async ()=>{ loadedCount=0; await loadMessages(); });
-    const prevBtn = $("#prevBtn"), nextBtn = $("#nextBtn");
-    if(prevBtn) prevBtn.addEventListener('click', ()=>scrollStep(-1));
-    if(nextBtn) nextBtn.addEventListener('click', ()=>scrollStep(1));
+    // --- 전체 로드 ---
+    async function reloadAll(){
+      const listStatus = $("#listStatus");
+      try{
+        setStatus(listStatus,"불러오는 중…","warn");
+        rowsCache = await fetchMessages(FETCH_LIMIT);
+        if(!Array.isArray(rowsCache)) rowsCache = [];
+        renderPage(1);
+      }catch(err){
+        setStatus(listStatus, `목록을 불러오지 못했습니다: ${err.message}`, "err");
+      }
+    }
 
-    // 제출
+    // --- 제출 ---
     $("#guestForm").addEventListener('submit', async (e)=>{
       e.preventDefault();
       const status = $("#formStatus"); const btn = $("#submitBtn");
@@ -286,10 +283,6 @@
       try{
         btn.disabled = true; setStatus(status,"전송 중…","warn");
 
-        // 제출 전 상단 일부 목록 확보(성공 검증용)
-        const beforeRows = await fetchMessages(5).catch(()=>[]); 
-        const beforeTop = beforeRows[0] || null;
-
         // 프리플라이트 회피: urlencoded로 전송(헤더 지정하지 않음)
         const body = new URLSearchParams({
           nickname,
@@ -299,22 +292,23 @@
         });
         const res = await fetch(SCRIPT_URL, { method:'POST', body });
 
+        // 서버 ok:true 감지(없어도 아래 재조회로 검증)
         let serverOK = false;
         try{
           const txt = await res.text();
           serverOK = /"ok"\s*:\s*true/.test(txt);
         }catch(_){ serverOK = false; }
 
-        // 저장 확인: 목록 재조회하여 증가/변경 확인
-        const afterRows = await fetchMessages(5).catch(()=>[]);
-        const increased = afterRows.length > beforeRows.length;
-        const changedTop = afterRows[0] && (!beforeTop || afterRows[0].message !== beforeTop.message || afterRows[0].nickname !== beforeTop.nickname);
-        const verified = increased || changedTop;
+        // 재조회로 성공 확인
+        const oldCount = rowsCache.length;
+        await reloadAll();
+        const newCount = rowsCache.length;
 
-        if(res.ok && (serverOK || verified)){
+        if(res.ok && (serverOK || newCount > oldCount)){
           setStatus(status,"등록되었습니다. 축하와 응원에 감사드립니다!","ok");
           $("#message").value=''; if(!eventOptin){ $("#phone").value=''; }
-          await loadMessages();
+          // 최상단(1페이지)로 유지
+          renderPage(1);
           document.getElementById("read-title").scrollIntoView({ behavior:'smooth', block:'start' });
         }else{
           setStatus(status,"등록에 실패했습니다. 잠시 후 다시 시도해 주세요.","err");
@@ -326,11 +320,15 @@
       }
     });
 
-    // 초기화
+    // --- 버튼 바인딩 & 초기화 ---
+    $("#refreshBtn").addEventListener('click', reloadAll);
+    $("#prevPage").addEventListener('click', ()=>renderPage(currentPage-1));
+    $("#nextPage").addEventListener('click', ()=>renderPage(currentPage+1));
+
     (function init(){
       const img = document.querySelector('.hero-imgwrap img');
       if(img && img.src.includes('HERO_IMAGE_URL')) img.alt = '상단 이미지를 설정해 주세요';
-      togglePhoneRequired(); setRaffleText(); loadMessages();
+      togglePhoneRequired(); setRaffleText(); reloadAll();
     })();
   </script>
 </body>
