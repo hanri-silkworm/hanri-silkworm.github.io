@@ -12,12 +12,24 @@
       --purple: #8b5cf6; --purple-100: #ede9fe; --card: #ffffff;
       --ring: rgba(139, 92, 246, .28);
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--bg);color:var(--fg);
+      font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans KR',sans-serif;
+      -webkit-font-smoothing:antialiased
+    }
 
+    /* ===== HERO ===== */
     header.hero{position:relative}
-    .hero-imgwrap{position:relative;width:100%;height:clamp(220px,38vw,420px);overflow:hidden}
-    .hero-imgwrap img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.03)}
+    .hero-imgwrap{
+      position:relative;width:100%;
+      height:clamp(220px,38vw,420px); overflow:hidden
+    }
+    .hero-imgwrap img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      filter:saturate(1.05) contrast(1.03)
+    }
     .hero-overlay{position:absolute;inset:0;background:
       radial-gradient(1000px 400px at 10% 10%, var(--pink-100), transparent),
       radial-gradient(800px 300px at 90% 0%, var(--purple-100), transparent),
@@ -30,17 +42,23 @@
     .raffle{margin-top:10px;background:var(--pink-100);color:#7c2d12;border:1px solid var(--pink-200);padding:10px 12px;border-radius:12px;font-size:14px}
     .raffle strong{color:#9a3412}
 
+    /* ===== LAYOUT ===== */
     main{max-width:1100px;margin:0 auto 64px;padding:0 16px}
     .grid{display:grid;gap:24px;grid-template-columns:1fr}
-    @media (min-width:980px){.grid{grid-template-columns:1fr 1fr}}
+    /* 데스크톱에서만 2열, 모바일은 자동으로 상/하 배치(방명록 → 메시지) */
+    @media (min-width:980px){ .grid{ grid-template-columns:1fr 1fr } }
 
     section.card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 10px 24px rgba(0,0,0,.06);border:1px solid #edecec}
     section.card h2{margin:6px 0 12px;font-size:20px}
     .hint{color:var(--muted);font-size:13px;margin:8px 0 16px}
 
+    /* ===== FORM ===== */
     form .row{margin-bottom:12px}
     label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
-    input[type="text"],input[type="tel"]{width:100%;padding:12px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;font-size:15px;outline:none;box-shadow:0 1px 0 rgba(0,0,0,.02) inset}
+    input[type="text"],input[type="tel"]{
+      width:100%;padding:12px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;font-size:15px;
+      outline:none;box-shadow:0 1px 0 rgba(0,0,0,.02) inset
+    }
     input:focus{border-color:var(--purple);box-shadow:0 0 0 4px var(--ring)}
     .checkbox{display:flex;align-items:center;gap:10px}
     .checkbox input{width:18px;height:18px;accent-color:var(--purple)}
@@ -54,12 +72,28 @@
     /* “방명록 남기기” 버튼만 중앙 정렬 */
     #submitBtn{display:block;margin:12px auto 0}
 
+    /* ===== LIST (모바일 가로 스와이프) ===== */
     .list{display:grid;gap:12px}
     .msg{border:1px solid #e5e7eb;border-radius:14px;padding:12px 14px;background:#fff}
     .msg-top{display:flex;align-items:baseline;gap:8px}
-    .nick{font-weight:700}
-    .time{font-size:12px;color:var(--muted)}
+    .nick{font-weight:700}.time{font-size:12px;color:var(--muted)}
     .text{margin:6px 0 0;word-break:break-word}
+
+    /* 모바일(폭 < 980px)에서는 가로 스와이프 캐러셀 */
+    @media (max-width:979px){
+      #list{
+        display:flex; overflow-x:auto; gap:12px;
+        scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding-bottom:6px
+      }
+      #list::-webkit-scrollbar{ display:none; }
+      .msg{flex:0 0 86%; min-width:86%; scroll-snap-align:start}
+      .carouselNav{display:inline-flex}
+    }
+    /* 데스크톱에서는 그리드 카드 */
+    @media (min-width:980px){
+      #list{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .carouselNav{display:none}
+    }
 
     .status{font-size:13px}.ok{color:#16a34a}.warn{color:#a16207}.err{color:#dc2626}
     footer{text-align:center;color:var(--muted);padding:32px 16px 56px}
@@ -68,20 +102,20 @@
 <body>
   <header class="hero">
     <div class="hero-imgwrap">
-      <img src="HERO_IMAGE_URL" alt="장순이 × 장풍이 웨딩 이미지" />
+      <img src="HERO_IMAGE_URL" alt="https://www.hanri.net/Jang/Jangpoon_jangsoon_title.png" />
       <div class="hero-overlay"></div>
     </div>
     <div class="hero-inner">
       <span class="badge" aria-label="축하 배지">Wedding Guestbook</span>
       <h1>장순이 × 장풍이</h1>
       <p class="sub">소중한 마음을 방명록으로 남겨 주세요. 두 주인공이 평생 간직합니다.</p>
-      <p class="raffle"><strong>이벤트 안내:</strong> 방명록을 남겨 주신 분 중 추첨으로 <strong id="prizeName">스타벅스 쿠폰 & 장순이·장풍이 청첩장 아크릴 키링</strong>을 드립니다. <span id="raffleInfo">마감 · 당첨자 개별 연락</span></p>
+      <p class="raffle"><strong>이벤트 안내:</strong> 방명록을 남겨 주신 분 중 추첨으로 <strong id="prizeName">장순이·장풍이 청첩장 아크릴 키링과 스타벅스 쿠폰</strong>을 드립니다. <span id="raffleInfo">마감 · 당첨자 개별 연락</span></p>
     </div>
   </header>
 
   <main>
     <div class="grid">
-      <!-- 작성 영역 -->
+      <!-- 작성 영역 (항상 상단/좌측) -->
       <section class="card" aria-labelledby="write-title">
         <h2 id="write-title">방명록 남기기</h2>
         <p class="hint">필수 항목은 <strong>닉네임</strong>과 <strong>한줄 글</strong>입니다. <strong>이벤트 참여자만</strong> 휴대폰 번호를 입력합니다. <em>이벤트 미참여자는 체크할 필요가 없습니다.</em></p>
@@ -118,11 +152,15 @@
         </form>
       </section>
 
-      <!-- 읽기 영역 -->
+      <!-- 읽기 영역 (항상 하단/우측) -->
       <section class="card" aria-labelledby="read-title">
         <h2 id="read-title">모두의 메시지</h2>
         <div id="list" class="list" aria-live="polite"></div>
-        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span class="carouselNav" style="display:none; gap:8px;">
+            <button id="prevBtn" class="btn-secondary" type="button" title="이전">이전</button>
+            <button id="nextBtn" class="btn-secondary" type="button" title="다음">다음</button>
+          </span>
           <button id="refreshBtn" class="btn-secondary" type="button" title="목록 새로고침">새로고침</button>
           <button id="moreBtn" class="btn-secondary" type="button">더 보기</button>
           <span id="listStatus" class="status"></span>
@@ -141,14 +179,14 @@
   </main>
 
   <footer>
-    <p>축하해 주셔서 고맙습니다 💗💜</p>
+    <p>♥️축하해 주셔서 고맙습니다♥️</p>
   </footer>
 
   <script>
     // ===== 설정 =====
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-xBykDWzkt6MT-30sGsrAvqaed_G_hRmEhewKV4j7gUG5D-m3MG1UEQarxiCzYMtp/exec";
 
-    const RAFFLE = { PRIZE_NAME: "스타벅스 쿠폰 & 장순이·장풍이 청첩장 아크릴 키링", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
+    const RAFFLE = { PRIZE_NAME: "장순이&장풍이 청첩장 아크릴 키링과 스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
     const PAGE_SIZE = 20;
     let loadedCount = 0;
 
@@ -189,6 +227,10 @@
         renderList(rows); loadedCount = rows.length;
         setStatus(listStatus, `${loadedCount}개 표시`, "");
         $("#moreBtn").style.display = rows.length < (loadedCount + PAGE_SIZE) ? 'none' : 'inline-flex';
+
+        // 모바일에서 카드가 2개 이상이면 캐러셀 내비 표시
+        const navWrap = document.querySelector('.carouselNav');
+        if(navWrap){ navWrap.style.display = (window.innerWidth < 980 && rows.length > 1) ? 'inline-flex' : 'none'; }
         return rows;
       }catch(err){
         setStatus(listStatus, `목록을 불러오지 못했습니다: ${err.message}`, "err");
@@ -208,11 +250,22 @@
       }));
     }
 
+    // 캐러셀 스크롤
+    function scrollStep(dir){
+      const list = $("#list");
+      const card = list.querySelector('.msg');
+      const step = Math.max((card?.offsetWidth||Math.floor(list.clientWidth*0.9)), 240) + 12; // 카드폭+간격
+      list.scrollBy({ left: dir * step, behavior: 'smooth' });
+    }
+
     // 이벤트 바인딩
     $("#eventOptin").addEventListener('change', togglePhoneRequired);
     $("#phone").addEventListener('input', handlePhoneInput);
     $("#moreBtn").addEventListener('click', () => loadMessages());
     $("#refreshBtn").addEventListener('click', async ()=>{ loadedCount=0; await loadMessages(); });
+    const prevBtn = $("#prevBtn"), nextBtn = $("#nextBtn");
+    if(prevBtn) prevBtn.addEventListener('click', ()=>scrollStep(-1));
+    if(nextBtn) nextBtn.addEventListener('click', ()=>scrollStep(1));
 
     // 제출
     $("#guestForm").addEventListener('submit', async (e)=>{
@@ -233,7 +286,7 @@
       try{
         btn.disabled = true; setStatus(status,"전송 중…","warn");
 
-        // 제출 전 목록 길이 확보(성공 검증용)
+        // 제출 전 상단 일부 목록 확보(성공 검증용)
         const beforeRows = await fetchMessages(5).catch(()=>[]); 
         const beforeTop = beforeRows[0] || null;
 
@@ -248,16 +301,15 @@
 
         let serverOK = false;
         try{
-          const txt = await res.text();             // JSON이든 텍스트든 수신
-          serverOK = /"ok"\s*:\s*true/.test(txt);   // ok:true 포함 여부로 1차 판정
+          const txt = await res.text();
+          serverOK = /"ok"\s*:\s*true/.test(txt);
         }catch(_){ serverOK = false; }
 
-        // 저장 확인: 목록 재조회하여 개수 증가 또는 최상단 내용 일치 확인
+        // 저장 확인: 목록 재조회하여 증가/변경 확인
         const afterRows = await fetchMessages(5).catch(()=>[]);
         const increased = afterRows.length > beforeRows.length;
-        const sameTop = !beforeTop && afterRows[0] ||
-                        (beforeTop && afterRows[0] && (afterRows[0].nickname===beforeTop.nickname? afterRows[0].message!==beforeTop.message : true));
-        const verified = increased || sameTop;
+        const changedTop = afterRows[0] && (!beforeTop || afterRows[0].message !== beforeTop.message || afterRows[0].nickname !== beforeTop.nickname);
+        const verified = increased || changedTop;
 
         if(res.ok && (serverOK || verified)){
           setStatus(status,"등록되었습니다. 축하와 응원에 감사드립니다!","ok");
