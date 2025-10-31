@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>장순이 × 장풍이 결혼식 — 방명록</title>
+  <meta name="description" content="장순이와 장풍이의 웨딩 방명록 페이지입니다." />
+  <style>
+    :root {
+      --bg: #fff7fb;      /* soft pink */
+      --fg: #1f2937;
+      --muted: #6b7280;
+      --pink: #f472b6;    /* pink-400 */
+      --pink-100: #fce7f3; /* banner bg */
+      --pink-200: #fbcfe8; /* banner border */
+      --purple: #8b5cf6;  /* violet-500 */
+      --purple-100: #ede9fe;
+      --card: #ffffff;
+      --ring: rgba(139, 92, 246, 0.28); /* purple ring */
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== HERO ===== */
+    header.hero { position: relative; }
+    .hero-imgwrap { position: relative; width: 100%; height: clamp(220px, 38vw, 420px); overflow: hidden; }
+    .hero-imgwrap img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.05) contrast(1.03); }
+    .hero-overlay { position: absolute; inset: 0; background:
+        radial-gradient(1000px 400px at 10% 10%, var(--pink-100), transparent),
+        radial-gradient(800px 300px at 90% 0%, var(--purple-100), transparent),
+        linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.0) 45%, rgba(255,247,251,0.0) 70%, var(--bg));
+      pointer-events: none; }
+    .hero-inner { max-width: 1100px; margin: 0 auto; padding: 18px 16px 28px; position: relative; margin-top: -60px; }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: var(--purple-100); color: #5b21b6; font-weight: 600; font-size: 12px; box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset; }
+    h1 { margin: 12px 0 8px; font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.5px; color: #111827; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
+    .sub { color: var(--muted); margin-top: 6px; }
+    .raffle { margin-top: 10px; background: var(--pink-100); color: #7c2d12; border: 1px solid var(--pink-200); padding: 10px 12px; border-radius: 12px; font-size: 14px; }
+    .raffle strong { color: #9a3412; }
+
+    /* ===== LAYOUT ===== */
+    main { max-width: 1100px; margin: 0 auto 64px; padding: 0 16px; }
+    .grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
+    @media (min-width: 980px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    section.card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 24px rgba(0,0,0,0.06); border: 1px solid #edecec; }
+    section.card h2 { margin: 6px 0 12px; font-size: 20px; }
+    .hint { color: var(--muted); font-size: 13px; margin: 8px 0 16px; }
+
+    /* ===== FORM ===== */
+    form .row { margin-bottom: 12px; }
+    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+    input[type="text"], input[type="email"], input[type="tel"] {
+      width: 100%; padding: 12px 12px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; font-size: 15px;
+      outline: none; box-shadow: 0 1px 0 rgba(0,0,0,0.02) inset;
+    }
+    input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px var(--ring); }
+    .checkbox { display: flex; align-items: center; gap: 10px; }
+    .checkbox input { width: 18px; height: 18px; accent-color: var(--purple); }
+    .hp { position: absolute; left: -5000px; top: -5000px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: 12px; border: 0; color: #fff; font-weight: 700; cursor: pointer;
+      background: linear-gradient(90deg, var(--pink), var(--purple)); box-shadow: 0 6px 16px rgba(139,92,246,0.25); }
+    .btn[disabled] { opacity: .6; cursor: not-allowed; }
+    .btn-secondary { border: 1px solid var(--purple-100); background: #f5f3ff; color: #4c1d95; font-weight: 700; padding: 10px 14px; border-radius: 12px; }
+
+    .note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    /* ===== LIST ===== */
+    .list { display: grid; gap: 12px; }
+    .msg { border: 1px solid #e5e7eb; border-radius: 14px; padding: 12px 14px; background: #fff; }
+    .msg-top { display: flex; align-items: baseline; gap: 8px; }
+    .nick { font-weight: 700; }
+    .time { font-size: 12px; color: var(--muted); }
+    .text { margin: 6px 0 0; word-break: break-word; }
+
+    .status { font-size: 13px; }
+    .ok { color: #16a34a; }
+    .warn { color: #a16207; }
+    .err { color: #dc2626; }
+
+    footer { text-align: center; color: var(--muted); padding: 32px 16px 56px; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-imgwrap">
+      <img src="HERO_IMAGE_URL" alt="장순이 × 장풍이 웨딩 이미지" />
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-inner">
+      <span class="badge" aria-label="축하 배지">Wedding Guestbook</span>
+      <h1>장순이 × 장풍이</h1>
+      <p class="sub">소중한 마음을 방명록으로 남겨 주세요. 두 주인공이 평생 간직합니다.</p>
+      <p class="raffle"><strong>이벤트 안내:</strong> 방명록을 남겨 주신 분 중 추첨으로 <strong id="prizeName">스타벅스 쿠폰</strong>을 드립니다. <span id="raffleInfo">마감 · 당첨자 개별 연락</span></p>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- 작성 영역 -->
+      <section class="card" aria-labelledby="write-title">
+        <h2 id="write-title">방명록 남기기</h2>
+        <p class="hint">필수 항목은 닉네임과 한줄 글입니다. 이벤트 참여 시 휴대폰 번호가 필요합니다.</p>
+        <form id="guestForm" novalidate>
+          <div class="row">
+            <label for="nickname">닉네임 *</label>
+            <input id="nickname" name="nickname" type="text" autocomplete="nickname" required minlength="1" maxlength="30" placeholder="예: 장풍이사랑" />
+          </div>
+          <div class="row">
+            <label for="email">이메일 주소</label>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="연락처를 이메일로 받고 싶으면 입력" />
+          </div>
+          <div class="row checkbox">
+            <input id="eventOptin" name="eventOptin" type="checkbox" />
+            <label for="eventOptin">이벤트에 참여합니다(개인정보 수집·이용 동의)</label>
+          </div>
+          <div class="row" id="phoneRow">
+            <label for="phone">휴대폰 번호 <span class="muted">(이벤트 참여 시 필수)</span></label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="예: 010-1234-5678" maxlength="13" pattern="^[0-9-]+$" />
+            <div class="note">숫자만 입력하면 자동으로 하이픈이 들어갑니다. 경품 발송 후 파기합니다.</div>
+          </div>
+          <div class="row">
+            <label for="message">한줄 글 *</label>
+            <input id="message" name="message" type="text" required maxlength="120" placeholder="축하 메시지를 120자 이내로 남겨 주세요" />
+          </div>
+          <!-- 스팸 방지용 허니팟: 비워 두세요 -->
+          <div class="hp">
+            <label for="website">Leave this empty</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <button class="btn" id="submitBtn" type="submit">방명록 남기기</button>
+          <div id="formStatus" class="status" aria-live="polite" style="margin-top:8px"></div>
+        </form>
+      </section>
+
+      <!-- 읽기 영역 -->
+      <section class="card" aria-labelledby="read-title">
+        <h2 id="read-title">모두의 메시지</h2>
+        <div id="list" class="list" aria-live="polite"></div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+          <button id="moreBtn" class="btn-secondary" type="button">더 보기</button>
+          <span id="listStatus" class="status"></span>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:24px" aria-labelledby="tips-title">
+      <h2 id="tips-title">개인정보 및 이벤트 안내</h2>
+      <ul>
+        <li>이벤트 참여자는 휴대폰 번호 제공이 필요합니다(경품 발송·당첨 안내 목적).</li>
+        <li>수집 항목: 닉네임, (선택) 이메일, (선택·이벤트 시 필수) 휴대폰 번호, 한줄 글.</li>
+        <li>보유 기간: 이벤트 종료 및 경품 발송 완료 후 즉시 파기.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>축하해 주셔서 고맙습니다 💗💜</p>
+  </footer>
+
+  <script>
+    // ===== 환경설정 (교체 필요) =====
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAWmdMbJ7gAqgPi5ihFclT9b17bOD3BARzCZuySA3qzHKoqZeoSGYSKRey67ZHLmP6/exec"; // Apps Script 웹앱 URL
+    const SECRET_KEY = ""; // (선택) 보안 키. Apps Script에도 동일 값 설정
+
+    // 이벤트 안내 설정
+    const RAFFLE = { PRIZE_NAME: "스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
+
+    // 목록 페이징
+    const PAGE_SIZE = 20; let loadedCount = 0;
+
+    // 유틸
+    const $ = (sel, el=document) => el.querySelector(sel);
+
+    function setRaffleText(){
+      const txt = `추첨 ${RAFFLE.PRIZES_COUNT}명 / 마감: ${RAFFLE.DEADLINE} / ${RAFFLE.CONTACT}`;
+      $("#prizeName").textContent = RAFFLE.PRIZE_NAME;
+      $("#raffleInfo").textContent = txt;
+    }
+
+    function togglePhoneRequired(){
+      const checked = $("#eventOptin").checked; const phone = $("#phone");
+      if(checked){ phone.setAttribute('required','required'); } else { phone.removeAttribute('required'); }
+    }
+
+    function digitsOnly(s){ return String(s||'').replace(/[^0-9]/g,''); }
+    function formatKoreanPhone(d){
+      // d: digits only
+      if(d.length <= 3) return d;
+      if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
+      if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
+      // default 11
+      return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
+    }
+
+    function handlePhoneInput(){
+      const el = $("#phone");
+      const d = digitsOnly(el.value).slice(0,11);
+      el.value = formatKoreanPhone(d);
+    }
+
+    function setStatus(el, msg, cls){ el.textContent = msg || ''; el.className = `status ${cls||''}`; }
+
+    // 목록 불러오기
+    async function loadMessages(){
+      const list = $("#list"); const listStatus = $("#listStatus"); const nextCount = loadedCount + PAGE_SIZE;
+      try {
+        setStatus(listStatus, "불러오는 중…", "warn");
+        const url = `${SCRIPT_URL}?mode=list&limit=${nextCount}&_=${Date.now()}`;
+        const res = await fetch(url, { method: 'GET' }); const data = await res.json();
+        const rows = (data && data.rows) || [];
+        list.replaceChildren(...rows.map(createMsgEl));
+        loadedCount = rows.length;
+        setStatus(listStatus, `${loadedCount}개 표시`, "");
+        $("#moreBtn").style.display = rows.length < nextCount ? 'none' : 'inline-flex';
+      } catch(err){ setStatus(listStatus, `목록을 불러오지 못했습니다: ${err}`, "err"); }
+    }
+
+    function createMsgEl(r){
+      const art = document.createElement('article'); art.className = 'msg';
+      const top = document.createElement('div'); top.className = 'msg-top';
+      const nick = document.createElement('span'); nick.className = 'nick'; nick.textContent = r.nickname || '익명';
+      const time = document.createElement('span'); time.className = 'time'; time.textContent = r.timestamp || '';
+      const p = document.createElement('p'); p.className = 'text'; p.textContent = r.message || '';
+      top.append(nick, time); art.append(top, p); return art;
+    }
+
+    // 이벤트
+    $("#eventOptin").addEventListener('change', togglePhoneRequired);
+    $("#phone").addEventListener('input', handlePhoneInput);
+    $("#moreBtn").addEventListener('click', () => loadMessages());
+
+    $("#guestForm").addEventListener('submit', async (e)=>{
+      e.preventDefault(); const status = $("#formStatus"); const btn = $("#submitBtn");
+      if($("#website").value){ setStatus(status, "스팸이 의심되어 전송하지 않습니다.", "err"); return; }
+
+      const nickname = $("#nickname").value.trim();
+      const email = $("#email").value.trim();
+      const eventOptin = $("#eventOptin").checked;
+      const phoneView = $("#phone").value.trim();
+      const d = digitsOnly(phoneView);
+      const message = $("#message").value.trim();
+
+      if(!nickname || nickname.length > 30){ setStatus(status, "닉네임을 1–30자로 입력해 주세요.", "err"); return; }
+      if(email && !/.+@.+[.].+/.test(email)){ setStatus(status, "이메일 형식이 올바르지 않습니다.", "err"); return; }
+      if(eventOptin && (d.length < 10 || d.length > 11)){ setStatus(status, "휴대폰 번호는 10~11자리여야 합니다.", "err"); return; }
+      if(!message){ setStatus(status, "한줄 글을 입력해 주세요.", "err"); return; }
+
+      try {
+        btn.disabled = true; setStatus(status, "전송 중…", "warn");
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(SECRET_KEY ? { 'X-Guestbook-Key': SECRET_KEY } : {}) },
+          body: JSON.stringify({ nickname, email, phone: formatKoreanPhone(d), message, eventOptin })
+        });
+        const data = await res.json();
+        if(!data || data.ok !== true) throw new Error((data && data.error) || '서버 오류');
+        setStatus(status, "등록되었습니다. 축하와 응원에 감사드립니다!", "ok");
+        $("#message").value = ''; $("#email").value = ''; if(!eventOptin){ $("#phone").value = ''; }
+        await loadMessages();
+      } catch(err){ setStatus(status, `전송 실패: ${err}`, "err"); }
+      finally { btn.disabled = false; }
+    });
+
+    // 초기화
+    setRaffleText(); togglePhoneRequired(); loadMessages();
+  </script>
+
+  <!--
+  =============================
+  설치 가이드 (Google Apps Script)
+  =============================
+  1) Google 스프레드시트 생성 → 시트 이름: guestbook
+     **헤더(1행)를 정확히 아래와 같이 입력**
+       시간 | 닉네임 | 이메일 | 휴대폰번호 | 한줄 | 이벤트
+
+  2) 시트에서 "확장 프로그램 → Apps Script" 열기 → 아래 코드 붙여넣기
+
+  3) "배포 → 새 배포 → 유형: 웹 앱"으로 배포
+     - 실행 사용자: 본인
+     - 액세스: 누구나
+     - 발급된 웹 앱 URL을 HTML 상단의 SCRIPT_URL에 붙여넣기
+
+  4) (선택) 보안 강화를 원하면 SECRET/SECRET_KEY를 동일한 값으로 설정
+
+  ---------- 복사할 Apps Script 코드 ----------
+
+  const SHEET_NAME = 'guestbook';
+  const TIMEZONE = 'Asia/Seoul';
+  const SECRET = ''; // 선택: 비워두면 키 체크 없음
+
+  const COLS = ['시간','닉네임','이메일','휴대폰번호','한줄','이벤트'];
+
+  function doGet(e){
+    const limit = Math.min(parseInt((e.parameter && e.parameter.limit) || '50', 10), 200);
+    const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
+    const values = sh.getDataRange().getValues();
+    const header = values.shift();
+    const idx = Object.fromEntries(header.map((h,i)=>[String(h).trim(), i]));
+
+    const rows = values.slice(-limit).reverse().map(r => ({
+      timestamp: Utilities.formatDate(new Date(r[idx['시간']]), TIMEZONE, 'yyyy-MM-dd HH:mm'),
+      nickname: String(r[idx['닉네임']]||'').trim(),
+      message: String(r[idx['한줄']]||'').trim()
+    }));
+
+    return ContentService.createTextOutput(JSON.stringify({ ok:true, rows }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  function doPost(e){
+    try{
+      const key = (e && e.headers && e.headers['X-Guestbook-Key']) || '';
+      if(SECRET && key !== SECRET) throw new Error('Unauthorized');
+
+      const data = JSON.parse(e.postData.contents);
+      const nickname = sanitizeText_(data.nickname, 1, 30);
+      const email = sanitizeText_(data.email || '', 0, 120);
+      const message = sanitizeText_(data.message, 1, 200);
+      const eventOptin = !!data.eventOptin;
+      const phoneDigits = String(data.phone||'').replace(/[^0-9]/g,'');
+      if(eventOptin && (phoneDigits.length < 10 || phoneDigits.length > 11)) throw new Error('Invalid phone length');
+      const phonePretty = eventOptin ? fmtKoreanPhone_(phoneDigits) : '';
+
+      const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
+      const row = [ new Date(), nickname, email, phonePretty, message, eventOptin ? 'Y':'N' ];
+      sh.appendRow(row);
+
+      return ContentService.createTextOutput(JSON.stringify({ ok:true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }catch(err){
+      return ContentService.createTextOutput(JSON.stringify({ ok:false, error: String(err) }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  function sanitizeText_(s, min, max){
+    s = String(s||'').trim();
+    if(s.length < min) throw new Error('Too short');
+    if(s.length > max) s = s.slice(0, max);
+    return s.replace(/[<>]/g,'');
+  }
+
+  function fmtKoreanPhone_(d){
+    // d: digits only
+    if(d.length <= 3) return d;
+    if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
+    if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
+    return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
+  }
+
+  -------------------------------------------
+  * doGet() 응답에는 시간·닉네임·한줄만 내려 최신순으로 렌더링합니다.
+  * 이메일/휴대폰번호는 목록에 노출하지 않습니다(시트에는 저장).
+  * 필요 시 컬럼명을 변경하면 COLS/인덱스 키도 함께 바꾸세요.
+  -->
+</body>
+</html>
