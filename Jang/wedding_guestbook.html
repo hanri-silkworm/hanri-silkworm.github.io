@@ -7,85 +7,62 @@
   <meta name="description" content="장순이와 장풍이의 웨딩 방명록 페이지입니다." />
   <style>
     :root {
-      --bg: #fff7fb;      /* soft pink */
-      --fg: #1f2937;
-      --muted: #6b7280;
-      --pink: #f472b6;    /* pink-400 */
-      --pink-100: #fce7f3; /* banner bg */
-      --pink-200: #fbcfe8; /* banner border */
-      --purple: #8b5cf6;  /* violet-500 */
-      --purple-100: #ede9fe;
-      --card: #ffffff;
-      --ring: rgba(139, 92, 246, 0.28);
+      --bg: #fff7fb; --fg: #1f2937; --muted: #6b7280;
+      --pink: #f472b6; --pink-100: #fce7f3; --pink-200: #fbcfe8;
+      --purple: #8b5cf6; --purple-100: #ede9fe; --card: #ffffff;
+      --ring: rgba(139, 92, 246, .28);
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0; background: var(--bg); color: var(--fg);
-      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
 
-    /* ===== HERO ===== */
-    header.hero { position: relative; }
-    .hero-imgwrap { position: relative; width: 100%; height: clamp(220px, 38vw, 420px); overflow: hidden; }
-    .hero-imgwrap img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.05) contrast(1.03); }
-    .hero-overlay { position: absolute; inset: 0; background:
-        radial-gradient(1000px 400px at 10% 10%, var(--pink-100), transparent),
-        radial-gradient(800px 300px at 90% 0%, var(--purple-100), transparent),
-        linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.0) 45%, rgba(255,247,251,0.0) 70%, var(--bg));
-      pointer-events: none; }
-    .hero-inner { max-width: 1100px; margin: 0 auto; padding: 18px 16px 28px; position: relative; margin-top: -60px; }
-    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: var(--purple-100); color: #5b21b6; font-weight: 600; font-size: 12px; box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset; }
-    h1 { margin: 12px 0 8px; font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.5px; color: #111827; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
-    .sub { color: var(--muted); margin-top: 6px; }
-    .raffle { margin-top: 10px; background: var(--pink-100); color: #7c2d12; border: 1px solid var(--pink-200); padding: 10px 12px; border-radius: 12px; font-size: 14px; }
-    .raffle strong { color: #9a3412; }
+    header.hero{position:relative}
+    .hero-imgwrap{position:relative;width:100%;height:clamp(220px,38vw,420px);overflow:hidden}
+    .hero-imgwrap img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.03)}
+    .hero-overlay{position:absolute;inset:0;background:
+      radial-gradient(1000px 400px at 10% 10%, var(--pink-100), transparent),
+      radial-gradient(800px 300px at 90% 0%, var(--purple-100), transparent),
+      linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,0) 45%, rgba(255,247,251,0) 70%, var(--bg));
+      pointer-events:none}
+    .hero-inner{max-width:1100px;margin:0 auto;padding:18px 16px 28px;position:relative;margin-top:-60px}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--purple-100);color:#5b21b6;font-weight:600;font-size:12px;box-shadow:0 1px 0 rgba(0,0,0,.04) inset}
+    h1{margin:12px 0 8px;font-size:clamp(28px,4vw,44px);letter-spacing:-.5px;color:#111827;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+    .sub{color:var(--muted);margin-top:6px}
+    .raffle{margin-top:10px;background:var(--pink-100);color:#7c2d12;border:1px solid var(--pink-200);padding:10px 12px;border-radius:12px;font-size:14px}
+    .raffle strong{color:#9a3412}
 
-    /* ===== LAYOUT ===== */
-    main { max-width: 1100px; margin: 0 auto 64px; padding: 0 16px; }
-    .grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
-    @media (min-width: 980px) { .grid { grid-template-columns: 1fr 1fr; } }
+    main{max-width:1100px;margin:0 auto 64px;padding:0 16px}
+    .grid{display:grid;gap:24px;grid-template-columns:1fr}
+    @media (min-width:980px){.grid{grid-template-columns:1fr 1fr}}
 
-    section.card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 24px rgba(0,0,0,0.06); border: 1px solid #edecec; }
-    section.card h2 { margin: 6px 0 12px; font-size: 20px; }
-    .hint { color: var(--muted); font-size: 13px; margin: 8px 0 16px; }
+    section.card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 10px 24px rgba(0,0,0,.06);border:1px solid #edecec}
+    section.card h2{margin:6px 0 12px;font-size:20px}
+    .hint{color:var(--muted);font-size:13px;margin:8px 0 16px}
 
-    /* ===== FORM ===== */
-    form .row { margin-bottom: 12px; }
-    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-    input[type="text"], input[type="tel"] {
-      width: 100%; padding: 12px 12px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; font-size: 15px;
-      outline: none; box-shadow: 0 1px 0 rgba(0,0,0,0.02) inset;
-    }
-    input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px var(--ring); }
-    .checkbox { display: flex; align-items: center; gap: 10px; }
-    .checkbox input { width: 18px; height: 18px; accent-color: var(--purple); }
-    .hp { position: absolute; left: -5000px; top: -5000px; }
+    form .row{margin-bottom:12px}
+    label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+    input[type="text"],input[type="tel"]{width:100%;padding:12px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;font-size:15px;outline:none;box-shadow:0 1px 0 rgba(0,0,0,.02) inset}
+    input:focus{border-color:var(--purple);box-shadow:0 0 0 4px var(--ring)}
+    .checkbox{display:flex;align-items:center;gap:10px}
+    .checkbox input{width:18px;height:18px;accent-color:var(--purple)}
+    .hp{position:absolute;left:-5000px;top:-5000px}
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: 12px; border: 0; color: #fff; font-weight: 700; cursor: pointer;
-      background: linear-gradient(90deg, var(--pink), var(--purple)); box-shadow: 0 6px 16px rgba(139,92,246,0.25); }
-    .btn[disabled] { opacity: .6; cursor: not-allowed; }
-    .btn-secondary { border: 1px solid var(--purple-100); background: #f5f3ff; color: #4c1d95; font-weight: 700; padding: 10px 14px; border-radius: 12px; }
-    .note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;border:0;color:#fff;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--pink),var(--purple));box-shadow:0 6px 16px rgba(139,92,246,.25)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+    .btn-secondary{border:1px solid var(--purple-100);background:#f5f3ff;color:#4c1d95;font-weight:700;padding:10px 14px;border-radius:12px}
+    .note{font-size:13px;color:var(--muted);margin-top:6px}
 
-    /* 버튼만 중앙 정렬 */
-    #submitBtn{display:block;margin:12px auto 0;}
+    /* “방명록 남기기” 버튼만 중앙 정렬 */
+    #submitBtn{display:block;margin:12px auto 0}
 
-    /* ===== LIST ===== */
-    .list { display: grid; gap: 12px; }
-    .msg { border: 1px solid #e5e7eb; border-radius: 14px; padding: 12px 14px; background: #fff; }
-    .msg-top { display: flex; align-items: baseline; gap: 8px; }
-    .nick { font-weight: 700; }
-    .time { font-size: 12px; color: var(--muted); }
-    .text { margin: 6px 0 0; word-break: break-word; }
+    .list{display:grid;gap:12px}
+    .msg{border:1px solid #e5e7eb;border-radius:14px;padding:12px 14px;background:#fff}
+    .msg-top{display:flex;align-items:baseline;gap:8px}
+    .nick{font-weight:700}
+    .time{font-size:12px;color:var(--muted)}
+    .text{margin:6px 0 0;word-break:break-word}
 
-    .status { font-size: 13px; }
-    .ok { color: #16a34a; }
-    .warn { color: #a16207; }
-    .err { color: #dc2626; }
-
-    footer { text-align: center; color: var(--muted); padding: 32px 16px 56px; }
+    .status{font-size:13px}.ok{color:#16a34a}.warn{color:#a16207}.err{color:#dc2626}
+    footer{text-align:center;color:var(--muted);padding:32px 16px 56px}
   </style>
 </head>
 <body>
@@ -98,7 +75,7 @@
       <span class="badge" aria-label="축하 배지">Wedding Guestbook</span>
       <h1>장순이 × 장풍이</h1>
       <p class="sub">소중한 마음을 방명록으로 남겨 주세요. 두 주인공이 평생 간직합니다.</p>
-      <p class="raffle"><strong>이벤트 안내:</strong> 방명록을 남겨 주신 분 중 추첨으로 <strong id="prizeName">스타벅스 쿠폰</strong>을 드립니다. <span id="raffleInfo">마감 · 당첨자 개별 연락</span></p>
+      <p class="raffle"><strong>이벤트 안내:</strong> 방명록을 남겨 주신 분 중 추첨으로 <strong id="prizeName">스타벅스 쿠폰 & 장순이·장풍이 청첩장 아크릴 키링</strong>을 드립니다. <span id="raffleInfo">마감 · 당첨자 개별 연락</span></p>
     </div>
   </header>
 
@@ -107,11 +84,7 @@
       <!-- 작성 영역 -->
       <section class="card" aria-labelledby="write-title">
         <h2 id="write-title">방명록 남기기</h2>
-        <p class="hint">
-          필수 항목은 <strong>닉네임</strong>과 <strong>한줄 글</strong>입니다.
-          <strong>이벤트 참여자만</strong> 휴대폰 번호를 입력합니다.
-          <em>이벤트 미참여자는 체크할 필요가 없습니다.</em>
-        </p>
+        <p class="hint">필수 항목은 <strong>닉네임</strong>과 <strong>한줄 글</strong>입니다. <strong>이벤트 참여자만</strong> 휴대폰 번호를 입력합니다. <em>이벤트 미참여자는 체크할 필요가 없습니다.</em></p>
         <form id="guestForm" novalidate>
           <div class="row">
             <label for="nickname">닉네임 *</label>
@@ -125,8 +98,7 @@
 
           <div class="row" id="phoneRow">
             <label for="phone">휴대폰 번호 <span class="muted">(이벤트 참여 시 필수)</span></label>
-            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"
-                   placeholder="예: 010-1234-5678" maxlength="13" pattern="^[0-9-]+$" />
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="예: 010-1234-5678" maxlength="13" pattern="^[0-9-]+$" />
             <div class="note">숫자만 입력하면 자동으로 하이픈이 들어갑니다. 경품 발송 후 파기합니다.</div>
           </div>
 
@@ -173,143 +145,141 @@
   </footer>
 
   <script>
-    // ===== 환경설정 =====
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_GKDQNvK1xsslbT31-mznTN6-56iIdxTbJMRwPBBEYRWys4-oev_S9THOSGeFQ4l_/exec";
+    // ===== 설정 =====
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzW5GCI3LWAj-4vuCs5YFHyQycyOeJd5CRs5v1B_OD9n_KH-jS7rNLg0hp7bfgbFo6e/exec";
 
-    // 이벤트 안내 (필요하면 바꾸기)
-    const RAFFLE = { PRIZE_NAME: "스타벅스 쿠폰", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
+    const RAFFLE = { PRIZE_NAME: "스타벅스 쿠폰 & 장순이·장풍이 청첩장 아크릴 키링", PRIZES_COUNT: 5, DEADLINE: "2025-11-30 23:59", CONTACT: "당첨자 개별 연락" };
+    const PAGE_SIZE = 20;
+    let loadedCount = 0;
 
-    // 목록 페이징
-    const PAGE_SIZE = 20; let loadedCount = 0;
-
-    // 유틸
     const $ = (sel, el=document) => el.querySelector(sel);
-    function setStatus(el, msg, cls){ el.textContent = msg || ''; el.className = `status ${cls||''}`; }
-    function digitsOnly(s){ return String(s||'').replace(/\D/g,''); }
-    function formatKoreanPhone(d){
-      if(d.length <= 3) return d;
-      if(d.length <= 7) return d.slice(0,3)+'-'+d.slice(3);
-      if(d.length === 10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
-      return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
-    }
-    function handlePhoneInput(){
-      const el = $("#phone"); const d = digitsOnly(el.value).slice(0,11);
-      el.value = formatKoreanPhone(d);
-    }
-    function togglePhoneRequired(){
-      const checked = $("#eventOptin").checked; const phone = $("#phone");
-      if(checked){ phone.setAttribute('required','required'); } else { phone.removeAttribute('required'); }
-    }
-    function setRaffleText(){
-      const txt = `추첨 ${RAFFLE.PRIZES_COUNT}명 / 마감: ${RAFFLE.DEADLINE} / ${RAFFLE.CONTACT}`;
-      const PN = document.getElementById("prizeName"); if(PN) PN.textContent = RAFFLE.PRIZE_NAME;
-      const RI = document.getElementById("raffleInfo"); if(RI) RI.textContent = txt;
-    }
+    const setStatus = (el, msg, cls) => { el.textContent = msg || ''; el.className = `status ${cls||''}`; };
+    const digitsOnly = s => String(s||'').replace(/\D/g,'');
+    function formatKoreanPhone(d){ if(d.length<=3) return d; if(d.length<=7) return d.slice(0,3)+'-'+d.slice(3); if(d.length===10) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6); return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11); }
+    function handlePhoneInput(){ const el=$("#phone"); const d=digitsOnly(el.value).slice(0,11); el.value=formatKoreanPhone(d); }
+    function togglePhoneRequired(){ const checked=$("#eventOptin").checked; const phone=$("#phone"); if(checked){phone.setAttribute('required','required')}else{phone.removeAttribute('required')} }
+    function setRaffleText(){ const txt=`추첨 ${RAFFLE.PRIZES_COUNT}명 / 마감: ${RAFFLE.DEADLINE} / ${RAFFLE.CONTACT}`; const PN=$("#prizeName"); if(PN) PN.textContent=RAFFLE.PRIZE_NAME; const RI=$("#raffleInfo"); if(RI) RI.textContent=txt; }
 
-    // ===== 목록 불러오기 (fetch → 실패 시 JSONP 폴백) =====
-    async function loadMessages(){
-      const listStatus = $("#listStatus");
-      const nextCount = loadedCount + PAGE_SIZE;
-      try {
-        setStatus(listStatus, "불러오는 중…", "warn");
-        const url = `${SCRIPT_URL}?mode=list&limit=${nextCount}&_=${Date.now()}`;
-        const res = await fetch(url, { method: 'GET' });
+    // --- 메시지 가져오기 (JSON → 실패 시 JSONP) ---
+    async function fetchMessages(limit){
+      const url = `${SCRIPT_URL}?mode=list&limit=${limit}&_=${Date.now()}`;
+      try{
+        const res = await fetch(url, {method:'GET'});
         if(!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const rows = (data && data.rows) || [];
-        renderList(rows); loadedCount = rows.length;
-        setStatus(listStatus, `${loadedCount}개 표시`, "");
-        $("#moreBtn").style.display = rows.length < nextCount ? 'none' : 'inline-flex';
-      } catch(err){
-        jsonpLoad(nextCount);
+        return (data && data.rows) || [];
+      }catch(_){
+        // JSONP 폴백
+        return new Promise((resolve,reject)=>{
+          const cbName = `__guestbookCB_${Date.now()}`;
+          window[cbName] = (data)=>{ try{ resolve((data&&data.rows)||[]); } finally { delete window[cbName]; s.remove(); } };
+          const s = document.createElement('script');
+          s.src = `${SCRIPT_URL}?mode=list&limit=${limit}&callback=${cbName}&_=${Date.now()}`;
+          s.onerror = ()=>{ s.remove(); delete window[cbName]; reject(new Error('JSONP failed')); };
+          document.body.appendChild(s);
+        });
       }
     }
 
-    function jsonpLoad(limit){
+    async function loadMessages(){
       const listStatus = $("#listStatus");
-      setStatus(listStatus, "불러오는 중…(JSONP)", "warn");
-      const cbName = `__guestbookCB_${Date.now()}`;
-      window[cbName] = (data)=>{
-        try{
-          const rows = (data && data.rows) || [];
-          renderList(rows); loadedCount = rows.length;
-          setStatus(listStatus, `${loadedCount}개 표시`, "");
-          $("#moreBtn").style.display = rows.length < limit ? 'none' : 'inline-flex';
-        } finally {
-          delete window[cbName]; s.remove();
-        }
-      };
-      const s = document.createElement('script');
-      s.src = `${SCRIPT_URL}?mode=list&limit=${limit}&callback=${cbName}&_=${Date.now()}`;
-      s.onerror = ()=>{ setStatus(listStatus, `목록을 불러오지 못했습니다`, "err"); s.remove(); delete window[cbName]; };
-      document.body.appendChild(s);
+      try{
+        setStatus(listStatus,"불러오는 중…","warn");
+        const rows = await fetchMessages(loadedCount + PAGE_SIZE);
+        renderList(rows); loadedCount = rows.length;
+        setStatus(listStatus, `${loadedCount}개 표시`, "");
+        $("#moreBtn").style.display = rows.length < (loadedCount + PAGE_SIZE) ? 'none' : 'inline-flex';
+        return rows;
+      }catch(err){
+        setStatus(listStatus, `목록을 불러오지 못했습니다: ${err.message}`, "err");
+        return [];
+      }
     }
 
     function renderList(rows){
       const list = $("#list");
-      list.replaceChildren(...rows.map(createMsgEl));
-    }
-    function createMsgEl(r){
-      const art = document.createElement('article'); art.className = 'msg';
-      const top = document.createElement('div'); top.className = 'msg-top';
-      const nick = document.createElement('span'); nick.className = 'nick'; nick.textContent = r.nickname || '익명';
-      const time = document.createElement('span'); time.className = 'time'; time.textContent = r.timestamp || '';
-      const p = document.createElement('p'); p.className = 'text'; p.textContent = r.message || '';
-      top.append(nick, time); art.append(top, p); return art;
+      list.replaceChildren(...rows.map(r=>{
+        const art=document.createElement('article'); art.className='msg';
+        const top=document.createElement('div'); top.className='msg-top';
+        const nick=document.createElement('span'); nick.className='nick'; nick.textContent=r.nickname||'익명';
+        const time=document.createElement('span'); time.className='time'; time.textContent=r.timestamp||'';
+        const p=document.createElement('p'); p.className='text'; p.textContent=r.message||'';
+        top.append(nick,time); art.append(top,p); return art;
+      }));
     }
 
-    // ===== 이벤트 =====
+    // 이벤트 바인딩
     $("#eventOptin").addEventListener('change', togglePhoneRequired);
     $("#phone").addEventListener('input', handlePhoneInput);
     $("#moreBtn").addEventListener('click', () => loadMessages());
-    $("#refreshBtn").addEventListener('click', () => { loadedCount = 0; loadMessages(); });
+    $("#refreshBtn").addEventListener('click', async ()=>{ loadedCount=0; await loadMessages(); });
 
+    // 제출
     $("#guestForm").addEventListener('submit', async (e)=>{
       e.preventDefault();
       const status = $("#formStatus"); const btn = $("#submitBtn");
-      if($("#website").value){ setStatus(status, "스팸이 의심되어 전송하지 않습니다.", "err"); return; }
+      if($("#website").value){ setStatus(status,"스팸이 의심되어 전송하지 않습니다.","err"); return; }
 
       const nickname = $("#nickname").value.trim();
       const eventOptin = $("#eventOptin").checked;
       const phoneDigits = digitsOnly($("#phone").value.trim());
       const message = $("#message").value.trim();
 
-      if(!nickname || nickname.length > 30){ setStatus(status, "닉네임을 1–30자로 입력해 주세요.", "err"); return; }
-      if(!eventOptin && phoneDigits.length > 0){
-        setStatus(status, "이벤트 참여자만 휴대폰 번호를 입력합니다. 참여하려면 이벤트 체크를 해 주세요.", "err"); return;
-      }
-      if(eventOptin && (phoneDigits.length < 10 || phoneDigits.length > 11)){
-        setStatus(status, "휴대폰 번호는 10~11자리여야 합니다.", "err"); return;
-      }
-      if(!message){ setStatus(status, "한줄 글을 입력해 주세요.", "err"); return; }
+      if(!nickname || nickname.length>30){ setStatus(status,"닉네임을 1–30자로 입력해 주세요.","err"); return; }
+      if(!eventOptin && phoneDigits.length>0){ setStatus(status,"이벤트 참여자만 휴대폰 번호를 입력합니다. 참여하려면 이벤트 체크를 해 주세요.","err"); return; }
+      if(eventOptin && (phoneDigits.length<10 || phoneDigits.length>11)){ setStatus(status,"휴대폰 번호는 10~11자리여야 합니다.","err"); return; }
+      if(!message){ setStatus(status,"한줄 글을 입력해 주세요.","err"); return; }
 
-      try {
-        btn.disabled = true; setStatus(status, "전송 중…", "warn");
+      try{
+        btn.disabled = true; setStatus(status,"전송 중…","warn");
 
-        // 프리플라이트 회피: urlencoded 로 전송(헤더 지정 안 함)
+        // 제출 전 목록 길이 확보(성공 검증용)
+        const beforeRows = await fetchMessages(5).catch(()=>[]); 
+        const beforeTop = beforeRows[0] || null;
+
+        // 프리플라이트 회피: urlencoded로 전송(헤더 지정하지 않음)
         const body = new URLSearchParams({
           nickname,
           message,
           eventOptin: eventOptin ? 'true' : 'false',
           phone: eventOptin ? formatKoreanPhone(phoneDigits) : ''
         });
-        const res = await fetch(SCRIPT_URL, { method: 'POST', body });
-        try { if(res && res.ok){ await res.text(); } } catch(_) {}
+        const res = await fetch(SCRIPT_URL, { method:'POST', body });
 
-        setStatus(status, "등록되었습니다. 축하와 응원에 감사드립니다!", "ok");
-        $("#message").value = '';
-        if(!eventOptin){ $("#phone").value = ''; }
-        await loadMessages();
-        document.getElementById("read-title").scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } catch(err){
-        setStatus(status, `전송 실패: ${err}`, "err");
-      } finally {
+        let serverOK = false;
+        try{
+          const txt = await res.text();             // JSON이든 텍스트든 수신
+          serverOK = /"ok"\s*:\s*true/.test(txt);   // ok:true 포함 여부로 1차 판정
+        }catch(_){ serverOK = false; }
+
+        // 저장 확인: 목록 재조회하여 개수 증가 또는 최상단 내용 일치 확인
+        const afterRows = await fetchMessages(5).catch(()=>[]);
+        const increased = afterRows.length > beforeRows.length;
+        const sameTop = !beforeTop && afterRows[0] ||
+                        (beforeTop && afterRows[0] && (afterRows[0].nickname===beforeTop.nickname? afterRows[0].message!==beforeTop.message : true));
+        const verified = increased || sameTop;
+
+        if(res.ok && (serverOK || verified)){
+          setStatus(status,"등록되었습니다. 축하와 응원에 감사드립니다!","ok");
+          $("#message").value=''; if(!eventOptin){ $("#phone").value=''; }
+          await loadMessages();
+          document.getElementById("read-title").scrollIntoView({ behavior:'smooth', block:'start' });
+        }else{
+          setStatus(status,"등록에 실패했습니다. 잠시 후 다시 시도해 주세요.","err");
+        }
+      }catch(err){
+        setStatus(status,`전송 실패: ${err.message}`,"err");
+      }finally{
         btn.disabled = false;
       }
     });
 
     // 초기화
-    setRaffleText(); togglePhoneRequired(); loadMessages();
+    (function init(){
+      const img = document.querySelector('.hero-imgwrap img');
+      if(img && img.src.includes('HERO_IMAGE_URL')) img.alt = '상단 이미지를 설정해 주세요';
+      togglePhoneRequired(); setRaffleText(); loadMessages();
+    })();
   </script>
 </body>
 </html>
