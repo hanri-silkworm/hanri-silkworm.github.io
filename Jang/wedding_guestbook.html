@@ -20,18 +20,28 @@
       -webkit-font-smoothing:antialiased
     }
 
-    /* ===== HERO ===== */
+    /* ===== HERO (80% 크기, 선명) ===== */
     header.hero{position:relative}
-    .hero-imgwrap{position:relative;width:100%;height:clamp(220px,38vw,420px);overflow:hidden}
-    .hero-imgwrap img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.03)}
-    .hero-overlay{position:absolute;inset:0;background:
-      radial-gradient(1000px 400px at 10% 10%, var(--pink-100), transparent),
-      radial-gradient(800px 300px at 90% 0%, var(--purple-100), transparent),
-      linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,0) 45%, rgba(255,247,251,0) 70%, var(--bg));
-      pointer-events:none}
-    .hero-inner{max-width:1100px;margin:0 auto;padding:18px 16px 28px;position:relative;margin-top:-60px}
+    .hero-imgwrap{
+      position:relative;
+      width:100%;
+      height:auto;
+      padding:14px 0;
+    }
+    .hero-imgwrap img{
+      width:min(80%, 1000px);
+      height:auto;
+      display:block;
+      margin:0 auto;
+      object-fit:contain;
+      filter:none;
+      image-rendering:auto;
+    }
+    .hero-overlay{ display:none; } /* 흐림 유발 오버레이 제거 */
+
+    .hero-inner{max-width:1100px;margin:0 auto;padding:18px 16px 28px;position:relative;}
     .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--purple-100);color:#5b21b6;font-weight:600;font-size:12px;box-shadow:0 1px 0 rgba(0,0,0,.04) inset}
-    h1{margin:12px 0 8px;font-size:clamp(28px,4vw,44px);letter-spacing:-.5px;color:#111827;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+    h1{margin:12px 0 8px;font-size:clamp(28px,4vw,44px);letter-spacing:-.5px;color:#111827}
     .sub{color:var(--muted);margin-top:6px}
     .raffle{margin-top:10px;background:var(--pink-100);color:#7c2d12;border:1px solid var(--pink-200);padding:10px 12px;border-radius:12px;font-size:14px}
     .raffle strong{color:#9a3412}
@@ -63,12 +73,12 @@
     .note{font-size:13px;color:var(--muted);margin-top:6px}
     #submitBtn{display:block;margin:12px auto 0} /* 방명록 남기기 버튼만 중앙정렬 */
 
-    /* ===== LIST (세로 5개/페이지) ===== */
+    /* ===== LIST (세로 5개/페이지, 긴 문장 생략) ===== */
     #list{display:flex;flex-direction:column;gap:12px}
     .msg{border:1px solid #e5e7eb;border-radius:14px;padding:12px 14px;background:#fff;cursor:pointer}
     .msg:active{transform:scale(0.995)}
     .msg-top{display:flex;align-items:baseline;gap:8px}
-    .nick{font-weight:700}.time{font-size:12px;color:var(--muted)}
+    .nick{font-weight:700}.time{font-size:12px;color:#6b7280}
     .text{
       margin:6px 0 0;word-break:break-word;
       display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
@@ -173,7 +183,7 @@
   </main>
 
   <footer>
-    <p>축하해 주셔서 고맙습니다 💗💜</p>
+    <p>♥️축하해 주셔서 고맙습니다♥️</p>
   </footer>
 
   <!-- Modal -->
