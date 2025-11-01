@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>누에 그림그리기 대회 – 공식 아카이브 & 참가</title>
+  <style>
+    :root{
+      --bg: #ffffff; --paper: #ffffff; --ink: #111827; --sub: #6b7280;
+      --pri: #4b5563; --pri-2: #374151; --acc: #9ca3af; --muted: #e5e7eb; --ring: rgba(107,114,128,.25);
+      --radius: 16px; --radius-sm: 12px; --shadow: 0 10px 30px rgba(17,24,39,.08);
+
+      --archive-card-w: 400px;
+      --archive-gap: 18px;
+      --archive-row-w: calc(3 * var(--archive-card-w) + 2 * var(--archive-gap));
+    }
+    *{box-sizing: border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+
+    .wrap{max-width:var(--archive-row-w);margin:0 auto;padding:24px}
+
+    /* NAV */
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.75);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+    .brand strong{font-weight:800;letter-spacing:.2px}
+    .nav-actions{display:flex;gap:8px;align-items:center;justify-content:center}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:600}
+    .btn.primary{background:#4b5563;color:#ffffff;border:0}
+    .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+    .btn.disabled,.btn[aria-disabled="true"]{opacity:.7;cursor:not-allowed;pointer-events:none}
+    a.disabled, a[aria-disabled="true"]{opacity:.7;cursor:not-allowed;pointer-events:none}
+    header.nav .wrap{max-width:1120px;padding:20px 24px}
+
+    /* 모바일 햄버거 */
+    .hamburger{display:none;align-items:center;justify-content:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);cursor:pointer;}
+    .hamburger svg{width:22px;height:22px}
+    .hamburger[aria-expanded="true"]{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+
+    /* 모바일 드로어 */
+    .mobile-drawer{position:absolute;right:18px;top:calc(100% + 8px);background:var(--paper);border:1px solid var(--muted);border-radius:14px;box-shadow:var(--shadow);min-width:240px;padding:8px;display:none;}
+    .mobile-drawer.open{display:block;}
+    .mobile-drawer a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:800;}
+    .mobile-drawer a:hover{background:#f3f4f6;}
+    .mobile-drawer a.primary{background:var(--pri);color:#fff;}
+    .mobile-drawer a.primary:hover{filter:brightness(.95);}
+
+    /* HERO */
+    .hero{position:relative;margin:24px auto 12px;border-radius:24px;background:
+      radial-gradient(1200px 600px at 10% -10%, #f3f4f6, transparent 60%),
+      radial-gradient(1200px 600px at 110% 10%, #eef2f7, transparent 60%),
+      var(--paper); box-shadow:var(--shadow); overflow:hidden}
+    .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;padding:40px}
+    @media (max-width:900px){.hero-grid{grid-template-columns:1fr;}}
+    .hero h1{margin:0 0 8px;font-size:clamp(24px,4vw,40px);letter-spacing:-.3px;line-height:1.2}
+    .hero h1 .sub{display:block;font-size:clamp(18px,2.6vw,28px);font-weight:700;color:var(--pri-2);letter-spacing:-.2px;margin-top:8px}
+    .hero p.lead{color:var(--sub);margin:0 0 16px;line-height:1.7}
+    .hero-grid section > * + *{margin-top:10px}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid transparent}
+    .pill.live{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
+    .pill.upcoming{background:#eff6ff;color:#1e3a8a;border-color:#bfdbfe}
+    .pill.muted{background:#f3f4f6;color:#4b5563;border-color:#e5e7eb}
+
+    /* CTA 간격(조금 아래로) */
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .cta-row.hero-cta{margin-top:26px}
+
+    .pill-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+    /* 참가 안내 리스트 */
+    .guide{margin-top:8px;}
+    .guide-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;}
+    .guide-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start;}
+    .guide-list .check{width:18px;height:18px;margin-top:1px;color:#6b7280;}
+
+    /* 우측 예시 일러스트 */
+    .illustration{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--muted);border-radius:16px;background:#fff;box-shadow:var(--shadow);padding:12px;}
+    .illustration .art{width:100%;height:auto;display:block;}
+    .illustration .caption{margin-top:8px;font-size:12px;color:#6b7280;text-align:center;}
+
+    #content.page{display:grid;justify-items:center;gap:28px;padding:0 24px 24px;}
+    #content.page > *{width:min(var(--archive-row-w), 100%)}
+
+    /* 🔶 후원자: 티어별 '줄'은 유지(라벨은 줄 안에서 표시하지 않음) */
+    .sponsor{background:linear-gradient(180deg,#fff7ed 0%,#fff 100%);border:1px solid #fed7aa;border-left:4px solid #fed7aa;border-radius:14px;box-shadow:var(--shadow);}
+    .sponsor .inner{padding:16px 18px;}
+    .sponsor-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;color:#9a3412;}
+    .sponsor-head .ico{width:18px;height:18px;}
+    .sponsor h3{margin:0;font-size:18px;letter-spacing:.2px;color:#9a3412;}
+
+    .sponsor-legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+    .pill-tier{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;border:1px solid transparent}
+    .pill-tier.gold{background:linear-gradient(180deg,#fef3c7,#fff);border-color:#f59e0b;color:#92400e}
+    .pill-tier.silver{background:linear-gradient(180deg,#f3f4f6,#fff);border-color:#cbd5e1;color:#334155}
+    .pill-tier.bronze{background:linear-gradient(180deg,#fde68a,#fff);border-color:#d97706;color:#7a4e2e}
+
+    .sponsor-groups{display:grid;gap:12px;}
+    .sponsor-groups .group + .group{border-top:1px dashed #e5e7eb;padding-top:10px;}
+
+    /* 각 줄 컨테이너: 텍스트 길이에 맞춘 배지(버튼) */
+    .sponsor-grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:0;
+      padding:0;
+      list-style:none;
+      align-items:center;
+      justify-content:flex-start;
+    }
+
+    /* 배지(버튼) + 티어별 색감: 폭은 내용에 맞춤 */
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      color:#374151;
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:13px;
+      text-align:center;
+      width:auto;
+      white-space:nowrap;
+    }
+    .badge .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#cbd5e1;}
+    .badge.gold{border-color:#f59e0b;color:#92400e;background:linear-gradient(180deg,#fff7ed,#fff)}
+    .badge.silver{border-color:#cbd5e1;color:#334155;background:linear-gradient(180deg,#f3f4f6,#fff)}
+    .badge.bronze{border-color:#d97706;color:#7a4e2e;background:linear-gradient(180deg,#fde68a,#fff)}
+    .badge.gold .dot{background:#f59e0b}
+    .badge.silver .dot{background:#94a3b8}
+    .badge.bronze .dot{background:#d97706}
+
+    .sponsor-desc{margin:8px 0 0;color:#7c2d12;font-size:14px}
+
+    /* 섹션/카드/FAQ */
+    .section{margin:40px 0;text-align:center}
+    .section h2{font-size:24px;margin:0 0 6px}
+    .section p.sub{color:var(--sub);margin:0 0 18px}
+    .card-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:var(--archive-gap);margin-top:28px}
+    .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;text-align:center;flex:0 1 var(--archive-card-w);max-width:var(--archive-card-w)}
+    .card .cover{height:140px;background:linear-gradient(135deg,rgba(75,85,99,.12),rgba(156,163,175,.14));display:flex;align-items:center;justify-content:center}
+    .card .cover svg{width:84px;height:84px;opacity:.9}
+    .card .body{padding:18px}
+    .card .body p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta{display:flex;gap:10px;color:var(--sub);font-size:13px;justify-content:center;flex-wrap:wrap}
+    .kicker{color:var(--pri-2);font-weight:800;font-size:12px;letter-spacing:.6px;text-transform:uppercase}
+    .hint{margin-top:6px;font-size:12px;color:#6b7280;}
+
+    .faq details{margin:10px 0;border:0}
+    .faq summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border:1px solid #d1d5db;border-radius:var(--radius);background:#f3f4f6;color:#4b5563;font-weight:700;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,color .15s ease;}
+    .faq summary::-webkit-details-marker{display:none}
+    .faq summary::after{content:"▸";font-size:14px;line-height:1;transform-origin:center;transition:transform .15s ease;color:#6b7280}
+    .faq summary:hover{background:#e5e7eb;border-color:#cbd5e1;box-shadow:0 6px 18px rgba(15,23,42,.06)}
+    .faq details[open] summary{background:#e5e7eb;border-color:#cbd5e1;border-bottom-left-radius:0;border-bottom-right-radius:0}
+    .faq details[open] summary::after{transform:rotate(90deg)}
+    .faq details > div{padding:14px 16px;border:1px solid #cbd5e1;border-top:0;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius);background:var(--paper);color:#111827;}
+    .faq summary:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ring)}
+
+    footer{margin:48px 0 12px;color:#6b7280;text-align:center;font-size:14px}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="brand" href="index.html" aria-label="누에 대회 홈">
+        <strong>🐛누에 그림그리기 대회</strong>
+      </a>
+      <nav class="nav-actions" aria-label="주요 링크">
+        <a class="btn" href="#sponsors">후원자</a>
+        <a class="btn" href="#archive">누에 고치 성별 맞추기 대회 아카이브</a>
+        <a class="btn primary" href="https://forms.gle/eBjTkykTmyQU534K6" id="btn-participate">참여하기</a>
+        <a class="btn js-vote disabled" aria-disabled="true" title="투표기간이 아닙니다 (11/15~11/22)" href="https://www.hanri.net/nunu/3rd_leaderboard.html" id="btn-leaderboard">투표하러 가기</a>
+      </nav>
+      <button id="hamburger" class="hamburger" aria-label="메뉴 열기" aria-controls="mobileDrawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/></svg>
+      </button>
+      <div id="mobileDrawer" class="mobile-drawer" role="menu" aria-label="모바일 메뉴">
+        <a role="menuitem" href="#sponsors">후원자</a>
+        <a role="menuitem" href="#archive">누에 고치 성별 맞추기 대회 아카이브</a>
+        <a role="menuitem" class="primary" href="https://hanri.net/nunu/art_submit.html">참여하기</a>
+        <a role="menuitem" class="js-vote disabled" aria-disabled="true" title="투표기간이 아닙니다 (11/15~11/22)" href="https://www.hanri.net/nunu/3rd_leaderboard.html">투표하러 가기</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="home" class="wrap hero">
+    <div class="hero-grid">
+      <section>
+        <div class="pill-row">
+          <div class="pill live">지원 기간 · 11월 1일 ~ 11월 14일</div>
+          <div class="pill upcoming">투표 기간 · 11월 15일 ~ 11월 22일</div>
+          <div class="pill muted">당선작 발표 · 11월 29일</div>
+        </div>
+
+        <h1>🐛귀여운 누에를 그려보세요
+          <span class="sub">누에 그림그리기 대회 · 참가</span>
+        </h1>
+
+        <p class="lead">
+          누에를 주제로 한 나만의 한 컷을 보내고, 커뮤니티 투표로 당선작에 도전하세요.
+          지금 참여하면 리더보드와 아카이브에 작품이 기록됩니다.
+        </p>
+
+        <div class="guide" id="participate" aria-label="참가 안내">
+          <ul class="guide-list">
+            <li>
+              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div><strong>제출 방법</strong>: <a href="https://hanri.net/nunu/art_submit.html">참여하기</a>를 통해 참여해주세요!</div>
+            </li>
+            <li>
+              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12l4 4 12-12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div>
+                <strong>작품 규정</strong>: <u>직접 그린</u> 누에 또는 누에 관련 그림만 가능하며 <strong>AI 사용은 금지</strong>됩니다(생성·보정·확장 도구 포함).
+                <strong>한 사람당 1개 작품만 참여할 수 있습니다</strong>(중복 제출 불가).
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="cta-row hero-cta">
+          <a class="btn primary" href="https://hanri.net/nunu/art_submit.html" id="btn-participate-hero">참여하기</a>
+          <a class="btn js-vote disabled" aria-disabled="true" title="투표기간이 아닙니다 (11/15~11/22)" href="https://www.hanri.net/nunu/3rd_leaderboard.html" id="btn-leaderboard-hero">투표하러 가기</a>
+        </div>
+      </section>
+
+      <!-- 우측 예시 그림 -->
+      <figure class="illustration" aria-label="누에 그림 예시">
+        <svg class="art" viewBox="0 0 320 240" role="img" aria-labelledby="art-title" xmlns="http://www.w3.org/2000/svg">
+          <title id="art-title">누에 일러스트 예시</title>
+          <rect x="0" y="0" width="320" height="240" rx="16" fill="#f8fafc" stroke="#e5e7eb"/>
+          <ellipse cx="110" cy="150" rx="28" ry="22" fill="#e5e7eb" stroke="#cbd5e1"/>
+          <ellipse cx="140" cy="150" rx="30" ry="24" fill="#eef2ff" stroke="#cbd5e1"/>
+          <ellipse cx="172" cy="148" rx="34" ry="26" fill="#e5e7eb" stroke="#cbd5e1"/>
+          <ellipse cx="208" cy="146" rx="38" ry="28" fill="#eef2ff" stroke="#cbd5e1"/>
+          <ellipse cx="246" cy="142" rx="42" ry="30" fill="#e5e7eb" stroke="#cbd5e1"/>
+          <circle cx="86" cy="144" r="18" fill="#ffffff" stroke="#cbd5e1"/>
+          <circle cx="82" cy="140" r="3.8" fill="#1f2937"/>
+          <circle cx="92" cy="142" r="3.8" fill="#1f2937"/>
+          <path d="M78 126 q-10 -18 -24 -12" fill="none" stroke="#94a3b8" stroke-width="2"/>
+          <path d="M94 126 q12 -16 26 -10" fill="none" stroke="#94a3b8" stroke-width="2"/>
+          <ellipse cx="170" cy="200" rx="110" ry="14" fill="#e5e7eb"/>
+        </svg>
+        <figcaption class="caption">예시 이미지 · 실제 제출작으로 대체됩니다</figcaption>
+      </figure>
+    </div>
+  </main>
+
+  <!-- === 중앙 래퍼 시작 === -->
+  <div id="content" class="page">
+
+    <!-- 🔶 후원자 -->
+    <section id="sponsors" class="sponsor" aria-labelledby="sponsor-title">
+      <div class="inner">
+        <div class="sponsor-head">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 17l-5.5 3 1.5-6.2L3 9.5l6.3-.6L12 3l2.7 5.9 6.3.6-5 4.3L17.5 20z" stroke-linejoin="round"/></svg>
+          <h3 id="sponsor-title">후원해주신 분들</h3>
+        </div>
+
+        <div class="sponsor-legend" aria-label="후원 등급 안내">
+          <span class="pill-tier gold">🥇 10만원 이상</span>
+          <span class="pill-tier silver">🥈 5만원 이상</span>
+          <span class="pill-tier bronze">🥉 1만원 이상</span>
+          <span class="pill-tier" style="border-color:#e5e7eb;color:#374151;">• 그 이하</span>
+        </div>
+
+        <div class="sponsor-groups" role="group" aria-label="후원자 등급별 목록">
+          <ul id="sponsorGold" class="sponsor-grid group gold" aria-label="10만원 이상"></ul>
+          <ul id="sponsorSilver" class="sponsor-grid group silver" aria-label="5만원 이상"></ul>
+          <ul id="sponsorBronze" class="sponsor-grid group bronze" aria-label="1만원 이상"></ul>
+          <ul id="sponsorDefault" class="sponsor-grid group default" aria-label="그 이하"></ul>
+        </div>
+
+        <p class="sponsor-desc">여러분의 응원으로 대회가 더 즐겁고 풍성해집니다. 감사합니다!</p>
+      </div>
+    </section>
+
+    <!-- ARCHIVE: 누에 고치 성별 맞추기 -->
+    <section id="archive" class="section">
+      <h2>누에 고치 성별 맞추기 대회 아카이브</h2>
+      <p class="sub">‘누에 고치 성별 맞추기 대회’ 제 1회 ~ 제 3회 기록 모음</p>
+
+      <div class="card-grid">
+        <article class="card">
+          <div class="cover" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+          </div>
+          <div class="body">
+            <div class="kicker">제 1회 (2025.06)</div>
+            <h3 style="margin:6px 0 6px">리더보드 & 기념사진</h3>
+            <p style="margin:0 0 10px;color:var(--sub)">참가 25명 · 문항 15 · 우승자 김○희</p>
+            <div class="meta">
+              <a class="btn" href="./1st_leaderboard.html">리더보드</a>
+              <a class="btn" href="#a1-dl">기념사진</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="cover" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+          </div>
+          <div class="body">
+            <div class="kicker">제 2회 (2025.08)</div>
+            <h3 style="margin:6px 0 6px">리더보드 & 기념사진</h3>
+            <p style="margin:0 0 10px;color:var(--sub)">참가 54명 · 문항 20 · 우승자 단팥빵, 김서윤</p>
+            <div class="meta">
+              <a class="btn" href="./2nd_leaderboard.html">리더보드</a>
+              <a class="btn" href="#a2-stats">기념사진</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="cover" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+          </div>
+          <div class="body">
+            <div class="kicker">제 3회 (2025.09)</div>
+            <h3 style="margin:6px 0 6px">리더보드 & 기념사진</h3>
+            <p style="margin:0 0 10px;color:var(--sub)">참가 64명· 문항 20 · 우승자 너미</p>
+            <div class="meta">
+              <a class="btn" href="https://www.hanri.net/nunu/3rd_leaderboard.html">리더보드</a>
+              <a class="btn" href="#a3-stats">기념사진</a>
+            </div>
+            <div class="hint">제 3회 결과는 <strong>리더보드</strong>에서 확인하세요.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ARCHIVE: 누에 그림그리기 -->
+    <section id="draw-archive" class="section">
+      <h2>누에 그림그리기 대회 아카이브</h2>
+      <p class="sub">‘누에 그림그리기 대회’ 제 1회 기록</p>
+
+      <div class="card-grid">
+        <article class="card">
+          <div class="cover" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 14l3-3 3 3 4-4"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="kicker">제 1회 (2025.11)</div>
+            <h3 style="margin:6px 0 6px">진행 현황 & 제출 안내</h3>
+            <p style="margin:0 0 10px;color:var(--sub)">지원 11.01–11.14 · 투표 11.15–11.22 · 발표 11.29</p>
+            <div class="meta">
+              <a class="btn primary" href="https://hanri.net/nunu/art_submit.html">참여하기</a>
+              <a class="btn js-vote disabled" aria-disabled="true" title="투표기간이 아닙니다 (11/15~11/22)" href="https://www.hanri.net/nunu/3rd_leaderboard.html">투표하러 가기</a>
+              <a class="btn" href="mailto:hanri@hanri.net">이메일 제출</a>
+            </div>
+            <div class="hint">발표 이후, 리더보드·기념사진을 이 섹션에 업데이트합니다.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="section">
+      <h2>FAQ</h2>
+      <p class="sub">가장 많이 묻는 질문을 모았습니다. 자세한 규정은 참가 안내를 참고하세요.</p>
+      <div class="faq" style="text-align:left">
+        <details><summary>닉네임 공개 범위는 어떻게 되나요?</summary><div>이벤트 참가 종료 후 리더보드에 닉네임과 각 참가자의 선택지와 점수만이 공개됩니다.</div></details>
+        <details><summary>동점자는 어떻게 처리하나요?</summary><div>기본 원칙은 동순위입니다.</div></details>
+        <details><summary>사진·영상은 어디에서 볼 수 있나요?</summary><div>각 회차 아카이브 페이지 하단의 "기념사진" 섹션에 정리합니다.</div></details>
+        <details><summary>참가 설문을 여러 번 제출해도 되나요?</summary><div>이벤트 참가 중복은 허용하지 않습니다. 휴대폰 번호 기준으로 중복 체크를 진행하며 만약 데이터베이스에 중복 기록 시 맨 처음 참여기록만 반영됩니다.</div></details>
+      </div>
+    </section>
+
+    <footer>
+      <div>© 2025 누에 그림그리기 대회 · 문의: <a href="mailto:hanri@hanri.net" style="color:#374151;text-decoration:none">hanri@hanri.net</a></div>
+    </footer>
+  </div>
+
+  <!-- 스크립트 -->
+  <script>
+    /* 비활성 링크 안내 */
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[aria-disabled="true"], a.disabled');
+      if (a) { e.preventDefault(); }
+    });
+
+    /* 🔒 오른쪽 클릭/드래그 금지 */
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+    document.addEventListener('dragstart', (e)=> e.preventDefault());
+
+    /* 모바일 햄버거 드로어 */
+    const ham = document.getElementById('hamburger');
+    const drawer = document.getElementById('mobileDrawer');
+    function closeDrawer(){ drawer.classList.remove('open'); ham.setAttribute('aria-expanded','false'); }
+    function openDrawer(){ drawer.classList.add('open'); ham.setAttribute('aria-expanded','true'); }
+    function toggleDrawer(){ drawer.classList.contains('open') ? closeDrawer() : openDrawer(); }
+    ham?.addEventListener('click', (e)=>{ e.stopPropagation(); toggleDrawer(); });
+    document.addEventListener('click', (e)=>{ if (!drawer.classList.contains('open')) return; if (e.target.closest('#mobileDrawer') || e.target.closest('#hamburger')) return; closeDrawer(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeDrawer(); });
+    window.addEventListener('resize', ()=>{ if (window.innerWidth > 720) closeDrawer(); });
+    drawer.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> closeDrawer()));
+
+    /* 후원자 데이터 */
+    const SPONSORS = [
+      { name: '중앙대학교 이윤지 교수님', amount: 200000 },
+      { name: '중앙대학교 나동희 교수님', amount: 100000 },
+      { name: '우리집 한지혜', amount: 100000 },
+      { name: '중앙대학교 연구실 김지산', amount: 100000 },
+      { name: '중앙대학교 연구실 정선', amount: 50000 },
+      { name: '중앙대학교 연구실 윤홍률', amount: 50000 },
+      { name: '데이안 은성 최고미녀 스테키', amount: 50000 },
+      { name: '복희어멍 단팥빵', amount: 50000 },
+      { name: '광주채고미나리', amount: 50000 },
+      { name: '중앙대학교 연구실 윤단비', amount: 30000 },
+      { name: '중앙대학교 연구실 조세현', amount: 20000 },
+      { name: 'KAIST 신지드 정진욱', amount: 10040 },
+      { name: '경희대학교 연구실 김영하', amount: 2000 },
+    ];
+
+    function tierOf(amt){
+      if (amt >= 100000) return 'gold';
+      if (amt >= 50000)  return 'silver';
+      if (amt >= 10000)  return 'bronze';
+      return 'default';
+    }
+
+    const sponsorEls = {
+      gold: document.getElementById('sponsorGold'),
+      silver: document.getElementById('sponsorSilver'),
+      bronze: document.getElementById('sponsorBronze'),
+      default: document.getElementById('sponsorDefault'),
+    };
+
+    function fillGroup(el, items){
+      el.innerHTML = '';
+      if(!items.length){
+        const li = document.createElement('li');
+        li.className = 'badge';
+        li.innerHTML = '<span class="dot" aria-hidden="true"></span> 등록 예정';
+        el.appendChild(li);
+        return;
+      }
+      items.forEach(({name, amount})=>{
+        const tier = tierOf(amount||0);
+        const icon = tier==='gold' ? '🥇' : tier==='silver' ? '🥈' : tier==='bronze' ? '🥉' : '•';
+        const li = document.createElement('li');
+        li.className = 'badge ' + (tier==='default' ? '' : tier);
+        li.innerHTML = `<span class="dot" aria-hidden="true"></span><span class="who">${icon} ${name}</span>`;
+        el.appendChild(li);
+      });
+    }
+
+    function renderSponsorsByTier(list){
+      const sorted = list.slice().sort((a,b)=> (b.amount||0) - (a.amount||0));
+      const groups = { gold:[], silver:[], bronze:[], default:[] };
+      sorted.forEach(s => { groups[tierOf(s.amount||0)].push(s); });
+      fillGroup(sponsorEls.gold, groups.gold);
+      fillGroup(sponsorEls.silver, groups.silver);
+      fillGroup(sponsorEls.bronze, groups.bronze);
+      fillGroup(sponsorEls.default, groups.default);
+    }
+    renderSponsorsByTier(SPONSORS);
+
+    /* 🗳 투표 버튼 자동 비활성/활성 */
+    const VOTE_START = new Date('2025-11-15T00:00:00');
+    const VOTE_END   = new Date('2025-11-22T23:59:59');
+    const isVotingOpen = (now = new Date()) => now >= VOTE_START && now <= VOTE_END;
+
+    function updateVoteButtons(){
+      const voteLinks = document.querySelectorAll('.js-vote');
+      const open = isVotingOpen();
+      voteLinks.forEach(link=>{
+        if(open){
+          link.classList.remove('disabled');
+          link.removeAttribute('aria-disabled');
+          link.removeAttribute('title');
+        }else{
+          link.classList.add('disabled');
+          link.setAttribute('aria-disabled','true');
+          link.setAttribute('title','투표기간이 아닙니다 (11/15~11/22)');
+        }
+      });
+    }
+
+    updateVoteButtons();
+    document.querySelectorAll('.js-vote').forEach(link=>{
+      link.addEventListener('mouseenter', updateVoteButtons);
+      link.addEventListener('focus', updateVoteButtons);
+    });
+  </script>
+</body>
+</html>
