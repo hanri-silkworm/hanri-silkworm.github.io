@@ -162,6 +162,47 @@
     .faq summary:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ring)}
 
     footer{margin:48px 0 12px;color:#6b7280;text-align:center;font-size:14px}
+
+    /* =========================
+       📱 모바일 최적화 (핸드폰)
+       ========================= */
+    @media (max-width: 720px){
+      /* 상단 */
+      header.nav .wrap{padding:12px 16px}
+      .nav-actions{display:none}         /* 우측 버튼 숨김 */
+      .hamburger{display:inline-flex}    /* 햄버거 표시 */
+      .wrap{padding:18px}
+
+      /* 히어로 */
+      .hero{margin:16px auto 8px;border-radius:18px}
+      .hero-grid{gap:16px;padding:22px}
+      .pill{font-size:11px;padding:5px 8px}
+      .guide-list li{grid-template-columns:16px 1fr}
+      .cta-row.hero-cta{margin-top:18px}
+      .btn{padding:10px 12px;font-size:14px}
+
+      /* 카드/아카이브 */
+      .card-grid{gap:12px;margin-top:18px}
+      .card{flex:1 1 100%;max-width:100%;text-align:left}
+      .card .cover{height:auto;aspect-ratio:16/9}  /* 비율 유지 */
+      .card .body p{white-space:normal}            /* 말줄임 해제 */
+
+      /* 후원자 */
+      .sponsor .inner{padding:14px}
+      .sponsor-legend{gap:6px}
+      .badge{padding:7px 10px;font-size:12px}
+
+      /* FAQ/푸터 */
+      .faq summary{padding:10px 12px}
+      footer{font-size:13px}
+    }
+
+    /* 초소형 기기 보완 */
+    @media (max-width: 380px){
+      .brand strong{font-size:15px}
+      .pill-row{gap:6px}
+      .kicker{font-size:11px}
+    }
   </style>
 </head>
 <body>
