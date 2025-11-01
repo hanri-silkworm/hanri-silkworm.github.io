@@ -69,8 +69,8 @@
     /* Toast */
     #toast{position:fixed;inset:auto 16px 16px auto;background:#111;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s ease}
 
-    /* RULES/AWARDS/PRIZE boxes (spacing ↓) */
-    .rules-box, .awards-box, .prize-box{background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #cbd5e1;border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-top:6px}
+    /* RULES/AWARDS/PRIZE boxes (spacing ↓ to 5px) */
+    .rules-box, .awards-box, .prize-box{background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #cbd5e1;border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-top:5px}
     .rule-list, .award-list, .prize-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
     .rule-list li, .award-list li, .prize-list li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
     .rule-list .ico, .award-list .ico, .prize-list .ico{width:18px;height:18px;line-height:18px;border-radius:50%;background:#6b7280;color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;margin-top:2px}
@@ -224,6 +224,10 @@
         return d.replace(/(\d{3})(\d{3,4})(\d{0,4})/, '$1-$2-$3').replace(/-$/,'');
       }
     }
+    function fallbackDataURL(text="이미지를 찾을 수 없음"){
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#999" font-size="22">${text}</text></svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
 
     /* 2) 갤러리 + 선택 제한 (버튼 방식) */
     let currentIndex = -1;
@@ -256,6 +260,11 @@
           </div>`;
         grid.appendChild(card);
       });
+      // 이미지 없을 때 회색 플레이스홀더로 대체
+      $$('.thumb img', grid).forEach(img=>{
+        img.addEventListener('error', ()=>{ img.src = fallbackDataURL(); });
+      });
+
       grid.setAttribute('aria-busy','false');
       bindChoiceLimit();
       $$(".thumb", grid).forEach(el=>{ el.addEventListener('click', (ev)=>{ ev.stopPropagation(); const idx = Number(el.getAttribute('data-index')) || 0; openLightbox(idx); }); });
@@ -347,4 +356,22 @@
           $('#submitBtn').disabled = false; return;
         }
         localStorage.setItem(phoneKey(phoneDigits), '1');
-        $('#message').inne
+        $('#message').innerHTML = '<span class="success">투표가 접수되었다. 감사합니다.</span>';
+        $('#submitBtn').disabled = true; $('#voterName').disabled = true; $('#voterPhone').disabled = true; $$('.pick-btn').forEach(b=> b.disabled = true);
+        toast('접수 완료');
+      };
+      const params = new URLSearchParams({ callback: cbName, name, phone: phoneDigits, choices: choices.join(','), ua: navigator.userAgent, ref: document.referrer || '' });
+      scriptTag = document.createElement('script');
+      scriptTag.src = `${APPS_SCRIPT_URL}?${params.toString()}&ts=${Date.now()}`;
+      scriptTag.defer = true;
+      document.body.appendChild(scriptTag);
+    }
+
+    /* 5) 초기화 */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      renderGallery();
+      $('#voteForm').addEventListener('submit', submitVote);
+    });
+  </script>
+</body>
+</html>
