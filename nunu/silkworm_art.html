@@ -78,22 +78,6 @@
     /* prize icon override (no grey circle, larger emoji) */
     #prize .ico{background:transparent;color:inherit;width:auto;height:auto;line-height:1;font-size:24px;border-radius:0}
     #prize .prize-list li{grid-template-columns:auto 1fr}
-
-    /* PICK BUTTON (left aligned with order number) */
-    .pick{margin-top:6px}
-    .pick-btn{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 12px; border:1px solid #d1d5db; border-radius:10px;
-      background:#fff; font-weight:800; cursor:pointer; text-align:left;
-    }
-    .pick-btn .pick-order{
-      display:none; width:22px; height:22px; border-radius:50%;
-      background:#111827; color:#fff; font-size:12px;
-      align-items:center; justify-content:center;
-    }
-    .pick-btn[aria-pressed="true"]{ border-color:#111827; background:rgba(17,24,39,.06) }
-    .pick-btn[aria-pressed="true"] .pick-order{ display:inline-flex }
-    .pick-btn[disabled]{ opacity:.55; cursor:not-allowed }
   </style>
 </head>
 <body>
@@ -212,6 +196,8 @@
     function normalizePhone(s){ return (s||"").replace(/[^0-9]/g,""); }
     function validPhoneDigits(d){ return d.length >= 9 && d.length <= 16; }
     function phoneKey(d){ return `silkworm_vote_${d}`; }
+
+    // 전화번호 자동 하이픈
     function formatKoreanPhone(s){
       const d = String(s||'').replace(/\D/g,'');
       if (d.startsWith('02')){ // 서울
@@ -224,12 +210,13 @@
         return d.replace(/(\d{3})(\d{3,4})(\d{0,4})/, '$1-$2-$3').replace(/-$/,'');
       }
     }
+    // 이미지 플레이스홀더
     function fallbackDataURL(text="이미지를 찾을 수 없음"){
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#999" font-size="22">${text}</text></svg>`;
       return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
     }
 
-    /* 2) 갤러리 + 선택 제한 (버튼 방식) */
+    /* 2) 갤러리 + 제한 */
     let currentIndex = -1;
     function renderGallery(){
       const list = RANDOMIZE_ORDER ? shuffle([...GALLERY]) : [...GALLERY];
@@ -250,17 +237,12 @@
             <div style="flex:1">
               <p class="title">${art.title}</p>
               <p class="muted desc">${art.desc || ""}</p>
-              <div class="pick">
-                <button type="button" class="pick-btn" data-id="${art.id}" aria-pressed="false">
-                  <span class="pick-order" aria-hidden="true"></span>
-                  <span class="pick-text">이 작품 선택</span>
-                </button>
-              </div>
+              <label class="checkbox"><input type="checkbox" class="choice" value="${art.id}" aria-label="${art.id} ${art.title} 선택" /> 이 작품 선택</label>
             </div>
           </div>`;
         grid.appendChild(card);
       });
-      // 이미지 없을 때 회색 플레이스홀더로 대체
+      // 이미지 없을 때 회색 플레이스홀더 적용
       $$('.thumb img', grid).forEach(img=>{
         img.addEventListener('error', ()=>{ img.src = fallbackDataURL(); });
       });
@@ -272,46 +254,26 @@
     function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 
     function bindChoiceLimit(){
-      const btns = $$('.pick-btn');
-      window.selectedIds = window.selectedIds || [];
-      function updateUI(){
-        const cnt = selectedIds.length;
+      const boxes = $$('.choice');
+      function update(){
+        const cnt = boxes.filter(b=>b.checked).length;
         $('#countLabel').textContent = `${cnt} / ${MAX_SELECTION} 선택`;
-        btns.forEach(btn=>{
-          const id = btn.dataset.id;
-          const idx = selectedIds.indexOf(id);
-          const selected = idx !== -1;
-          btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
-          const ord = btn.querySelector('.pick-order');
-          ord.textContent = selected ? String(idx+1) : '';
-          btn.disabled = !selected && cnt >= MAX_SELECTION;
-        });
+        // 선택 최대치 도달 시 나머지 비활성화
+        boxes.forEach(b=>{ if(!b.checked) b.disabled = cnt >= MAX_SELECTION; });
         const validForm =
           $('#voterName').value.trim().length>0 &&
           validPhoneDigits(normalizePhone($('#voterPhone').value)) &&
           cnt>0 && cnt<=MAX_SELECTION;
         $('#submitBtn').disabled = !validForm;
       }
-      btns.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const id = btn.dataset.id;
-          const idx = selectedIds.indexOf(id);
-          if (idx === -1){
-            if (selectedIds.length >= MAX_SELECTION){ toast(`최대 ${MAX_SELECTION}개까지 선택할 수 있다.`); return; }
-            selectedIds.push(id);
-          } else {
-            selectedIds.splice(idx,1);
-          }
-          updateUI();
-        });
-      });
-      $('#voterName').addEventListener('input', updateUI);
+      boxes.forEach(b=> b.addEventListener('change', update));
+      $('#voterName').addEventListener('input', update);
       $('#voterPhone').addEventListener('input', ()=>{
         const el=$('#voterPhone');
         el.value = formatKoreanPhone(el.value);
-        updateUI();
+        update();
       });
-      updateUI();
+      update();
     }
 
     /* 3) 라이트박스 */
@@ -338,7 +300,7 @@
       if (!validPhoneDigits(phoneDigits)){ toast('전화번호를 숫자로 정확히 입력한다.'); return; }
       if (localStorage.getItem(phoneKey(phoneDigits))){ toast('이미 제출한 전화번호이다.'); return; }
 
-      const choices = (window.selectedIds || []).slice(0,MAX_SELECTION);
+      const choices = $$('.choice').filter(c=>c.checked).map(c=>c.value).slice(0,MAX_SELECTION);
       if (choices.length < 1){ toast('최소 1개 작품을 선택한다.'); return; }
 
       $('#submitBtn').disabled = true; $('#message').textContent = '제출을 처리한다…';
@@ -352,12 +314,12 @@
           const code = resp && resp.code ? resp.code : 'ERROR';
           if (code==='DUPLICATE'){ $('#message').innerHTML = '<span class="error">이미 제출한 전화번호이다. 1회만 제출 가능하다.</span>'; }
           else if (code==='INVALID'){ $('#message').innerHTML = '<span class="error">입력 값이 유효하지 않다.</span>'; }
-          else { $('#message').innerHTML = '<span class="error">제출 중 오류가 발생했다. (웹앱 권한/시트 ID 확인)</span>'; }
+          else { $('#message').innerHTML = '<span class="error">제출 중 오류가 발생했다.</span>'; }
           $('#submitBtn').disabled = false; return;
         }
         localStorage.setItem(phoneKey(phoneDigits), '1');
         $('#message').innerHTML = '<span class="success">투표가 접수되었다. 감사합니다.</span>';
-        $('#submitBtn').disabled = true; $('#voterName').disabled = true; $('#voterPhone').disabled = true; $$('.pick-btn').forEach(b=> b.disabled = true);
+        $('#submitBtn').disabled = true; $('#voterName').disabled = true; $('#voterPhone').disabled = true; $$('.choice').forEach(c=> c.disabled = true);
         toast('접수 완료');
       };
       const params = new URLSearchParams({ callback: cbName, name, phone: phoneDigits, choices: choices.join(','), ua: navigator.userAgent, ref: document.referrer || '' });
