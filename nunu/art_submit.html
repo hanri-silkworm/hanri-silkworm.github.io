@@ -57,7 +57,17 @@
     </div>
   </header>
 
-  이" />
+  <!-- FORM -->
+  <main class="wrap">
+    <section class="card" aria-labelledby="form-title">
+      <h2 id="form-title" class="section-title">작품 제출</h2>
+      <p class="hint">아래 정보를 입력하고 그림 파일을 첨부한다. “보내기”를 누르면 주최 측 이메일로 전송한다.</p>
+
+      <form id="submitForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="artistName">참가자 이름/닉네임</label>
+            <input id="artistName" name="name" type="text" autocomplete="name" required placeholder="예: 한리 / Hanri" />
           </div>
           <div class="field">
             <label for="artistContact">연락 수단(이메일 또는 전화번호)</label>
