@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>누에 그림 대회 — 온라인 투표</title>
+  <meta name="description" content="누에 그림 그리기 대회 온라인 투표 페이지" />
+  <style>
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --pri:#4b5563; --pri-2:#374151; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
+      --radius:16px; --shadow:0 10px 30px rgba(17,24,39,.08);
+      --wrap:1100px;
+      --accent:#10b981; --accent-bg:#ecfdf5; --accent-bd:#a7f3d0;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+    img{max-width:100%;display:block}
+    .wrap{max-width:var(--wrap);margin:0 auto;padding:24px}
+
+    /* NAV */
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);background:rgba(247,246,243,.8);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 18px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+    .brand strong{font-weight:800;letter-spacing:.2px}
+    .nav-actions{display:flex;gap:8px;align-items:center}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid var(--muted);background:var(--paper);color:var(--ink);text-decoration:none;font-weight:700}
+    .btn.primary{background:#4b5563;color:#fff;border:0}
+    .btn:hover{box-shadow:0 6px 18px rgba(15,23,42,.08)}
+    @media (max-width:760px){ .nav-actions{display:none} }
+
+    /* CARD */
+    main .card{background:var(--paper);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .section-title{margin:0 0 10px;font-size:18px}
+    .row{display:grid;grid-template-columns:1fr;gap:10px}
+    @media (min-width:700px){.row{grid-template-columns:1fr 1fr}}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:14px;font-weight:800}
+    .field input{border:1px solid #d1d5db;border-radius:12px;padding:12px;font-size:15px}
+    .hint{color:var(--sub);font-size:13px;margin:6px 0 0}
+    .toolbar{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .count{font-weight:800;font-size:14px;color:var(--pri-2)}
+    .btn.submit{border:0;border-radius:12px;font-weight:800;padding:12px 16px;cursor:pointer;background:#111827;color:#fff;font-size:15px}
+    .btn.submit[disabled]{opacity:.5;cursor:not-allowed}
+
+    /* GALLERY */
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:16px}
+    @media (min-width:560px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:980px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .art{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column;transition:transform .12s ease, box-shadow .12s ease}
+    .art:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(17,24,39,.08)}
+    .thumb{position:relative;aspect-ratio:4/3;width:100%;background:#f6f6f6;overflow:hidden;cursor:pointer}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .zoom-hint{position:absolute;inset:auto 8px 8px auto;background:rgba(17,24,39,.6);color:#fff;border-radius:999px;padding:6px 9px;font-size:12px}
+    .info{padding:10px 12px;display:flex;align-items:flex-start;gap:10px}
+    .badge{font-size:12px;background:#111827;color:#fff;padding:4px 8px;border-radius:999px}
+    .title{font-weight:800;font-size:15px;margin:0}
+    .muted{color:#6b7280;font-size:12px;margin:4px 0 0}
+    .desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .checkbox{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .checkbox input{width:18px;height:18px}
+
+    /* LIGHTBOX */
+    .lightbox{position:fixed;inset:0;background:rgba(17,24,39,.85);display:none;align-items:center;justify-content:center;padding:24px;z-index:100}
+    .lightbox.open{display:flex}
+    .lb-figure{position:relative;margin:0;max-width:min(96vw,1200px);max-height:90vh;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);background:#000;display:flex;flex-direction:column}
+    .lb-figure img{display:block;max-width:100%;max-height:72vh;margin:0 auto}
+    .lb-cap{position:static;background:#fff;color:#111827;padding:14px 16px;font-size:14px;line-height:1.5;border-top:1px solid #e5e7eb}
+    .lb-title{font-weight:800;font-size:16px}
+    .lb-desc{color:#6b7280;font-size:14px;margin-top:4px}
+    .lb-btn{position:absolute;top:50%;transform:translateY(-50%);border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);backdrop-filter:blur(6px);color:#fff;padding:10px 12px;border-radius:12px;cursor:pointer}
+    .lb-prev{left:10px}
+    .lb-next{right:10px}
+    .lb-close{top:10px;right:10px;transform:none;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.4);padding:10px 12px;border-radius:12px}
+    @media (max-width:720px){ .wrap{padding:18px} .lb-figure img{max-height:64vh} }
+
+    /* Toast */
+    #toast{position:fixed;inset:auto 16px 16px auto;background:#111;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s ease}
+    /* RULES box */
+    .rules-box, .awards-box, .prize-box{background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #cbd5e1;border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-top:10px}
+    .rule-list, .award-list, .prize-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .rule-list li, .award-list li, .prize-list li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+    .rule-list .ico, .award-list .ico, .prize-list .ico{width:18px;height:18px;line-height:18px;border-radius:50%;background:#6b7280;color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;margin-top:2px}
+    @media (max-width:720px){.rules-box, .awards-box, .prize-box{padding:14px 14px}}
+    /* prize icon override (no grey circle, larger emoji) */
+    #prize .ico{background:transparent;color:inherit;width:auto;height:auto;line-height:1;font-size:24px;border-radius:0}
+    #prize .prize-list li{grid-template-columns:auto 1fr}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="brand" href="#vote" aria-label="누에 대회 홈"><strong>🐛 누에 그림 대회</strong></a>
+      <nav class="nav-actions" aria-label="주요 링크">
+        <a class="btn" href="#vote">투표</a>
+        <a class="btn" href="#rules">규칙</a>
+        <a class="btn" href="#awards">시상</a>
+        <a class="btn" href="#prize">경품</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- RULES -->
+  <section id="rules" class="wrap">
+    <div class="rules-box" role="region" aria-labelledby="rules-title">
+      <h2 id="rules-title" style="margin:0 0 8px;font-size:20px">귀여운 누에 그림그리기 대회</h2>
+      <p class="intro" style="margin:6px 0 10px;color:#374151;font-size:14px">누에의 매력을 담은 귀여운 그림을 함께 즐기는 작은 전시·투표 행사이다. 작품을 감상하고 마음에 드는 최대 세 작품을 골라 응원한다.</p>
+      <ul class="rule-list">
+        <li>
+          <span class="ico" aria-hidden="true">✔</span>
+          <div><b>투표</b>: 1인 1회, <b>최대 3작품</b> 선택(동일 작품 중복 불가)</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- AWARDS -->
+  <section id="awards" class="wrap">
+    <div class="awards-box" role="region" aria-labelledby="awards-title">
+      <h2 id="awards-title" style="margin:0 0 8px;font-size:20px">시상</h2>
+      <ul class="award-list">
+        <li>
+          <span class="ico" aria-hidden="true">1</span>
+          <div><b>1등</b>: 1등상 이미지 아크릴 키링 + 치킨 쿠폰</div>
+        </li>
+        <li>
+          <span class="ico" aria-hidden="true">2</span>
+          <div><b>2등</b>: 누누누 스티커 + 배민 쿠폰</div>
+        </li>
+        <li>
+          <span class="ico" aria-hidden="true">3</span>
+          <div><b>3등</b>: 스타벅스 쿠폰</div>
+        </li>
+      </ul>
+      <div class="hint" style="margin-top:8px;color:#4b5563;font-size:13px">동점 처리: ① 심사위원(3인) 합산(창의성·주제 적합성·완성도 각 1–5점) → ② 설명문 품질 +1점(필요 시) → ③ 공동수상.</div>
+    </div>
+  </section>
+
+  <!-- PRIZE -->
+  <section id="prize" class="wrap">
+    <div class="prize-box" role="region" aria-labelledby="prize-title">
+      <h2 id="prize-title" style="margin:0 0 8px;font-size:20px">투표자 경품</h2>
+      <ul class="prize-list">
+        <li>
+          <span class="ico" aria-hidden="true">🎁</span>
+          <div>투표자 중 <b>추첨 5명</b>을 선정하여 <b>1등상 이미지 아크릴 키링</b>을 드린다. 추첨은 결과 발표일에 무작위로 진행하며, 당첨자에게 개별 연락한다.</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- VOTE -->
+  <main class="wrap" id="vote">
+    <section class="card" aria-labelledby="form-title">
+      <h2 id="form-title" class="section-title">투표자 정보</h2>
+      <form id="voteForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="voterName">이름</label>
+            <input id="voterName" name="name" type="text" autocomplete="name" required placeholder="홍길동" />
+          </div>
+          <div class="field">
+            <label for="voterPhone">전화번호</label>
+            <input id="voterPhone" name="phone" type="tel" inputmode="numeric" pattern="[0-9+ -]{9,16}" required placeholder="010-1234-5678" />
+          </div>
+        </div>
+        <p class="hint">입력 정보는 중복 투표 방지와 결과 안내에만 사용한다.</p>
+
+        <div style="height:14px"></div>
+        <h2 class="section-title" style="margin-top:0">작품 선택 (최대 3개)</h2>
+        <div id="gallery" class="grid" aria-live="polite" aria-busy="false"></div>
+
+        <div class="toolbar">
+          <div class="count" id="countLabel">0 / 3 선택</div>
+          <button class="btn submit" id="submitBtn" type="submit" disabled>투표 제출</button>
+        </div>
+
+        <p id="message" class="notice" role="status" aria-live="polite"></p>
+      </form>
+      <footer>개인정보 처리 고지: 수집 항목은 이름, 전화번호, 선택 작품 번호이다. 목적은 중복 투표 방지와 수상 안내이다. 행사 종료 후 30일 내 파기한다.</footer>
+    </section>
+  </main>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="lb-close" id="lbClose" aria-label="닫기">✕</button>
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="이전">‹</button>
+    <figure class="lb-figure" aria-labelledby="lbCaption">
+      <img id="lbImg" alt="전시 작품 확대 보기" />
+      <figcaption id="lbCaption" class="lb-cap"></figcaption>
+    </figure>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="다음">›</button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* 0) 설정 */
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXushAStBXnqjXmGYmnl2ogr1TkWV7-kGEhoijDLsb6Vm5LSSUjN9eTok3zBq7EqhV8w/exec"; // 배포 URL 입력
+    const MAX_SELECTION = 3;
+    const RANDOMIZE_ORDER = false;
+
+    // 전시 작품 목록(예시)
+    const GALLERY = [
+      { id: "SM25-001", title: "작품 제목 1", desc: "봄 소풍 간 누에.", image: "images/SM25-001.jpg" },
+      { id: "SM25-002", title: "작품 제목 2", desc: "고치를 지키는 친구.", image: "images/SM25-002.jpg" },
+      { id: "SM25-003", title: "작품 제목 3", desc: "단풍과 누에.",   image: "images/SM25-003.jpg" },
+      { id: "SM25-004", title: "작품 제목 4", desc: "비 오는 날 산책.", image: "images/SM25-004.jpg" }
+    ];
+
+    /* 1) 유틸 */
+    const $ = (sel, el=document) => el.querySelector(sel);
+    const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+    function toast(msg, ms=2200){ const t = $("#toast"); t.textContent = msg; t.style.opacity = 1; t.style.transform = "translateY(0)"; clearTimeout(window.__toastTimer); window.__toastTimer = setTimeout(()=>{t.style.opacity=0; t.style.transform="translateY(8px)"}, ms); }
+    function normalizePhone(s){ return (s||"").replace(/[^0-9]/g,""); }
+    function validPhoneDigits(d){ return d.length >= 9 && d.length <= 16; }
+    function phoneKey(d){ return `silkworm_vote_${d}`; }
+
+    /* 2) 갤러리 + 제한 */
+    let currentIndex = -1;
+    function renderGallery(){
+      const list = RANDOMIZE_ORDER ? shuffle([...GALLERY]) : [...GALLERY];
+      const grid = $("#gallery");
+      grid.setAttribute('aria-busy','true');
+      grid.innerHTML = '';
+      list.forEach((art)=>{
+        const realIdx = GALLERY.findIndex(a => a.id === art.id);
+        const card = document.createElement('article');
+        card.className = 'art';
+        card.innerHTML = `
+          <div class="thumb" data-index="${realIdx}" title="클릭하여 확대">
+            <img src="${art.image}" alt="${art.id} ${art.title}" loading="lazy" />
+            <span class="zoom-hint">확대</span>
+          </div>
+          <div class="info">
+            <div class="badge">${art.id}</div>
+            <div style="flex:1">
+              <p class="title">${art.title}</p>
+              <p class="muted desc">${art.desc || ""}</p>
+              <label class="checkbox"><input type="checkbox" class="choice" value="${art.id}" aria-label="${art.id} ${art.title} 선택" /> 이 작품 선택</label>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+      grid.setAttribute('aria-busy','false');
+      bindChoiceLimit();
+      $$(".thumb", grid).forEach(el=>{ el.addEventListener('click', (ev)=>{ ev.stopPropagation(); const idx = Number(el.getAttribute('data-index')) || 0; openLightbox(idx); }); });
+    }
+    function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+    function bindChoiceLimit(){
+      const boxes=$$('.choice');
+      function update(){
+        const checked = boxes.filter(b=>b.checked);
+        const cnt = checked.length;
+        $('#countLabel').textContent = `${cnt} / ${MAX_SELECTION} 선택`;
+        if (cnt >= MAX_SELECTION){ boxes.forEach(b=>{ if(!b.checked) b.disabled = true; }); } else { boxes.forEach(b=> b.disabled=false); }
+        const validForm = $('#voterName').value.trim().length>0 && validPhoneDigits(normalizePhone($('#voterPhone').value)) && cnt>0 && cnt<=MAX_SELECTION;
+        $('#submitBtn').disabled = !validForm;
+      }
+      boxes.forEach(b=> b.addEventListener('change', update));
+      $('#voterName').addEventListener('input', update);
+      $('#voterPhone').addEventListener('input', update);
+      update();
+    }
+
+    /* 3) 라이트박스 */
+    const lb = $('#lightbox'), lbImg = $('#lbImg'), lbCap = $('#lbCaption');
+    const lbPrev = $('#lbPrev'), lbNext = $('#lbNext'), lbClose = $('#lbClose');
+    let focusBackup = null;
+    function showLightboxAt(i){ if (i<0) i = GALLERY.length-1; if (i>=GALLERY.length) i = 0; currentIndex = i; const {id,title,image,desc} = GALLERY[currentIndex]; lbImg.src = image; lbImg.alt = `${id} ${title} 확대 이미지`; lbCap.innerHTML = ''; const t=document.createElement('div'); t.className='lb-title'; t.textContent = id + ' · ' + title; lbCap.appendChild(t); const d=document.createElement('div'); d.className='lb-desc'; d.textContent = desc || ''; lbCap.appendChild(d); preloadNeighbors(); }
+    function openLightbox(i){ focusBackup = document.activeElement; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.documentElement.style.overflow = 'hidden'; showLightboxAt(i); lbClose.focus(); }
+    function closeLightbox(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.documentElement.style.overflow = ''; if (focusBackup) focusBackup.focus(); }
+    function preloadNeighbors(){ const prev = new Image(); prev.src = GALLERY[(currentIndex-1+GALLERY.length)%GALLERY.length].image; const next = new Image(); next.src = GALLERY[(currentIndex+1)%GALLERY.length].image; }
+    lbPrev.addEventListener('click', ()=> showLightboxAt(currentIndex-1));
+    lbNext.addEventListener('click', ()=> showLightboxAt(currentIndex+1));
+    lbClose.addEventListener('click', closeLightbox);
+    lb.addEventListener('click', (e)=>{ if(e.target===lb) closeLightbox(); });
+    document.addEventListener('keydown', (e)=>{ if (!lb.classList.contains('open')) return; if (e.key==='Escape') closeLightbox(); if (e.key==='ArrowLeft') showLightboxAt(currentIndex-1); if (e.key==='ArrowRight') showLightboxAt(currentIndex+1); });
+    let sx=0, sy=0; lb.addEventListener('pointerdown', (e)=>{ sx=e.clientX; sy=e.clientY; }); lb.addEventListener('pointerup', (e)=>{ const dx=e.clientX-sx, dy=e.clientY-sy; if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) showLightboxAt(currentIndex+1); else showLightboxAt(currentIndex-1); } });
+
+    /* 4) 제출(JSONP) */
+    function submitVote(evt){
+      evt.preventDefault();
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')){ toast('제출 URL을 설정한다.'); return; }
+      const name = $('#voterName').value.trim();
+      const phoneDigits = normalizePhone($('#voterPhone').value);
+      if (!name){ toast('이름을 입력한다.'); return; }
+      if (!validPhoneDigits(phoneDigits)){ toast('전화번호를 숫자로 정확히 입력한다.'); return; }
+      if (localStorage.getItem(phoneKey(phoneDigits))){ toast('이미 제출한 전화번호이다.'); return; }
+      const choices = $$('.choice').filter(c=>c.checked).map(c=>c.value).slice(0,MAX_SELECTION);
+      if (choices.length < 1){ toast('최소 1개 작품을 선택한다.'); return; }
+
+      $('#submitBtn').disabled = true; $('#message').textContent = '제출을 처리한다…';
+
+      const cbName = `voteCallback_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
+      window[cbName] = function(resp){
+        try{ document.body.removeChild(scriptTag); }catch(e){}
+        delete window[cbName];
+        if (!resp || !resp.ok){
+          const code = resp && resp.code ? resp.code : 'ERROR';
+          if (code==='DUPLICATE'){ $('#message').innerHTML = '<span class="error">이미 제출한 전화번호이다. 1회만 제출 가능하다.</span>'; }
+          else if (code==='INVALID'){ $('#message').innerHTML = '<span class="error">입력 값이 유효하지 않다.</span>'; }
+          else { $('#message').innerHTML = '<span class="error">제출 중 오류가 발생했다.</span>'; }
+          $('#submitBtn').disabled = false; return;
+        }
+        localStorage.setItem(phoneKey(phoneDigits), '1');
+        $('#message').innerHTML = '<span class="success">투표가 접수되었다. 감사합니다.</span>';
+        $('#submitBtn').disabled = true; $('#voterName').disabled = true; $('#voterPhone').disabled = true; $$('.choice').forEach(c=> c.disabled = true);
+        toast('접수 완료');
+      };
+      const params = new URLSearchParams({ callback: cbName, name, phone: phoneDigits, choices: choices.join(','), ua: navigator.userAgent, ref: document.referrer || '' });
+      const scriptTag = document.createElement('script'); scriptTag.src = `${APPS_SCRIPT_URL}?${params.toString()}&ts=${Date.now()}`; scriptTag.defer = true; document.body.appendChild(scriptTag);
+    }
+
+    /* 5) 초기화 */
+    document.addEventListener('DOMContentLoaded', ()=>{ renderGallery(); $('#voteForm').addEventListener('submit', submitVote); });
+  </script>
+</body>
+</html>
