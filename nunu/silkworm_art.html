@@ -69,15 +69,32 @@
     /* Toast */
     #toast{position:fixed;inset:auto 16px 16px auto;background:#111;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s ease}
 
-    /* RULES/AWARDS/PRIZE boxes (spacing ↓ to 5px) */
-    .rules-box, .awards-box, .prize-box{background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #cbd5e1;border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-top:5px}
+    /* RULES/AWARDS/PRIZE boxes (spacing ↓ to 2px) */
+    .rules-box, .awards-box, .prize-box{background:#f8fafc;border:1px solid #e5e7eb;border-left:4px solid #cbd5e1;border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-top:2px}
     .rule-list, .award-list, .prize-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
     .rule-list li, .award-list li, .prize-list li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
     .rule-list .ico, .award-list .ico, .prize-list .ico{width:18px;height:18px;line-height:18px;border-radius:50%;background:#6b7280;color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;margin-top:2px}
     @media (max-width:720px){.rules-box, .awards-box, .prize-box{padding:14px 14px}}
-    /* prize icon override (no grey circle, larger emoji) */
+
+    /* prize icon override for gifts */
     #prize .ico{background:transparent;color:inherit;width:auto;height:auto;line-height:1;font-size:24px;border-radius:0}
     #prize .prize-list li{grid-template-columns:auto 1fr}
+
+    /* PICK BUTTON (left aligned with order number) */
+    .pick{margin-top:6px}
+    .pick-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border:1px solid #d1d5db; border-radius:10px;
+      background:#fff; font-weight:800; cursor:pointer; text-align:left;
+    }
+    .pick-btn .pick-order{
+      display:none; width:22px; height:22px; border-radius:50%;
+      background:#111827; color:#fff; font-size:12px;
+      align-items:center; justify-content:center;
+    }
+    .pick-btn[aria-pressed="true"]{ border-color:#111827; background:rgba(17,24,39,.06) }
+    .pick-btn[aria-pressed="true"] .pick-order{ display:inline-flex }
+    .pick-btn[disabled]{ opacity:.55; cursor:not-allowed }
   </style>
 </head>
 <body>
@@ -108,9 +125,9 @@
     <div class="awards-box" role="region" aria-labelledby="awards-title">
       <h2 id="awards-title" style="margin:0 0 8px;font-size:20px">시상</h2>
       <ul class="award-list">
-        <li><span class="ico" aria-hidden="true">1</span><div><b>1등</b>: 1등상 이미지 아크릴 키링 + 치킨 쿠폰</div></li>
-        <li><span class="ico" aria-hidden="true">2</span><div><b>2등</b>: 누누누 스티커 + 배민 쿠폰</div></li>
-        <li><span class="ico" aria-hidden="true">3</span><div><b>3등</b>: 스타벅스 쿠폰</div></li>
+        <li><span class="ico" aria-hidden="true">🥇</span><div><b>1등</b>: 1등상 이미지 아크릴 키링 + 치킨 쿠폰</div></li>
+        <li><span class="ico" aria-hidden="true">🥈</span><div><b>2등</b>: 누누누 스티커 + 배민 쿠폰</div></li>
+        <li><span class="ico" aria-hidden="true">🥉</span><div><b>3등</b>: 스타벅스 쿠폰</div></li>
       </ul>
       <div class="hint" style="margin-top:8px;color:#4b5563;font-size:13px">동점 처리: ① 심사위원(3인) 합산(창의성·주제 적합성·완성도 각 1–5점) → ② 설명문 품질 +1점(필요 시) → ③ 공동수상.</div>
     </div>
@@ -216,7 +233,7 @@
       return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
     }
 
-    /* 2) 갤러리 + 제한 */
+    /* 2) 갤러리 + 제한 (버튼 방식) */
     let currentIndex = -1;
     function renderGallery(){
       const list = RANDOMIZE_ORDER ? shuffle([...GALLERY]) : [...GALLERY];
@@ -237,7 +254,12 @@
             <div style="flex:1">
               <p class="title">${art.title}</p>
               <p class="muted desc">${art.desc || ""}</p>
-              <label class="checkbox"><input type="checkbox" class="choice" value="${art.id}" aria-label="${art.id} ${art.title} 선택" /> 이 작품 선택</label>
+              <div class="pick">
+                <button type="button" class="pick-btn" data-id="${art.id}" aria-pressed="false">
+                  <span class="pick-order" aria-hidden="true"></span>
+                  <span class="pick-text">이 작품 선택</span>
+                </button>
+              </div>
             </div>
           </div>`;
         grid.appendChild(card);
@@ -254,26 +276,46 @@
     function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 
     function bindChoiceLimit(){
-      const boxes = $$('.choice');
-      function update(){
-        const cnt = boxes.filter(b=>b.checked).length;
+      const btns = $$('.pick-btn');
+      window.selectedIds = window.selectedIds || [];
+      function updateUI(){
+        const cnt = selectedIds.length;
         $('#countLabel').textContent = `${cnt} / ${MAX_SELECTION} 선택`;
-        // 선택 최대치 도달 시 나머지 비활성화
-        boxes.forEach(b=>{ if(!b.checked) b.disabled = cnt >= MAX_SELECTION; });
+        btns.forEach(btn=>{
+          const id = btn.dataset.id;
+          const idx = selectedIds.indexOf(id);
+          const selected = idx !== -1;
+          btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+          const ord = btn.querySelector('.pick-order');
+          ord.textContent = selected ? String(idx+1) : '';
+          btn.disabled = !selected && cnt >= MAX_SELECTION;
+        });
         const validForm =
           $('#voterName').value.trim().length>0 &&
           validPhoneDigits(normalizePhone($('#voterPhone').value)) &&
           cnt>0 && cnt<=MAX_SELECTION;
         $('#submitBtn').disabled = !validForm;
       }
-      boxes.forEach(b=> b.addEventListener('change', update));
-      $('#voterName').addEventListener('input', update);
+      btns.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.dataset.id;
+          const idx = selectedIds.indexOf(id);
+          if (idx === -1){
+            if (selectedIds.length >= MAX_SELECTION){ toast(`최대 ${MAX_SELECTION}개까지 선택할 수 있다.`); return; }
+            selectedIds.push(id);
+          } else {
+            selectedIds.splice(idx,1);
+          }
+          updateUI();
+        });
+      });
+      $('#voterName').addEventListener('input', updateUI);
       $('#voterPhone').addEventListener('input', ()=>{
         const el=$('#voterPhone');
         el.value = formatKoreanPhone(el.value);
-        update();
+        updateUI();
       });
-      update();
+      updateUI();
     }
 
     /* 3) 라이트박스 */
@@ -300,7 +342,7 @@
       if (!validPhoneDigits(phoneDigits)){ toast('전화번호를 숫자로 정확히 입력한다.'); return; }
       if (localStorage.getItem(phoneKey(phoneDigits))){ toast('이미 제출한 전화번호이다.'); return; }
 
-      const choices = $$('.choice').filter(c=>c.checked).map(c=>c.value).slice(0,MAX_SELECTION);
+      const choices = (window.selectedIds || []).slice(0,MAX_SELECTION);
       if (choices.length < 1){ toast('최소 1개 작품을 선택한다.'); return; }
 
       $('#submitBtn').disabled = true; $('#message').textContent = '제출을 처리한다…';
@@ -319,7 +361,7 @@
         }
         localStorage.setItem(phoneKey(phoneDigits), '1');
         $('#message').innerHTML = '<span class="success">투표가 접수되었다. 감사합니다.</span>';
-        $('#submitBtn').disabled = true; $('#voterName').disabled = true; $('#voterPhone').disabled = true; $$('.choice').forEach(c=> c.disabled = true);
+        $('#submitBtn').disabled = true; $('#voterName').disabled = true; $('#voterPhone').disabled = true; $$('.pick-btn').forEach(b=> b.disabled = true);
         toast('접수 완료');
       };
       const params = new URLSearchParams({ callback: cbName, name, phone: phoneDigits, choices: choices.join(','), ua: navigator.userAgent, ref: document.referrer || '' });
