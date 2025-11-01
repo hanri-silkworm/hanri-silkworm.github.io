@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>누에 그림 대회 — 작품 제출</title>
+  <meta name="description" content="누에 그림 그리기 대회 작품 제출 페이지" />
+  <style>
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#111827; --sub:#6b7280;
+      --pri:#4b5563; --pri-2:#374151; --muted:#e5e7eb; --ring:rgba(107,114,128,.25);
+      --radius:16px; --shadow:0 10px 30px rgba(17,24,39,.08); --wrap:1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+      font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif}
+    .wrap{max-width:var(--wrap);margin:0 auto;padding:24px}
+    header.nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(8px);
+      background:rgba(247,246,243,.8);border-bottom:1px solid var(--muted);z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 18px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+    .brand strong{font-weight:800;letter-spacing:.2px}
+
+    main .card{background:var(--paper);border:1px solid var(--muted);
+      border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .section-title{margin:0 0 10px;font-size:20px}
+    .row{display:grid;grid-template-columns:1fr;gap:10px}
+    @media (min-width:700px){.row{grid-template-columns:1fr 1fr}}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:14px;font-weight:800}
+    .field input,.field textarea{
+      border:1px solid #d1d5db;border-radius:12px;padding:12px;font-size:15px}
+    .field textarea{min-height:110px;resize:vertical}
+    .hint{color:var(--sub);font-size:13px;margin:6px 0 0}
+    .toolbar{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .btn.submit{border:0;border-radius:12px;font-weight:800;padding:12px 16px;cursor:pointer;background:#111827;color:#fff;font-size:15px}
+    .btn.submit[disabled]{opacity:.5;cursor:not-allowed}
+    .notice{font-size:14px;margin:8px 0 0}
+    .success{color:#065f46}.error{color:#b91c1c}
+
+    /* 파일 미리보기 */
+    .preview{margin-top:8px;border:1px dashed #d1d5db;border-radius:12px;padding:10px;background:#fafafa}
+    .preview small{color:#6b7280}
+    .thumb{margin-top:8px;max-height:260px;overflow:hidden;border-radius:10px}
+    .thumb img{width:100%;height:auto;object-fit:contain}
+
+    /* Toast */
+    #toast{position:fixed;inset:auto 16px 16px auto;background:#111;color:#fff;
+      padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s ease}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner wrap">
+      <a class="brand" href="#" aria-label="누에 대회 홈"><strong>🐛 누에 그림 대회</strong></a>
+    </div>
+  </header>
+
+  이" />
+          </div>
+          <div class="field">
+            <label for="artistContact">연락 수단(이메일 또는 전화번호)</label>
+            <input id="artistContact" name="contact" type="text" required placeholder="예: hanri@example.com 또는 010-1234-5678" />
+            <p class="hint">이메일 또는 전화번호 중 하나만 적어도 된다.</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="artTitle">작품 제목</label>
+            <input id="artTitle" name="title" type="text" required placeholder="예: 단풍 속의 누에" />
+          </div>
+          <div class="field">
+            <label for="artFile">작품 첨부</label>
+            <input id="artFile" name="files" type="file" accept="image/*" required />
+            <div id="filePreview" class="preview" hidden>
+              <div><b id="fileName"></b> <small id="fileMeta"></small></div>
+              <div class="thumb"><img id="fileImg" alt="첨부 그림 미리보기" /></div>
+              <small>최대 10MB, 이미지 1개.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="artDesc">작품 설명(선택)</label>
+          <textarea id="artDesc" name="desc" maxlength="500" placeholder="작품 의도·설명(최대 500자)"></textarea>
+        </div>
+
+        <div class="toolbar">
+          <div class="hint">개인정보 처리: 수집 항목은 이름/연락처/작품 제목/설명/이미지이며, 심사·연락 목적으로만 사용하고 행사 종료 후 30일 내 파기한다.</div>
+          <button class="btn submit" id="submitBtn" type="submit">보내기</button>
+        </div>
+
+        <p id="message" class="notice" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* 0) 설정 */
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLqPcobeZs4B208tJhQ0JSIQilnXGQ4o7bwMu8Vd2QmF7-7Zk9eb0fA3DNcb5M-raf/exec";
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB (Apps Script + 이메일 첨부 한도 고려)
+
+    /* 유틸 */
+    const $ = (s,el=document)=>el.querySelector(s);
+    function toast(msg, ms=2200){ const t=$("#toast"); t.textContent=msg; t.style.opacity=1; t.style.transform="translateY(0)"; clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>{t.style.opacity=0; t.style.transform="translateY(8px)"}, ms); }
+    function isEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+    function isPhone(s){ return /[0-9]{7,}/.test(String(s).replace(/\D/g,'')); }
+
+    /* 파일 미리보기 */
+    const fileInput = $("#artFile");
+    fileInput.addEventListener("change", ()=>{
+      const f = fileInput.files && fileInput.files[0];
+      if (!f){ $("#filePreview").hidden = true; return; }
+      if (f.size > MAX_SIZE){ fileInput.value=""; $("#filePreview").hidden=true; toast("파일 크기는 최대 10MB이다."); return; }
+      $("#fileName").textContent = f.name;
+      $("#fileMeta").textContent = `(${f.type || "image/*"}, ${(f.size/1024/1024).toFixed(2)}MB)`;
+      const img = $("#fileImg");
+      img.src = URL.createObjectURL(f);
+      img.onload = ()=> URL.revokeObjectURL(img.src);
+      $("#filePreview").hidden = false;
+    });
+
+    /* 파일 → base64 JSON용 */
+    function fileToBase64(file){
+      return new Promise((resolve,reject)=>{
+        const reader = new FileReader();
+        reader.onload = ()=> {
+          const dataUrl = reader.result; // data:*/*;base64,AAAA
+          const base64 = String(dataUrl).split(",")[1] || "";
+          resolve({ name:file.name, mimeType:file.type || "application/octet-stream", size:file.size, data:base64 });
+        };
+        reader.onerror = ()=> reject(new Error("파일을 읽을 수 없다."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    /* 제출 */
+    $("#submitForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const name = $("#artistName").value.trim();
+      const contact = $("#artistContact").value.trim();
+      const title = $("#artTitle").value.trim();
+      const desc  = $("#artDesc").value.trim();
+      const f = fileInput.files && fileInput.files[0];
+
+      if (!name){ toast("이름/닉네임을 입력한다."); return; }
+      if (!contact || !(isEmail(contact) || isPhone(contact))){ toast("이메일 또는 전화번호를 정확히 입력한다."); return; }
+      if (!title){ toast("작품 제목을 입력한다."); return; }
+      if (!f){ toast("작품 이미지를 첨부한다."); return; }
+      if (f.size > MAX_SIZE){ toast("파일 크기는 최대 10MB이다."); return; }
+
+      $("#submitBtn").disabled = true;
+      $("#message").textContent = "전송을 처리한다…";
+
+      try{
+        const fileObj = await fileToBase64(f);
+        const payload = { name, contact, title, desc, files:[fileObj], ua:navigator.userAgent, ref:document.referrer||"" };
+
+        // CORS 제약 회피: 응답을 읽지 않아도 되므로 x-www-form-urlencoded + no-cors
+        const body = new URLSearchParams({ payload: JSON.stringify(payload) });
+
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body
+        });
+
+        $("#message").innerHTML = '<span class="success">제출이 접수되었다. 감사합니다.</span>';
+        toast("접수 완료");
+        $("#submitForm").reset();
+        $("#filePreview").hidden = true;
+      } catch(err){
+        console.error(err);
+        $("#message").innerHTML = '<span class="error">전송 중 문제가 발생했다. 잠시 후 다시 시도한다.</span>';
+        toast("전송 실패");
+      } finally{
+        $("#submitBtn").disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
